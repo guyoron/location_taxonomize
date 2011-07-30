@@ -1,0 +1,84 @@
+<?php
+
+/*
+ * @file
+ * Installer
+ */
+
+define('LOCATION_TAXONOMIZE_MODULE_NAME', 'location_taxonomize');
+define('LOCATION_TAXONOMIZE_VOCAB_NAME', 'location_taxonomize');
+
+
+/**
+ * Implementation of hook_install()
+ */
+function location_taxonomize_install() {
+  // check if there is already a Location vocab
+  $location_taxonomize_vid = variable_get('location_taxonomize_vid');
+  if (!isset($location_taxonomize_vid)) {
+    // create the location vocabulary
+    taxonomy_vocabulary_save((object) array(
+      'name' => 'Location',
+      'machine_name' => 'location_taxonomize',
+      'description' => 'This vocabulary is synchronized with Location data automatically by the ' . LOCATION_TAXONOMIZE_MODULE_NAME . ' module',
+      ));
+    // save the vid of the newly created vocabulary
+    $vocab = taxonomy_vocabulary_machine_name_load(LOCATION_TAXONOMIZE_VOCAB_NAME);
+    $vid = $vocab->vid;
+    variable_set('location_taxonomize_vid', $vid);
+    $msg = 'Successfully created the Location taxonomy (vid ' . $vid . ')';
+    drupal_set_message($msg);
+  } 
+  else {
+    $msg = 'Using the already-existing vocabulary vid '. $location_taxonomize_vid;
+    drupal_set_message($msg);
+  }
+  
+}
+
+function location_taxonomize_enable() {
+  // Create the 'taxonomy_forums' field if it doesn't already exist.
+  if (!field_info_field('location_taxonomize_longname')) {
+    $field = array(
+      'field_name' => 'location_taxonomize_longname', 
+      'type' => 'text', 
+    );
+    field_create_field($field);
+  }
+  if (!field_info_instance('taxonomy_term','location_taxonomize_longname','location_taxonomize')) {
+    // Create the instance on the bundle.
+    $instance = array(
+      'field_name' => 'location_taxonomize_longname',
+      'label' => 'Long Name', 
+      'entity_type' => 'taxonomy_term', 
+      'bundle' => 'location_taxonomize',
+    );
+    field_create_instance($instance);
+  }
+}
+
+/**
+* Implementation of hook_requirements()
+*/
+function location_taxonomize_requirements($phase) {
+  $requirements = array();
+  switch($phase) {
+    case 'install':
+      
+      // check to see if there is already a location_taxonomize vocab
+      $vocab = taxonomy_vocabulary_machine_name_load(LOCATION_TAXONOMIZE_VOCAB_NAME);
+      if ($vocab) {
+        $requirements['vocab'] = array(
+          'title'         => 'Vocabulary name taken.',
+          'description'    => 'A vocabulary already exists with the name \'location_taxonomize\'. This vocabulary will be used as the Location vocabulary.',
+          'severity'        => REQUIREMENT_WARNING
+        );
+        // if it's there, make sure it is associated with location_taxonomize 
+        $vid = $vocab->vid;
+        variable_set('location_taxonomize_vid', $vid);
+      }
+    break;
+  }
+  return $requirements;
+}
+

@@ -1,0 +1,9 @@
+name = Location taxonomize
+description = Creates and maintains a Location taxonomy, synchronized with data from the Location module.
+core = 7.x
+
+dependencies[] = taxonomy
+dependencies[] = location (>3.x)
+
+package = "Location"
+
