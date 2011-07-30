@@ -5,9 +5,9 @@
  * Installer
  */
 
-define('LOCATION_TAXONOMIZE_MODULE_NAME', 'location_taxonomize');
+define('LOCATION_TAXONOMIZE_MODULE_ID', 'location_taxonomize');
+define('LOCATION_TAXONOMIZE_MODULE_NAME', 'Location taxonomize')
 define('LOCATION_TAXONOMIZE_VOCAB_NAME', 'location_taxonomize');
-
 
 /**
  * Implementation of hook_install()
@@ -20,7 +20,7 @@ function location_taxonomize_install() {
     taxonomy_vocabulary_save((object) array(
       'name' => 'Location',
       'machine_name' => 'location_taxonomize',
-      'description' => 'This vocabulary is synchronized with Location data automatically by the ' . LOCATION_TAXONOMIZE_MODULE_NAME . ' module',
+      'description' => 'This vocabulary is synchronized with Location data automatically by the ' . LOCATION_TAXONOMIZE_MODULE_ID . ' module',
       ));
     // save the vid of the newly created vocabulary
     $vocab = taxonomy_vocabulary_machine_name_load(LOCATION_TAXONOMIZE_VOCAB_NAME);
@@ -82,3 +82,16 @@ function location_taxonomize_requirements($phase) {
   return $requirements;
 }
 
+/**
+ * Sets all the variables to their default values
+ */
+function _location_taxonomize_set_defaults() {
+  
+}
+
+/**
+ * Returns an array of default variable values
+ */
+function _location_taxonomize_defaults() {
+  
+}
