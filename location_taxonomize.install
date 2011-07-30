@@ -77,17 +77,3 @@ function location_taxonomize_requirements($phase) {
   }*/
   return $requirements;
 }
-
-/**
- * Sets all the variables to their default values
- */
-function _location_taxonomize_set_defaults() {
-  
-}
-
-/**
- * Returns an array of default variable values
- */
-function _location_taxonomize_defaults() {
-  
-}

@@ -34,7 +34,7 @@ function location_taxonomize_locationapi(&$obj, $op, $a3 = NULL, $a4 = NULL, $a5
             'vid' => $vid,
           );
           if (variable_get('location_taxonomize_save_longname')) {
-            _add_longname(&$term, $hlevel, $location);
+            _location_taxonomy_add_longname(&$term, $hlevel, $location);
           }
           if ($hlevel == 0) {
             $term->parent = array(0, );
@@ -55,7 +55,7 @@ function location_taxonomize_locationapi(&$obj, $op, $a3 = NULL, $a4 = NULL, $a5
  * Adds a longname field to a term
  *
  */
-function _add_longname(&$term, $hlevel, $location) {
+function _location_taxonomy_add_longname(&$term, $hlevel, $location) {
   $opts = variable_get('location_taxonomize_longname');
   $fields = $opts['fields'];
   $longname = array();
@@ -163,7 +163,56 @@ function location_taxonomize_menu() {
   return $items;
 }
 
-function location_taxonomize_initialize() {
+/**
+ * 
+ */
+function location_taxonomize_form_validate($form, $form_state) {
+  $values = $form_state['values'];
+  //  if we're initializing, make sure that there are no interfering vocabs
+  $values_init = $values['location_taxonomize_init'];
+  if ($values_init) {
+    $vid = variable_get('location_taxonomize_vid');
+    if ($vid) form_set_error('','There seems to already be a Vocabulary
+                            associated with Location Taxonomize.');
+    $vocab = taxonomy_vocabulary_machine_name_load(LOCATION_TAXONOMIZE_VOCAB_NAME);
+    if ($values_init['method'] == 'new' && $vocab) {
+      form_set_error('','Could not create new Location Taxonomy vocabulary. A vocabulary with the name
+                    \'' . LOCATION_TAXONOMIZE_VOCAB_NAME . '\' already exists.');
+    }
+  }
+  
+}
+
+/**
+ * Called from the configuration form. Handles initialization of Location Taxonomy
+ */
+function location_taxonomize_initialize($form, $form_state) {
+  dpm ($form);
+  dpm($form_state);
+  $method = $form['location_taxonomize_init']['method']['#value'];
+  switch ($method) {
+    case 'new':
+      /*
+      if (!isset($location_taxonomize_vid)) {
+        // create the location vocabulary
+        taxonomy_vocabulary_save((object) array(
+          'name' => 'Location',
+          'machine_name' => 'location_taxonomize',
+          'description' => 'This vocabulary is synchronized with Location data automatically by the ' . LOCATION_TAXONOMIZE_MODULE_ID . ' module',
+          ));
+        // save the vid of the newly created vocabulary
+        $vocab = taxonomy_vocabulary_machine_name_load(LOCATION_TAXONOMIZE_VOCAB_NAME);
+        $vid = $vocab->vid;
+        variable_set('location_taxonomize_vid', $vid);
+        $msg = 'Successfully created the Location taxonomy (vid ' . $vid . ')';
+        drupal_set_message($msg);
+      }
+    drupal_set_message('Created new Location Vocabulary (vid ' . . ')');
+    break;
+    case 'existing':
+    */
+    break;
+  }
   drupal_set_message('The Location Taxonomy was successfully initialized');
 }
 /**

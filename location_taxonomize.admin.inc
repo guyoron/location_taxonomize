@@ -10,7 +10,35 @@
 * in location_taxonomize_menu().
 */
 function location_taxonomize_form($form, &$form_state) {
+  $form['location_taxonomize_default'] = array(
+    '#type' => 'button',
+    '#value' => t('Set variables to defaults'),
+    '#ajax' => array(
+                'callback' => '_location_taxonomize_set_defaults',
+                'wrapper' => 'msg--div',
+                'method' => 'replace',
+                'effect' => 'fade',
+                'event' => 'mousedown',
+                ),
+  );
+  $form['location_taxonomize_var_del'] = array(
+    '#type' => 'button',
+    '#value' => t('Delete all variables'),
+    '#ajax' => array(
+                'callback' => '_location_taxonomize_del_variables',
+                'wrapper' => 'msg--div',
+                'method' => 'replace',
+                'effect' => 'fade',
+                'event' => 'mousedown',
+                ),
+  );
+  // placeholder div for ajax message
+  $form['msg--div'] = array(
+    '#type' => 'container',
+    '#id'=> 'msg--div',
+  );
   // initialization
+  $opts_init = variable_get('location_taxonomize_init');
   $vid = variable_get('location_taxonomize_vid');
   if (!$vid) {
     $form['location_taxonomize_init'] = array(
@@ -31,6 +59,7 @@ function location_taxonomize_form($form, &$form_state) {
           'new' => t('Create a new Vocabulary to associate with Location Taxonomize'),
           'existing' => t('Use the existing vocabulary vid ' . $possible_vid),
         ),
+        '#default_value' => $opts_init['method'],
         '#description' => t('If you use the existing vocabulary, all your terms will be maintained, and Location 
                             Taxonomize will start adding terms on top of the existing ones. Note that your
                             vocabulary must match the hierarchy structure you choose below, or there 
@@ -43,6 +72,7 @@ function location_taxonomize_form($form, &$form_state) {
         '#options' => array(
           'new' => t('Create a new Vocabulary to associate with Location Taxonomize'),
         ),
+        '#default_value' => 'new',
         '#description' => t('If you want to use an existing Vocabulary, you must change that 
                             Vocabulary\'s machine name to \'' . LOCATION_TAXONOMIZE_VOCAB_NAME . '\'.
                              It will then be available here as an option.'),
@@ -52,8 +82,10 @@ function location_taxonomize_form($form, &$form_state) {
     $form['location_taxonomize_init']['fields'] = array(
       '#type' => 'checkboxes',
       '#title' => t('Location Taxonomy Hierachy'),
-      '#description' => t('Choose which Location fields to save as terms in the Location Taxonomy'),
+      '#description' => t('Choose which Location fields to save as terms in the Location Taxonomy. For now, their 
+                          relative hierarchy cannot be changed.'),
       '#options' => _get_location_fields(),
+      '#default_value' => $opts_init['fields'],
     );
     $form = system_settings_form($form);
     $form['actions']['submit']['#value'] = t('Initialize Location Taxonomy');
