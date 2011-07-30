@@ -194,33 +194,30 @@ function location_taxonomize_form_validate($form, $form_state) {
  * Called from the configuration form. Handles initialization of Location Taxonomy
  */
 function location_taxonomize_initialize($form, $form_state) {
-  dpm ($form);
-  dpm($form_state);
-  $method = $form['location_taxonomize_init']['method']['#value'];
+  $values_init = $form_state['values']['location_taxonomize_init'];
+  $method = $values_init['method'];
   switch ($method) {
     case 'new':
-      /*
-      if (!isset($location_taxonomize_vid)) {
-        // create the location vocabulary
-        taxonomy_vocabulary_save((object) array(
-          'name' => 'Location',
-          'machine_name' => 'location_taxonomize',
-          'description' => 'This vocabulary is synchronized with Location data automatically by the ' . LOCATION_TAXONOMIZE_MODULE_ID . ' module',
-          ));
-        // save the vid of the newly created vocabulary
-        $vocab = taxonomy_vocabulary_machine_name_load(LOCATION_TAXONOMIZE_VOCAB_NAME);
-        $vid = $vocab->vid;
-        variable_set('location_taxonomize_vid', $vid);
-        $msg = 'Successfully created the Location taxonomy (vid ' . $vid . ')';
-        drupal_set_message($msg);
-      }
-    drupal_set_message('Created new Location Vocabulary (vid ' . . ')');
+      // create a new location vocabulary
+      taxonomy_vocabulary_save((object) array(
+        'name' => 'Location',
+        'machine_name' => LOCATION_TAXONOMIZE_VOCAB_NAME,
+        'description' => 'This vocabulary is synchronized with Location data
+                          automatically by the ' . LOCATION_TAXONOMIZE_MODULE_NAME . ' module',
+        ));
+      // save the vid of the newly created vocabulary
+      $vocab = taxonomy_vocabulary_machine_name_load(LOCATION_TAXONOMIZE_VOCAB_NAME);
+      $vid = $vocab->vid;
+      variable_set('location_taxonomize_vid', $vid);
+      $msg = 'Successfully created the Location taxonomy (vid ' . $vid . ')';
     break;
     case 'existing':
-    */
+      $vid = $values_init['possible_vid'];
+      variable_set('location_taxonomize_vid', $vid);
+      $msg = 'Successfully connected to the existing Location Vocabulary (vid ' . $vid . ')';
     break;
   }
-  drupal_set_message('The Location Taxonomy was successfully initialized');
+  drupal_set_message($msg);
 }
 /**
 * Callback function for location_taxonomize_form
