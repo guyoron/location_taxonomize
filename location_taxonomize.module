@@ -169,7 +169,7 @@ function location_taxonomize_menu() {
 function location_taxonomize_form_validate($form, $form_state) {
   $values = $form_state['values'];
   //  if we're initializing, make sure that there are no interfering vocabs
-  $values_init = $values['location_taxonomize_init'];
+  $values_init = $values['location_taxonomize_init']; 
   if ($values_init) {
     $vid = variable_get('location_taxonomize_vid');
     if ($vid) form_set_error('','There seems to already be a Vocabulary
@@ -178,6 +178,13 @@ function location_taxonomize_form_validate($form, $form_state) {
     if ($values_init['method'] == 'new' && $vocab) {
       form_set_error('','Could not create new Location Taxonomy vocabulary. A vocabulary with the name
                     \'' . LOCATION_TAXONOMIZE_VOCAB_NAME . '\' already exists.');
+    }
+    if ($values_init['method'] == 'existing') {
+      if (!$vocab) form_set_error('', 'Could not use the existing vocabulary. There is no existing vocabulary with the name 
+                                  \'' . LOCATION_TAXONOMIZE_VOCAB_NAME . '\'');
+      else if ($vocab->vid != $values_init['possible_vid']) {
+        form_set_error('', 'Could not use the existing vocabulary (vid ' . $values_init['possible_vid'] . '). Wrong vid.');
+      }
     }
   }
   

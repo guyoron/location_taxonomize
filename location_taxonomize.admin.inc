@@ -52,6 +52,10 @@ function location_taxonomize_form($form, &$form_state) {
     $vocab = taxonomy_vocabulary_machine_name_load(LOCATION_TAXONOMIZE_VOCAB_NAME);
     if ($vocab) {
       $possible_vid = $vocab->vid;
+      $form['location_taxonomize_init']['possible_vid'] = array(
+        '#type' => 'hidden',
+        '#value' => $possible_vid,
+      );
       $form['location_taxonomize_init']['method'] = array(
         '#type' => 'radios',
         '#title' => t('Choose an initialization method'),
