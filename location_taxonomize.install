@@ -5,15 +5,11 @@
  * Installer
  */
 
-define('LOCATION_TAXONOMIZE_MODULE_ID', 'location_taxonomize');
-define('LOCATION_TAXONOMIZE_MODULE_NAME', 'Location taxonomize')
-define('LOCATION_TAXONOMIZE_VOCAB_NAME', 'location_taxonomize');
-
 /**
  * Implementation of hook_install()
  */
 function location_taxonomize_install() {
-  // check if there is already a Location vocab
+  /*
   $location_taxonomize_vid = variable_get('location_taxonomize_vid');
   if (!isset($location_taxonomize_vid)) {
     // create the location vocabulary
@@ -32,13 +28,13 @@ function location_taxonomize_install() {
   else {
     $msg = 'Using the already-existing vocabulary vid '. $location_taxonomize_vid;
     drupal_set_message($msg);
-  }
+  }*/
   
 }
 
 function location_taxonomize_enable() {
-  // Create the 'taxonomy_forums' field if it doesn't already exist.
-  if (!field_info_field('location_taxonomize_longname')) {
+  // Create the 'taxonomy_longname' field if it doesn't already exist.
+  /*if (!field_info_field('location_taxonomize_longname')) {
     $field = array(
       'field_name' => 'location_taxonomize_longname', 
       'type' => 'text', 
@@ -54,7 +50,7 @@ function location_taxonomize_enable() {
       'bundle' => 'location_taxonomize',
     );
     field_create_instance($instance);
-  }
+  }*/
 }
 
 /**
@@ -62,7 +58,7 @@ function location_taxonomize_enable() {
 */
 function location_taxonomize_requirements($phase) {
   $requirements = array();
-  switch($phase) {
+  /*switch($phase) {
     case 'install':
       
       // check to see if there is already a location_taxonomize vocab
@@ -78,7 +74,7 @@ function location_taxonomize_requirements($phase) {
         variable_set('location_taxonomize_vid', $vid);
       }
     break;
-  }
+  }*/
   return $requirements;
 }
 

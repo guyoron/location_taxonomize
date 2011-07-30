@@ -6,6 +6,9 @@
 * which is synchronized with Data from the Location module
 */
 
+define('LOCATION_TAXONOMIZE_MODULE_ID', 'location_taxonomize');
+define('LOCATION_TAXONOMIZE_MODULE_NAME', 'Location taxonomize');
+define('LOCATION_TAXONOMIZE_VOCAB_NAME', 'location_taxonomize');
 
 /**
  * Implements hook_locationapi().
@@ -166,6 +169,47 @@ function location_taxonomize_menu() {
 * in location_taxonomize_menu().
 */
 function location_taxonomize_form($form, &$form_state) {
+  // initialization
+  $vid = variable_get('location_taxonomize_vid');
+  if (!$vid) {
+    $form['location_taxonomize_init'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Initialization'),
+      '#collapsible' => TRUE,
+      '#collapsed' => FALSE,
+      '#tree' => TRUE,
+    );
+    // check if there is already a Location vocab
+    $vocab = taxonomy_vocabulary_machine_name_load(LOCATION_TAXONOMIZE_VOCAB_NAME);
+    if ($vocab) {
+      $possible_vid = $vocab->vid;
+      $form['location_taxonomize_init']['method'] = array(
+        '#type' => 'radios',
+        '#title' => t('Choose an initialization method'),
+        '#options' => array(
+          'new' => t('Create a new Vocabulary to associate with Location Taxonomize'),
+          'existing' => t('Use the existing vocabulary vid ' . $possible_vid),
+        ),
+        '#description' => t('If you use the existing vocabulary, all your terms will be maintained, and Location 
+                            Taxonomize will start adding terms on top of the existing ones. Note that your
+                            vocabulary must match the hierarchy structure used by Location Taxonomize, or there 
+                            will be unexpected behavior.')
+      );
+    } else {
+      $form['location_taxonomize_init']['method'] = array(
+        '#type' => 'radios',
+        '#title' => t('Choose an initialization method'),
+        '#options' => array(
+          'new' => t('Create a new Vocabulary to associate with Location Taxonomize'),
+        ),
+        '#description' => t('If you want to use an existing Vocabulary, you must change that 
+                            Vocabulary\'s machine name to \'' . LOCATION_TAXONOMIZE_VOCAB_NAME . '\'.
+                             It will then be available here as an option.'),
+      );
+      
+    }
+    return system_settings_form($form);
+  }
   // option to enable or disable synchronization
   $form['location_taxonomize_enable'] = array(
     '#type' => 'checkbox',
@@ -313,8 +357,6 @@ function location_taxonomize_form($form, &$form_state) {
         ),
       ),
   );
-  //dpm($form);
-  //dpm(variable_get('location_taxonomize_longname'));
   return system_settings_form($form);
 }
 
