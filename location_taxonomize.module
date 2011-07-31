@@ -169,8 +169,9 @@ function location_taxonomize_menu() {
 function location_taxonomize_form_validate($form, $form_state) {
   $values = $form_state['values'];
   //  if we're initializing, make sure that there are no interfering vocabs
-  $values_init = $values['location_taxonomize_init']; 
-  if ($values_init) {
+  $state = $values['location_taxonomize_vocab']['state']; 
+  if ($state == 'initialization') {
+    $values_init = $values['location_taxonomize_vocab'];
     $vid = variable_get('location_taxonomize_vid');
     if ($vid) form_set_error('','There seems to already be a Vocabulary
                             associated with Location Taxonomize.');
@@ -194,7 +195,7 @@ function location_taxonomize_form_validate($form, $form_state) {
  * Called from the configuration form. Handles initialization of Location Taxonomy
  */
 function location_taxonomize_initialize($form, $form_state) {
-  $values_init = $form_state['values']['location_taxonomize_init'];
+  $values_init = $form_state['values']['location_taxonomize_vocab'];
   $method = $values_init['method'];
   switch ($method) {
     case 'new':
@@ -202,8 +203,7 @@ function location_taxonomize_initialize($form, $form_state) {
       taxonomy_vocabulary_save((object) array(
         'name' => 'Location',
         'machine_name' => LOCATION_TAXONOMIZE_VOCAB_NAME,
-        'description' => 'This vocabulary is synchronized with Location data
-                          automatically by the ' . LOCATION_TAXONOMIZE_MODULE_NAME . ' module',
+        'description' => 'This vocabulary is synchronized with Location data automatically by the ' . LOCATION_TAXONOMIZE_MODULE_NAME . ' module',
         ));
       // save the vid of the newly created vocabulary
       $vocab = taxonomy_vocabulary_machine_name_load(LOCATION_TAXONOMIZE_VOCAB_NAME);
@@ -212,34 +212,31 @@ function location_taxonomize_initialize($form, $form_state) {
       $msg = 'Successfully created the Location taxonomy (vid ' . $vid . ')';
     break;
     case 'existing':
+      // save the vid of the existing vocabulary
       $vid = $values_init['possible_vid'];
       variable_set('location_taxonomize_vid', $vid);
       $msg = 'Successfully connected to the existing Location Vocabulary (vid ' . $vid . ')';
     break;
   }
   drupal_set_message($msg);
-}
-/**
-* Callback function for location_taxonomize_form
-* clears the Location Vocabulary
-*/
-function location_taxonomize_empty_vocab () {
-  $terms = taxonomy_get_tree(variable_get('location_taxonomize_vid'));
-  foreach ($terms as $term) {
-    taxonomy_term_delete($term->tid);
+  // Create the 'taxonomy_longname' field if it doesn't already exist.
+  if (!field_info_field('location_taxonomize_longname')) {
+    $field = array(
+      'field_name' => 'location_taxonomize_longname', 
+      'type' => 'text', 
+    );
+    field_create_field($field);
   }
-  $termsnow = taxonomy_get_tree(variable_get('location_taxonomize_vid'));
-  if (!$termsnow) return t('Location vocabulary cleared.');
-  return t('There was a problem clearing the Location Vocabulary.');
-}
-
-function _get_location_fields () {
-  $fields = location_field_names(TRUE);
-  // for now, only country, city, and state are supported for this
-  foreach ($fields as $field => $value) {
-    if($field != 'country_name' && $field != 'province_name' && $field != 'city') {
-      unset($fields[$field]);
-    }
+  if (!field_info_instance('taxonomy_term','location_taxonomize_longname','location_taxonomize')) {
+    // Create the instance on the bundle.
+    $instance = array(
+      'field_name' => 'location_taxonomize_longname',
+      'label' => 'Long Name', 
+      'entity_type' => 'taxonomy_term', 
+      'bundle' => 'location_taxonomize',
+    );
+    field_create_instance($instance);
   }
-  return $fields;
+  drupal_set_message(t('Attached the Long Name field to the vocabulary'));
+  drupal_set_message(t('Location Taxonomy initialized successfully'));
 }

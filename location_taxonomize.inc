@@ -36,22 +36,50 @@ function _location_taxonomize_variables() {
     'city' => 'city'
   );
   return array(
-    'location_taxonomize_init' => array(
+    'location_taxonomize_vid' => NULL,
+    'location_taxonomize_vocab' => array(
       'method' => NULL,
+      'possible_vid' => NULL,
       'fields' => $fields,
     ),
-    'location_taxonomize_enable' => 1,
-    'location_taxonomize_vid' => NULL,
-    'location_taxonomize_node_attach' => 0,
-    'location_taxonomize_longname' => array(
-      'enable' => 0,
-      'fields' => $fields,
-      'separator' => ',',
-      'country_code' => 1,
-      'cap_co' => 1,
-      'province_code' => 0,
-      'cap_pr' => 0,
-      'usa' => 1,
+    'location_taxonomize_settings' => array(
+      'enable' => 1,
+      'node_attach' => 0,
+      'longname_enable' => 0,
+      'longname' => array(
+        'fields' => $fields,
+        'separator' => ',',
+        'country_code' => 1,
+        'cap_co' => 1,
+        'province_code' => 0,
+        'cap_pr' => 0,
+        'usa' => 1,
+      ),
     ),
   );
+}
+
+/**
+* Callback function for location_taxonomize_form
+* clears the Location Vocabulary
+*/
+function location_taxonomize_empty_vocab () {
+  $terms = taxonomy_get_tree(variable_get('location_taxonomize_vid'));
+  foreach ($terms as $term) {
+    taxonomy_term_delete($term->tid);
+  }
+  $termsnow = taxonomy_get_tree(variable_get('location_taxonomize_vid'));
+  if (!$termsnow) return t('Location vocabulary cleared.');
+  return t('There was a problem clearing the Location Vocabulary.');
+}
+
+function _get_location_fields () {
+  $fields = location_field_names(TRUE);
+  // for now, only country, city, and state are supported for this
+  foreach ($fields as $field => $value) {
+    if($field != 'country_name' && $field != 'province_name' && $field != 'city') {
+      unset($fields[$field]);
+    }
+  }
+  return $fields;
 }
