@@ -35,7 +35,7 @@ function location_taxonomize_locationapi(&$obj, $op, $a3, $a4, $a5) {
             'name' => $name,
             'vid' => $vid,
           );
-          if (variable_get('location_taxonomize_save_longname')) {
+          if ($settings['longname_enable']) {
             _location_taxonomy_add_longname(&$term, $hlevel, $location);
           }
           if ($hlevel == 0) {
@@ -58,7 +58,8 @@ function location_taxonomize_locationapi(&$obj, $op, $a3, $a4, $a5) {
  *
  */
 function _location_taxonomy_add_longname(&$term, $hlevel, $location) {
-  $opts = variable_get('location_taxonomize_longname');
+  $settings = variable_get('location_taxonomize_settings');
+  $opts = $settings['longname'];
   $fields = $opts['fields'];
   $longname = array();
   switch ($hlevel) {
@@ -71,8 +72,10 @@ function _location_taxonomy_add_longname(&$term, $hlevel, $location) {
       }
       if ($fields['country_name']) {
         if ($opts['country_code']) {
-          if ($opts['cap_co']) $longname[] = strtoupper($location['country']);
-          else $longname[] = $location['country'];
+          if ($opts['usa'] && $location['country'] == 'us') $country = 'usa';
+          else $country = 'us';
+          if ($opts['cap_co']) $longname[] = strtoupper($country);
+          else $longname[] = $country;
         } else {
           $longname[] = $location['country_name'];
         }
@@ -90,8 +93,10 @@ function _location_taxonomy_add_longname(&$term, $hlevel, $location) {
       }
       if ($fields['country_name']) {
         if ($opts['country_code']) {
-          if ($opts['cap_co']) $longname[] = strtoupper($location['country']);
-          else $longname[] = $location['country'];
+          if ($opts['usa'] && $location['country'] == 'us') $country = 'usa';
+          else $country = 'us';
+          if ($opts['cap_co']) $longname[] = strtoupper($country);
+          else $longname[] = $country;
         } else {
           $longname[] = $location['country_name'];
         }
