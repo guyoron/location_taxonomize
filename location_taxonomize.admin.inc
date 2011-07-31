@@ -129,6 +129,11 @@ function location_taxonomize_form($form, &$form_state) {
                 'event' => 'mousedown',
                 ),
   );
+  $form['location_taxonomize_vocab']['disassociate'] = array(
+    '#type' => 'submit',
+    '#value' => 'Disassociate Vocab',
+    '#submit' => array('location_taxonomize_disassociate',),
+  );
   // placeholder div for ajax message
   $form['location_taxonomize_vocab']['msg-div'] = array(
     '#type' => 'container',
