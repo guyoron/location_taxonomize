@@ -260,10 +260,10 @@ function location_taxonomize_disassociate($form, $form_state) {
 function location_taxonomize_bulk_taxonomize($form, $form_state) {
   $batch = array(
     'operations' => array(
-      array('location_taxonnomize_bulk_taxonomize_1', array($form_state)),
+      array('location_taxonomize_bulk_taxonomize_1', array($form_state)),
       //array('batch_example_process', array($options3, $options4)),
     ),
-    //'finished' => 'batch_example_finished',
+    'finished' => 'location_taxonomize_bulk_taxonomize_finished',
     'title' => t('Taxonomizing Locations'),
     'init_message' => t('Initializing...'),
     'progress_message' => t('Processed @current out of @total.'),
@@ -273,23 +273,25 @@ function location_taxonomize_bulk_taxonomize($form, $form_state) {
   batch_set($batch);
 }
 
-function location_taxonnomize_bulk_taxonomize_1($form_state, &$context) {
+function location_taxonomize_bulk_taxonomize_1($form_state, &$context) {
   $limit = 20;
   if (!isset($context['sandbox']['progress'])) {
       $context['sandbox']['progress'] = 0;
       $context['sandbox']['max'] = 100;
   }
   for ($i=0;$i<$limit;$i++) {
-    for ($j=0;$j<5000000;$j++) {
+    for ($j=0;$j<1000000;$j++) {
       //do nothing
     }
     $context['sandbox']['progress']++;
     $context['message'] = t('Now processing %n', array('%n' => $context['sandbox']['progress']));
-    //if ($context['sandbox']['progress'] != $context['sandbox']['max']) {
-        $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['max'];
-    //}
+    $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['max'];
   
   }
+}
+
+function location_taxonomize_bulk_taxonomize_finished($success, $results, $operations) {
+  drupal_set_message('Bulk Taxonomize completed successfully!');
 }
 
 
