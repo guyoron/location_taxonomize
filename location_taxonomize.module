@@ -166,7 +166,6 @@ function location_taxonomize_menu() {
     'access arguments' => array('access administration pages'),
     'type' => MENU_NORMAL_ITEM,
   );
- 
   return $items;
 }
 
@@ -253,3 +252,44 @@ function location_taxonomize_disassociate($form, $form_state) {
   variable_del('location_taxonomize_vid');
   drupal_set_message('Location Taxonomy successfully disassociated.');
 }
+
+////////////////////////////////////////
+// Feature: Bulk taxonomize
+////////////////////////////////////////
+
+function location_taxonomize_bulk_taxonomize($form, $form_state) {
+  $batch = array(
+    'operations' => array(
+      array('location_taxonnomize_bulk_taxonomize_1', array($form_state)),
+      //array('batch_example_process', array($options3, $options4)),
+    ),
+    //'finished' => 'batch_example_finished',
+    'title' => t('Taxonomizing Locations'),
+    'init_message' => t('Initializing...'),
+    'progress_message' => t('Processed @current out of @total.'),
+    'error_message' => t('Bulk Taxonomize encountered an error.'),
+    //'file' => drupal_get_path('module', 'batch_example') . '/batch_example.inc',
+  );
+  batch_set($batch);
+}
+
+function location_taxonnomize_bulk_taxonomize_1($form_state, &$context) {
+  $limit = 20;
+  if (!isset($context['sandbox']['progress'])) {
+      $context['sandbox']['progress'] = 0;
+      $context['sandbox']['max'] = 100;
+  }
+  for ($i=0;$i<$limit;$i++) {
+    for ($j=0;$j<5000000;$j++) {
+      //do nothing
+    }
+    $context['sandbox']['progress']++;
+    $context['message'] = t('Now processing %n', array('%n' => $context['sandbox']['progress']));
+    //if ($context['sandbox']['progress'] != $context['sandbox']['max']) {
+        $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['max'];
+    //}
+  
+  }
+}
+
+

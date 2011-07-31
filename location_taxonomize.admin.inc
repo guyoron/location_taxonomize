@@ -132,7 +132,12 @@ function location_taxonomize_form($form, &$form_state) {
   $form['location_taxonomize_vocab']['disassociate'] = array(
     '#type' => 'submit',
     '#value' => 'Disassociate Vocab',
-    '#submit' => array('location_taxonomize_disassociate',),
+    '#submit' => array('location_taxonomize_disassociate', ),
+  );
+  $form['location_taxonomize_vocab']['bulk_taxonomize'] = array(
+    '#type' => 'submit',
+    '#value' => 'Bulk Taxonomize Locations',
+    '#submit' => array('location_taxonomize_bulk_taxonomize', ),
   );
   // placeholder div for ajax message
   $form['location_taxonomize_vocab']['msg-div'] = array(
