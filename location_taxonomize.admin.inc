@@ -107,6 +107,16 @@ function location_taxonomize_form($form, &$form_state) {
     '#title' => 'Vocabulary',
     '#markup' => 'Currently using Vocabulary vid ' . variable_get('location_taxonomize_vid'),
   );
+  $opts_vocab = variable_get('location_taxonomize_vocab');
+  // fields used for hierarchy, none editable now
+  $form['location_taxonomize_vocab']['fields'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Location Taxonomy Hierachy'),
+    '#description' => t('This cannot be changed once the vocabulary is initialized. If you want to change them, you have to unassociate this vocabulary and initialize a new one.'),
+    '#options' => _get_location_fields(),
+    '#default_value' => $opts_vocab['fields'],
+    '#disabled' => TRUE,
+  );
   // button to empty the location vocabulary
   $form['location_taxonomize_vocab']['emptyvocab'] = array(
     '#type' => 'button',
