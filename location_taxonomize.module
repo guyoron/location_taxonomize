@@ -277,7 +277,8 @@ function location_taxonomize_bulk_taxonomize_1($form_state, &$context) {
   $limit = 20;
   if (!isset($context['sandbox']['progress'])) {
       $context['sandbox']['progress'] = 0;
-      $context['sandbox']['max'] = 100;
+      $context['sandbox']['max'] = db_query('SELECT COUNT(DISTINCT lid) FROM {location}')->fetchField();
+      drupal_set_message('max = '.$context['sandbox']['max']);
   }
   for ($i=0;$i<$limit;$i++) {
     for ($j=0;$j<1000000;$j++) {
