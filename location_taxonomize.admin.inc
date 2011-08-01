@@ -103,6 +103,7 @@ function location_taxonomize_form($form, &$form_state) {
     '#default_value' => $opts_vocab['fields'],
     '#disabled' => TRUE,
   );
+  dpm($opts_vocab['fields']);
   // button to empty the location vocabulary
   $form['location_taxonomize_vocab']['emptyvocab'] = array(
     '#type' => 'button',
@@ -218,9 +219,10 @@ function location_taxonomize_form($form, &$form_state) {
     '#type' => 'checkboxes',
     '#title' => t('Long Name fields'),
     '#description' => t('Choose which fields to use when constructing the Long Name'),
-    '#options' => _get_location_fields(),
+    '#options' => _location_taxonomize_get_hierarchy(),
     '#default_value' => $longname_opts['fields'],
   );
+  dpm($longname_opts['fields']);
   $form['location_taxonomize_settings']['longname']['separator'] = array(
     '#type' =>'textfield',
     '#title' => t('Separator'),
@@ -229,49 +231,36 @@ function location_taxonomize_form($form, &$form_state) {
     '#size' => 1,
     '#required' => TRUE,
   );
-  $form['location_taxonomize_settings']['longname']['country_code'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Use the country code instead of its name where it is not the primary item'),
-    '#default_value' => $longname_opts['country_code'],
-  );
-  $form['location_taxonomize_settings']['longname']['cap_co'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Capitalize country code in Long Name'),
-    '#default_value' => $longname_opts['cap_co'],
-    '#states' => array(
-        // Only show this field when the checkbox is enabled.
-        'enabled' => array(
-          ':input[name="location_taxonomize_settings[longname][country_code]"]' => array('checked' => TRUE),
-        ),
-      ),
-  );
-  $form['location_taxonomize_settings']['longname']['province_code'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Use the province code instead of its name where it is not the primary item'),
-    '#default_value' => $longname_opts['province_code'],
-  );
-  $form['location_taxonomize_settings']['longname']['cap_pr'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Capitalize province code in Long Name'),
-    '#default_value' => $longname_opts['cap_pr'],
-    '#states' => array(
-        // Only show this field when the checkbox is enabled.
-        'enabled' => array(
-          ':input[name="location_taxonomize_settings[longname][province_code]"]' => array('checked' => TRUE),
-        ),
-      ),
+  $form['location_taxonomize_settings']['longname']['country_naming'] = array(
+    '#type' => 'radios',
+    '#title' => t('Country naming in Long Names'),
+    '#description' => t('Determines how the country will be saved in Long Names'),
+    '#options' => array(
+      'name' => t('Always use full name (i.e. <em>United States</em>)'),
+      'code' => t('Use province code (i.e. <em>US</em>) when it is not the primary item in the Full Name'),
+    ),
+    '#default_value' => $longname_opts['country_naming'],
   );
   $form['location_taxonomize_settings']['longname']['usa'] = array(
     '#type' => 'checkbox',
     '#title' => t('Use \'USA\' instead of \'US\''),
-    '#description' => t('Capitalization will depend on capitalization settings'),
     '#default_value' => $longname_opts['usa'],
     '#states' => array(
-        // Only show this field when the checkbox is enabled.
-        'enabled' => array(
-          ':input[name="location_taxonomize_settings[longname][country_code]"]' => array('checked' => TRUE),
-        ),
+      // Only show this field when the checkbox is enabled.
+      'enabled' => array(
+        ':input[name="location_taxonomize_settings[longname][country_naming]"]' => array('value' => 'code'),
       ),
+    ),
+  );
+  $form['location_taxonomize_settings']['longname']['province_naming'] = array(
+    '#type' => 'radios',
+    '#title' => t('Province naming in Long Names'),
+    '#description' => t('Determines how the province will be saved in Long Names'),
+    '#options' => array(
+      'name' => t('Always use full name (i.e. <em>California</em>)'),
+      'code' => t('Use province code (i.e. <em>CA</em>) when it is not the primary item in the Full Name'),
+    ),
+    '#default_value' => $longname_opts['province_naming'],
   );
   $form['location_taxonomize_default'] = array(
     '#type' => 'submit',
@@ -281,7 +270,7 @@ function location_taxonomize_form($form, &$form_state) {
   $form['location_taxonomize_test'] = array(
     '#type' => 'submit',
     '#value' => t('Test'),
-    '#submit' => array('_location_taxonomize_get_hierarchy'),
+    '#submit' => array('_get_location_fields'),
   );
   return system_settings_form($form);
 }

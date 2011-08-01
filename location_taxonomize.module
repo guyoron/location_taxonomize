@@ -215,6 +215,18 @@ function location_taxonomize_initialize($form, $form_state) {
     );
     field_create_instance($instance);
   }
+  // set the longname fields variable
+  $fields = _get_location_fields(FALSE);
+  $vocab = variable_get('location_taxonomize_vocab');
+  $vocab_fields = $vocab['fields'];
+  $settings = variable_get('location_taxonomize_settings');
+  $settings['longname']['fields'] = array();
+  foreach ($fields as $field) {
+    if ($vocab_fields[$field]) {
+      $settings['longname']['fields'][$field] = $field;
+    }
+  }
+  variable_set('location_taxonomize_settings', $settings);
   drupal_set_message(t('Location Taxonomize initialized successfully'));
 }
 
@@ -239,26 +251,11 @@ function location_taxonomize_process_loc($obj) {
   for ($hlevel = 0; $hlevel < count($hierarchy); $hlevel++) {
     $hlevel_name = $hierarchy[$hlevel];
     // set the term name
-    switch ($hlevel_name) {
-      case 'country':
-        if ($settings['naming']['country'] == 'name') $name = $location['country_name'];
-        elseif ($location['country'] == 'us' && $settings['naming']['usa']) $name = 'USA';
-        else $name = strtoupper($location['country']);
-        break;
-      case 'province':
-        if ($settings['naming']['province'] == 'name') $name = $location['province_name'];
-        else $name = $location['province'];
-        break;
-      default:
-        $name = $location[$hlevel_name];
-        break;
-    }
-    
+    $name = _location_taxonomize_create_term_name($hlevel_name, &$location, &$settings);
     // find if the term exists already or not
     if ($hlevel == 0) $parentid = -1;
     else $parentid = $tids[$hlevel-1];
     $findterm = _find_term($name, $hlevel, $parentid);
-    
     // save if necessary
     if (!$findterm) {
       $term = (object) array(
@@ -280,6 +277,24 @@ function location_taxonomize_process_loc($obj) {
     else if ($findterm->tid) $tids[] = $findterm->tid;
   }
   return $saved;
+}
+
+function _location_taxonomize_create_term_name($hlevel_name, &$location, &$settings) {
+  switch ($hlevel_name) {
+    case 'country':
+      if ($settings['naming']['country'] == 'name') $name = $location['country_name'];
+      elseif ($location['country'] == 'us' && $settings['naming']['usa']) $name = 'USA';
+      else $name = strtoupper($location['country']);
+      break;
+    case 'province':
+      if ($settings['naming']['province'] == 'name') $name = $location['province_name'];
+      else $name = $location['province'];
+      break;
+    default:
+      $name = $location[$hlevel_name];
+      break;
+  }
+  return $name;
 }
 
 ////////////////////////////////////////

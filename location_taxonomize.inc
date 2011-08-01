@@ -46,7 +46,7 @@ function _location_taxonomize_variables() {
   return array(
     'location_taxonomize_vid' => NULL,
     'location_taxonomize_vocab' => array(
-      'method' => NULL,
+      'method' => 'existing',
       'possible_vid' => NULL,
       'fields' => $fields,
     ),
@@ -60,12 +60,10 @@ function _location_taxonomize_variables() {
       ),
       'longname_enable' => 0,
       'longname' => array(
-        'fields' => $fields,
+        'fields' => NULL,   // this is set by the initialization process
         'separator' => ',',
-        'country_code' => 1,
-        'cap_co' => 1,
-        'province_code' => 0,
-        'cap_pr' => 0,
+        'country_naming' => 'code',
+        'province_naming' => 'code',
         'usa' => 1,
       ),
     ),
@@ -87,8 +85,9 @@ function location_taxonomize_empty_vocab () {
 
 /**
  * Returns the Location module fields that can be used for the Location Vocabulary
+ * @param $assoc - whether to return an associative array (TRUE) or just an indexed array (FALSE) 
  */
-function _get_location_fields () {
+function _get_location_fields ($assoc = TRUE) {
   // get name of site database
   global $databases;
   $db = $databases['default']['default']['database'];
@@ -98,8 +97,9 @@ function _get_location_fields () {
   $return = array();
   // remove unsupported fields
   foreach ($fields as $field) {
-    if($field != 'lid' && $field != 'additional' && $field != 'latitude' && $field != 'longitude' && $field != 'source' && $field != 'is_primary' && $field != 'postal_code') {
-      $return[$field] = $field;
+    if ($field != 'lid' && $field != 'additional' && $field != 'latitude' && $field != 'longitude' && $field != 'source' && $field != 'is_primary' && $field != 'postal_code') {
+      if ($assoc) $return[$field] = $field;
+      else $return[] = $field;
     }
   }
   return array_reverse($return);
