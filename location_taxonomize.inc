@@ -53,6 +53,11 @@ function _location_taxonomize_variables() {
     'location_taxonomize_settings' => array(
       'enable' => 1,
       'node_attach' => 0,
+      'naming' => array(
+        'country' => 'name',
+        'province' => 'name',
+        'usa' => 1,
+      ),
       'longname_enable' => 0,
       'longname' => array(
         'fields' => $fields,
@@ -106,10 +111,11 @@ function _get_location_fields () {
 function _location_taxonomize_get_hierarchy() {
   $vocab = variable_get('location_taxonomize_vocab');
   $fields = $vocab['fields'];
+  $hierarchy = array();
   foreach ($fields as $key => $value) {
-    if (!$value) unset($fields[$key]);
+    if ($value) $hierarchy[] = $key;
   }
-  return $fields;
+  return $hierarchy;
 }
 
 function location_taxonomize_disassociate($form, $form_state) {

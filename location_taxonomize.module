@@ -14,7 +14,8 @@ require_once('location_taxonomize.admin.inc');
  */
 function location_taxonomize_locationapi(&$obj, $op, $a3, $a4, $a5) {
   $settings = variable_get('location_taxonomize_settings');
-  if (!$settings['enable']) return;
+  $vid = variable_get('location_taxonomize_vid');
+  if (!$settings['enable'] || !$vid) return;
   switch ($op) {
     // if we're saving a location, synchronize with vocab
     case 'save':
@@ -214,7 +215,7 @@ function location_taxonomize_initialize($form, $form_state) {
     );
     field_create_instance($instance);
   }
-  drupal_set_message(t('Location Taxonomy initialized successfully'));
+  drupal_set_message(t('Location Taxonomize initialized successfully'));
 }
 
 
@@ -236,10 +237,28 @@ function location_taxonomize_process_loc($obj) {
   $tids = array();
   // this loops through hierarchy levels and saves terms if necessary
   for ($hlevel = 0; $hlevel < count($hierarchy); $hlevel++) {
-    $name = $location[$hierarchy[$hlevel]];
+    $hlevel_name = $hierarchy[$hlevel];
+    // set the term name
+    switch ($hlevel_name) {
+      case 'country':
+        if ($settings['naming']['country'] == 'name') $name = $location['country_name'];
+        else $name = strtoupper($location['country']);
+        break;
+      case 'province':
+        if ($settings['naming']['province'] == 'name') $name = $location['province_name'];
+        else $name = $location['province'];
+        break;
+      default:
+        $name = $location[$hlevel_name];
+        break;
+    }
+    
+    // find if the term exists already or not
     if ($hlevel == 0) $parentid = -1;
     else $parentid = $tids[$hlevel-1];
     $findterm = _find_term($name, $hlevel, $parentid);
+    
+    // save if necessary
     if (!$findterm) {
       $term = (object) array(
         'name' => $name,

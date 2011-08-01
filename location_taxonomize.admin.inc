@@ -148,11 +148,48 @@ function location_taxonomize_form($form, &$form_state) {
   );
   // option to assign terms to nodes
   $form['location_taxonomize_settings']['node_attach'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Also attach the appropriate Taxonomy Location terms to nodes'),
-    '#description' => t('If this is checked, the terms saved in the Location Taxonomy will also automatically be applied to the 
+    '#type'         => 'checkbox',
+    '#title'        => t('Also attach the appropriate Taxonomy Location terms to nodes (NOT IMPLEMENTED YET)'),
+    '#description'  => t('If this is checked, the terms saved in the Location Taxonomy will also automatically be applied to the 
                         nodes with those locations. Note that...'),
-    '#default_value' => $opts_settings['node_attach'],
+    '#default_value'=> $opts_settings['node_attach'],
+  );
+  $form['location_taxonomize_settings']['naming'] = array(
+    '#type'         => 'fieldset',
+    '#title'        => t('Term Naming Settings'),
+    '#collapsible'  => TRUE,
+    '#collapsed'    => FALSE,
+    '#tree'         => TRUE,
+  );
+  $form['location_taxonomize_settings']['naming']['country'] = array(
+    '#type'       => 'radios',
+    '#title'      => 'Country naming',
+    '#required'   => TRUE,
+    '#options'    => array(
+      'name' => t('Use full name (i.e. <em>United States</em>)'),
+      'code' => t('Use country code (i.e. <em>US</em>)'),
+    ),
+    '#default_value' => $opts_settings['naming']['country'],
+  );
+  $form['location_taxonomize_settings']['naming']['usa'] = array(
+    '#type'       => 'checkbox',
+    '#title'      => t("Use 'USA' instead of 'US'"),
+    '#default_value' => $opts_settings['naming']['usa'],
+    '#states' => array(
+      'enabled' => array(
+        ':input[name="location_taxonomize_settings[naming][country]"]' => array('value' => 'code'),
+      ),
+    ),
+  );
+  $form['location_taxonomize_settings']['naming']['province'] = array(
+    '#type'       => 'radios',
+    '#title'      => 'Province naming',
+    '#required'   => TRUE,
+    '#options'    => array(
+      'name' => t('Use full name (i.e. <em>California</em>)'),
+      'code' => t('Use province code (i.e. <em>CA</em>)'),
+    ),
+    '#default_value' => $opts_settings['naming']['province'],
   );
   // option to enable or disable the Full Name field
   $form['location_taxonomize_settings']['longname_enable'] = array(
