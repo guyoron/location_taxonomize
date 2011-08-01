@@ -241,5 +241,10 @@ function location_taxonomize_form($form, &$form_state) {
     '#value' => t('Reset module'),
     '#submit' => array('_location_taxonomize_reset'),
   );
+  $form['location_taxonomize_test'] = array(
+    '#type' => 'submit',
+    '#value' => t('Test'),
+    '#submit' => array('_location_taxonomize_get_hierarchy'),
+  );
   return system_settings_form($form);
 }

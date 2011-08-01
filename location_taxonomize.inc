@@ -99,3 +99,26 @@ function _get_location_fields () {
   }
   return array_reverse($return);
 }
+
+/**
+ * Returns the hierarchy configured for the current Location Vocabulary
+ */
+function _location_taxonomize_get_hierarchy() {
+  $vocab = variable_get('location_taxonomize_vocab');
+  $fields = $vocab['fields'];
+  foreach ($fields as $key => $value) {
+    if (!$value) unset($fields[$key]);
+  }
+  return $fields;
+}
+
+function location_taxonomize_disassociate($form, $form_state) {
+  // unset the vid variable
+  variable_del('location_taxonomize_vid');
+  drupal_set_message('Location Taxonomy successfully disassociated.');
+}
+
+
+
+
+
