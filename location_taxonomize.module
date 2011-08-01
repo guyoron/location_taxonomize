@@ -242,6 +242,7 @@ function location_taxonomize_process_loc($obj) {
     switch ($hlevel_name) {
       case 'country':
         if ($settings['naming']['country'] == 'name') $name = $location['country_name'];
+        elseif ($location['country'] == 'us' && $settings['naming']['usa']) $name = 'USA';
         else $name = strtoupper($location['country']);
         break;
       case 'province':
