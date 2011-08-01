@@ -10,22 +10,6 @@
 * in location_taxonomize_menu().
 */
 function location_taxonomize_form($form, &$form_state) {
-  $form['location_taxonomize_default'] = array(
-    '#type' => 'button',
-    '#value' => t('Set variables to defaults'),
-    '#ajax' => array(
-                'callback' => '_location_taxonomize_set_defaults',
-                'wrapper' => 'msg--div',
-                'method' => 'replace',
-                'effect' => 'fade',
-                'event' => 'mousedown',
-                ),
-  );
-  // placeholder div for ajax message
-  $form['msg--div'] = array(
-    '#type' => 'container',
-    '#id'=> 'msg--div',
-  );
   // initialization
   $opts_vocab = variable_get('location_taxonomize_vocab');
   $vid = variable_get('location_taxonomize_vid');
@@ -52,6 +36,7 @@ function location_taxonomize_form($form, &$form_state) {
       $form['location_taxonomize_vocab']['method'] = array(
         '#type' => 'radios',
         '#title' => t('Choose an initialization method'),
+        '#required' => TRUE,
         '#options' => array(
           'new' => t('Create a new Vocabulary to associate with Location Taxonomize'),
           'existing' => t('Use the existing vocabulary vid ' . $possible_vid),
@@ -66,6 +51,7 @@ function location_taxonomize_form($form, &$form_state) {
       $form['location_taxonomize_vocab']['method'] = array(
         '#type' => 'radios',
         '#title' => t('Choose an initialization method'),
+        '#required' => TRUE,
         '#options' => array(
           'new' => t('Create a new Vocabulary to associate with Location Taxonomize'),
         ),
@@ -249,6 +235,11 @@ function location_taxonomize_form($form, &$form_state) {
           ':input[name="location_taxonomize_settings[longname][country_code]"]' => array('checked' => TRUE),
         ),
       ),
+  );
+  $form['location_taxonomize_default'] = array(
+    '#type' => 'submit',
+    '#value' => t('Reset module'),
+    '#submit' => array('_location_taxonomize_reset'),
   );
   return system_settings_form($form);
 }

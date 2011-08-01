@@ -23,18 +23,26 @@ $defaults = _location_taxonomize_variables();
     if($value) variable_set($key,$value);
     else variable_del($key);
   }
-  return 'All variables set to default';
+  
+}
+
+function _location_taxonomize_reset() {
+  location_taxonomize_empty_vocab();
+  _location_taxonomize_set_defaults();
+  drupal_set_message('Module reset');
 }
 
 /**
  * Keeps a list of all the variables maintained by this module, with their default values.
  */
 function _location_taxonomize_variables() {
-  $fields = array(
-    'country_name' => 'country_name', 
-    'province_name' => 'province_name', 
-    'city' => 'city'
-  );
+  $fields = _get_location_fields();
+  // set field defaults
+  foreach ($fields as $key => $value) {
+    if ($key != 'country' && $key != 'province' && $key != 'city') {
+      $fields[$key] = 0;
+    }
+  }
   return array(
     'location_taxonomize_vid' => NULL,
     'location_taxonomize_vocab' => array(
@@ -60,8 +68,7 @@ function _location_taxonomize_variables() {
 }
 
 /**
-* Callback function for location_taxonomize_form
-* clears the Location Vocabulary
+* Empties the Location Vocabulary
 */
 function location_taxonomize_empty_vocab () {
   $terms = taxonomy_get_tree(variable_get('location_taxonomize_vid'));
@@ -69,17 +76,26 @@ function location_taxonomize_empty_vocab () {
     taxonomy_term_delete($term->tid);
   }
   $termsnow = taxonomy_get_tree(variable_get('location_taxonomize_vid'));
-  if (!$termsnow) return t('Location vocabulary cleared.');
-  return t('There was a problem clearing the Location Vocabulary.');
+  if (!$termsnow) return t('Location vocabulary emptied.');
+  return t('There was a problem emptying the Location Vocabulary.');
 }
 
+/**
+ * Returns the Location module fields that can be used for the Location Vocabulary
+ */
 function _get_location_fields () {
-  $fields = location_field_names(TRUE);
-  // for now, only country, city, and state are supported for this
-  foreach ($fields as $field => $value) {
-    if($field != 'country_name' && $field != 'province_name' && $field != 'city') {
-      unset($fields[$field]);
+  // get name of site database
+  global $databases;
+  $db = $databases['default']['default']['database'];
+  // get names of fields in the location table
+  $result = db_query("SELECT column_name FROM information_schema.columns WHERE table_name = 'location' AND table_schema = :db ORDER BY ordinal_position", array(':db' => $db));
+  $fields = $result->fetchCol();
+  $return = array();
+  // remove unsupported fields
+  foreach ($fields as $field) {
+    if($field != 'lid' && $field != 'additional' && $field != 'latitude' && $field != 'longitude' && $field != 'source' && $field != 'is_primary' && $field != 'postal_code') {
+      $return[$field] = $field;
     }
   }
-  return $fields;
+  return array_reverse($return);
 }
