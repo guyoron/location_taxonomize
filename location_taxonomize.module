@@ -18,7 +18,8 @@ function location_taxonomize_locationapi(&$obj, $op, $a3, $a4, $a5) {
   switch ($op) {
     // if we're saving a location, synchronize with vocab
     case 'save':
-      $saved = location_taxonomize_process_location($obj);
+      drupal_set_message('saving');
+      $saved = location_taxonomize_process_loc($obj);
       drupal_set_message(t('Location Taxonomize: %num new terms saved',array('%num' => $saved)));
   }
 }
@@ -213,14 +214,7 @@ function location_taxonomize_initialize($form, $form_state) {
     );
     field_create_instance($instance);
   }
-  drupal_set_message(t('Attached the Long Name field to the vocabulary'));
   drupal_set_message(t('Location Taxonomy initialized successfully'));
-}
-
-function location_taxonomize_disassociate($form, $form_state) {
-  // unset the vid variable
-  variable_del('location_taxonomize_vid');
-  drupal_set_message('Location Taxonomy successfully disassociated.');
 }
 
 
@@ -228,11 +222,15 @@ function location_taxonomize_disassociate($form, $form_state) {
  * Determines if a location needs to be taxonomized. If so, it saves the appropriate terms
  * Returns the number of terms added
  */
-function location_taxonomize_process_location($obj) {
+function location_taxonomize_process_loc($obj) {
+  drupal_set_message('process');
+  // get settings
   $settings = variable_get('location_taxonomize_settings');
   $vid = variable_get('location_taxonomize_vid');
-  $saved = 0;
-  $hierarchy = array ('country_name','province_name','city');
+  $hierarchy = _location_taxonomize_get_hierarchy();
+  dpm($hierarchy);
+  $saved = 0;   // holds the number of newly saved terms
+  // make sure the province_name and country_name fields are there and updated
   $location = _fix_loc_tmp($obj);
   dpm($location);
   $tids = array();
@@ -251,9 +249,9 @@ function location_taxonomize_process_location($obj) {
         _location_taxonomy_add_longname(&$term, $hlevel, $location);
       }
       if ($hlevel == 0) {
-        $term->parent = array(0, );
+        $term->parent = array(0);
       } else {
-        $term->parent = array($parentid, );
+        $term->parent = array($parentid);
       }
       taxonomy_term_save($term);
       $tids[] = $term->tid;
@@ -299,7 +297,7 @@ function location_taxonomize_bulk_taxonomize_op($form_state, &$context) {
   $result = db_query_range("SELECT lid, name, street, additional, city, province, postal_code, country, latitude, longitude, source FROM {location} WHERE lid != 0 ORDER BY lid ASC", $context['sandbox']['current'], $limit, array());
   $result_array = $result->fetchAllAssoc('lid');
   foreach ($result_array as $row) {
-    $added = location_taxonomize_process_location((array)$row);
+    $added = location_taxonomize_process_loc((array)$row);
     $context['results']['added'] += $added;
     $context['sandbox']['progress']++;
     $context['message'] = t('Processing location lid %n', array('%n' => $row->lid));
