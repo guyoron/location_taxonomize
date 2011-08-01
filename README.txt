@@ -5,3 +5,5 @@
 /////////////////////////////////////////////
 
 Location Taxonomize is a Drupal contrib module
+
+Check it out at http://drupal.org/sandbox/goron/1234754
