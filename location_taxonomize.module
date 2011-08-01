@@ -18,7 +18,8 @@ function location_taxonomize_locationapi(&$obj, $op, $a3, $a4, $a5) {
   switch ($op) {
     // if we're saving a location, synchronize with vocab
     case 'save':
-      location_taxonomize_process_location($obj);
+      $saved = location_taxonomize_process_location($obj);
+      drupal_set_message(t('Location Taxonomize: %num new terms saved',array('%num' => $saved)));
   }
 }
 
@@ -179,7 +180,7 @@ function location_taxonomize_initialize($form, $form_state) {
         'name' => 'Location',
         'machine_name' => LOCATION_TAXONOMIZE_VOCAB_NAME,
         'description' => 'This vocabulary is synchronized with Location data automatically by the ' . LOCATION_TAXONOMIZE_MODULE_NAME . ' module',
-        ));
+      ));
       // save the vid of the newly created vocabulary
       $vocab = taxonomy_vocabulary_machine_name_load(LOCATION_TAXONOMIZE_VOCAB_NAME);
       $vid = $vocab->vid;
@@ -222,10 +223,6 @@ function location_taxonomize_disassociate($form, $form_state) {
   drupal_set_message('Location Taxonomy successfully disassociated.');
 }
 
-/*function location_taxonomize_process_location_lid($lid) {
-  
-  location_taxonomize_process_location($location);
-}*/
 
 /**
  * Determines if a location needs to be taxonomized. If so, it saves the appropriate terms
@@ -237,6 +234,7 @@ function location_taxonomize_process_location($obj) {
   $saved = 0;
   $hierarchy = array ('country_name','province_name','city');
   $location = _fix_loc_tmp($obj);
+  dpm($location);
   $tids = array();
   // this loops through hierarchy levels and saves terms if necessary
   for ($hlevel = 0; $hlevel < count($hierarchy); $hlevel++) {
