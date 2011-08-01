@@ -15,41 +15,10 @@ require_once('location_taxonomize.admin.inc');
 function location_taxonomize_locationapi(&$obj, $op, $a3, $a4, $a5) {
   $settings = variable_get('location_taxonomize_settings');
   if (!$settings['enable']) return;
-  $vid = variable_get('location_taxonomize_vid');
   switch ($op) {
     // if we're saving a location, synchronize with vocab
     case 'save':
-      //dpm($obj);
-      $hierarchy = array ('country_name','province_name','city');
-      $location = _fix_loc_tmp($obj);
-      dpm($location);
-      $tids = array();
-      // this loops through hierarchy levels and saves terms if necessary
-      for ($hlevel = 0; $hlevel < count($hierarchy); $hlevel++) {
-        $name = $location[$hierarchy[$hlevel]];
-        if ($hlevel == 0) $parentid = -1;
-        else $parentid = $tids[$hlevel-1];
-        $findterm = _find_term($name, $hlevel, $parentid);
-        if (!$findterm) {
-          $term = (object) array(
-            'name' => $name,
-            'vid' => $vid,
-          );
-          if ($settings['longname_enable']) {
-            _location_taxonomy_add_longname(&$term, $hlevel, $location);
-          }
-          if ($hlevel == 0) {
-            $term->parent = array(0, );
-          } else {
-            $term->parent = array($parentid, );
-          }
-          taxonomy_term_save($term);
-          dpm($term);
-          $tids[] = $term->tid;
-          drupal_set_message('Saved new Location Taxonomy term: ' . $term->name . ' (' . $term->tid . ')');
-        }
-        else if ($findterm->tid) {$tids[] = $findterm->tid; dpm($findterm); }
-      }
+      location_taxonomize_process_location($obj);
   }
 }
 
@@ -253,6 +222,46 @@ function location_taxonomize_disassociate($form, $form_state) {
   drupal_set_message('Location Taxonomy successfully disassociated.');
 }
 
+/*function location_taxonomize_process_location_lid($lid) {
+  
+  location_taxonomize_process_location($location);
+}*/
+
+function location_taxonomize_process_location($obj) {
+  $settings = variable_get('location_taxonomize_settings');
+  $vid = variable_get('location_taxonomize_vid');
+  $hierarchy = array ('country_name','province_name','city');
+  $location = _fix_loc_tmp($obj);
+  dpm($location);
+  $tids = array();
+  // this loops through hierarchy levels and saves terms if necessary
+  for ($hlevel = 0; $hlevel < count($hierarchy); $hlevel++) {
+    $name = $location[$hierarchy[$hlevel]];
+    if ($hlevel == 0) $parentid = -1;
+    else $parentid = $tids[$hlevel-1];
+    $findterm = _find_term($name, $hlevel, $parentid);
+    if (!$findterm) {
+      $term = (object) array(
+        'name' => $name,
+        'vid' => $vid,
+      );
+      if ($settings['longname_enable']) {
+        _location_taxonomy_add_longname(&$term, $hlevel, $location);
+      }
+      if ($hlevel == 0) {
+        $term->parent = array(0, );
+      } else {
+        $term->parent = array($parentid, );
+      }
+      taxonomy_term_save($term);
+      dpm($term);
+      $tids[] = $term->tid;
+      drupal_set_message('Saved new Location Taxonomy term: ' . $term->name . ' (' . $term->tid . ')');
+    }
+    else if ($findterm->tid) $tids[] = $findterm->tid;
+  }
+}
+
 ////////////////////////////////////////
 // Feature: Bulk taxonomize
 ////////////////////////////////////////
@@ -283,19 +292,19 @@ function location_taxonomize_bulk_taxonomize_1($form_state, &$context) {
   // maximum 20 locations per function iteration
   $limit = 20;
   // iterate through the next group of locations
-  $result = db_query_range("SELECT lid FROM {location} WHERE lid != 0 ORDER BY lid ASC", $context['sandbox']['current'], $limit, array());
+  $result = db_query_range("SELECT lid, name, street, additional, city, province, postal_code, country, latitude, longitude, source FROM {location} WHERE lid != 0 ORDER BY lid ASC", $context['sandbox']['current'], $limit, array());
   $result_array = $result->fetchAllAssoc('lid');
   foreach ($result_array as $row) {
-    for ($j=0;$j<1000000;$j++) {
+    /*for ($j=0;$j<1000000;$j++) {
       //do nothing
-    }
+    }*/
+    location_taxonomize_process_location((array)$row);
     $context['sandbox']['progress']++;
     $context['message'] = t('Now processing location lid %n', array('%n' => $row->lid));
     drupal_set_message($context['message']);
     $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['max'];
   }
   $context['sandbox']['current'] = $context['sandbox']['progress'];
-  drupal_set_message('set current to '.$context['sandbox']['current']);
 }
 
 function location_taxonomize_bulk_taxonomize_finished($success, $results, $operations) {
