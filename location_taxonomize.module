@@ -215,18 +215,18 @@ function location_taxonomize_initialize($form, $form_state) {
     );
     field_create_instance($instance);
   }
-  // set the longname fields variable
-  $fields = _get_location_fields(FALSE);
-  $vocab = variable_get('location_taxonomize_vocab');
-  $vocab_fields = $vocab['fields'];
-  $settings = variable_get('location_taxonomize_settings');
-  $settings['longname']['fields'] = array();
-  foreach ($fields as $field) {
-    if ($vocab_fields[$field]) {
-      $settings['longname']['fields'][$field] = $field;
-    }
+  $hierarchy = _location_taxonomize_get_hierarchy();
+  $defaults = array();
+  $i = 0;
+  foreach ($hierarchy as $field) {
+    if ($field != 'country' && $field != 'province' && $field != 'city') {
+      $defaults[] = -1;
+    } else $defaults[] = $i;
+    $i++;
   }
-  variable_set('location_taxonomize_settings', $settings);
+  $settings = variable_get('location_taxonomize_settings');
+  $settings['longname']['fields'] = $defaults;
+  variable_set('location_taxonomize_settings',$settings);
   drupal_set_message(t('Location Taxonomize initialized successfully'));
 }
 
