@@ -33,6 +33,7 @@ function _location_taxonomy_add_longname(&$term, $hlevel, $location) {
   $settings = variable_get('location_taxonomize_settings');
   $ln_settings = $settings['longname'];
   $fields = $ln_settings['fields'];
+  dpm($fields);
   $hierarchy = _location_taxonomize_get_hierarchy();
   $term_hlevel_name = $hierarchy[$hlevel];
   $longname = array();
