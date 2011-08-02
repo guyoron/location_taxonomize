@@ -20,7 +20,7 @@ function location_taxonomize_locationapi(&$obj, $op, $a3, $a4, $a5) {
     // if we're saving a location, synchronize with vocab
     case 'save':
       $saved = location_taxonomize_process_loc($obj);
-      drupal_set_message(t('Location Taxonomize: %num new terms saved',array('%num' => $saved)));
+      drupal_set_message(t('Location Taxonomize: @num new terms saved', array('@num' => $saved)));
   }
 }
 
@@ -138,12 +138,12 @@ function location_taxonomize_form_validate($form, $form_state) {
   if ($state == 'initialization') {
     $values_init = $values['location_taxonomize_vocab'];
     $vid = variable_get('location_taxonomize_vid');
-    if ($vid) form_set_error('','There seems to already be a Vocabulary
-                            associated with Location Taxonomize.');
+    if ($vid) form_set_error('',t('There seems to already be a Vocabulary
+                            associated with Location Taxonomize.'));
     $vocab = taxonomy_vocabulary_machine_name_load(LOCATION_TAXONOMIZE_VOCAB_NAME);
     if ($values_init['method'] == 'new' && $vocab) {
-      form_set_error('','Could not create new Location Taxonomy vocabulary. A vocabulary with the name
-                    \'' . LOCATION_TAXONOMIZE_VOCAB_NAME . '\' already exists.');
+      form_set_error('',t("Could not create new Location Taxonomy vocabulary. A vocabulary with the name
+                    '@name' already exists.", array('@name' => LOCATION_TAXONOMIZE_VOCAB_NAME)));
     }
     if ($values_init['method'] == 'existing') {
       if (!$vocab) form_set_error('', 'Could not use the existing vocabulary. There is no existing vocabulary with the name 
