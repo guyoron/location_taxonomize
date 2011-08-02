@@ -199,6 +199,7 @@ function location_taxonomize_form($form, &$form_state) {
     '#default_value' => $opts_settings['longname_enable'],
   );
   $longname_opts = $opts_settings['longname'];
+  //dpm($longname_opts);
   // Long Name fieldset
   $form['location_taxonomize_settings']['longname'] = array(
     '#type' => 'fieldset',
@@ -218,7 +219,7 @@ function location_taxonomize_form($form, &$form_state) {
     '#type' => 'checkboxes',
     '#title' => t('Long Name fields'),
     '#description' => t('Choose which fields to use when constructing the Long Name'),
-    '#options' => _location_taxonomize_get_hierarchy(),
+    '#options' => _location_taxonomize_get_hierarchy(TRUE),
     '#default_value' => $longname_opts['fields'],
   );
   $form['location_taxonomize_settings']['longname']['separator'] = array(

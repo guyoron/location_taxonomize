@@ -70,6 +70,19 @@ function _location_taxonomize_variables() {
   );
 }
 
+function _location_taxonomize_init_var_longname() {
+  $hierarchy = _location_taxonomize_get_hierarchy(FALSE);
+  $defaults = array();
+  foreach ($hierarchy as $field) {
+    if ($field != 'country' && $field != 'province' && $field != 'city') {
+      $defaults[$field] = 0;
+    } else $defaults[$field] = $field;
+  }
+  $settings = variable_get('location_taxonomize_settings');
+  $settings['longname']['fields'] = $defaults;
+  variable_set('location_taxonomize_settings',$settings);
+}
+
 /**
 * Empties the Location Vocabulary
 */
@@ -107,13 +120,17 @@ function _get_location_fields ($assoc = TRUE) {
 
 /**
  * Returns the hierarchy configured for the current Location Vocabulary
+ * @param $assoc - whether to return an associative array (TRUE) or keyed array (FALSE)
  */
-function _location_taxonomize_get_hierarchy() {
+function _location_taxonomize_get_hierarchy($assoc = FALSE) {
   $vocab = variable_get('location_taxonomize_vocab');
   $fields = $vocab['fields'];
   $hierarchy = array();
   foreach ($fields as $key => $value) {
-    if ($value) $hierarchy[] = $key;
+    if ($value) {
+      if ($assoc) $hierarchy[$key] = $key;
+      else $hierarchy[] = $key;
+    }
   }
   return $hierarchy;
 }

@@ -19,7 +19,6 @@ function location_taxonomize_locationapi(&$obj, $op, $a3, $a4, $a5) {
   switch ($op) {
     // if we're saving a location, synchronize with vocab
     case 'save':
-      drupal_set_message('saving');
       $saved = location_taxonomize_process_loc($obj);
       drupal_set_message(t('Location Taxonomize: %num new terms saved',array('%num' => $saved)));
   }
@@ -33,14 +32,15 @@ function _location_taxonomy_add_longname(&$term, $hlevel, $location) {
   $settings = variable_get('location_taxonomize_settings');
   $ln_settings = $settings['longname'];
   $fields = $ln_settings['fields'];
-  dpm($fields);
+  //dpm($fields);
   $hierarchy = _location_taxonomize_get_hierarchy();
   $term_hlevel_name = $hierarchy[$hlevel];
+  if (!$fields[$term_hlevel_name]) return '';   // no Long Name if this hlevel_name is not selected in config
   $longname = array();
   for ($i = 0; $i <= $hlevel; $i++) {
     $hlevel_name = $hierarchy[$i];
-    $include = $fields[$i];
-    if ($include != -1) {
+    $include = $fields[$hlevel_name];
+    if ($include) {
       switch ($hlevel_name) {
         case 'country':
           if ($term_hlevel_name == 'country' || $ln_settings['country_naming'] == 'name') {
@@ -202,18 +202,8 @@ function location_taxonomize_initialize($form, $form_state) {
     );
     field_create_instance($instance);
   }
-  $hierarchy = _location_taxonomize_get_hierarchy();
-  $defaults = array();
-  $i = 0;
-  foreach ($hierarchy as $field) {
-    if ($field != 'country' && $field != 'province' && $field != 'city') {
-      $defaults[] = -1;
-    } else $defaults[] = $i;
-    $i++;
-  }
-  $settings = variable_get('location_taxonomize_settings');
-  $settings['longname']['fields'] = $defaults;
-  variable_set('location_taxonomize_settings',$settings);
+  // set defaults for longname fields
+  _location_taxonomize_init_var_longname();
   drupal_set_message(t('Location Taxonomize initialized successfully'));
 }
 
@@ -223,16 +213,15 @@ function location_taxonomize_initialize($form, $form_state) {
  * Returns the number of terms added
  */
 function location_taxonomize_process_loc($obj) {
-  drupal_set_message('process');
   // get settings
   $settings = variable_get('location_taxonomize_settings');
   $vid = variable_get('location_taxonomize_vid');
   $hierarchy = _location_taxonomize_get_hierarchy();
-  dpm($hierarchy);
+  //dpm($hierarchy);
   $saved = 0;   // holds the number of newly saved terms
   // make sure the province_name and country_name fields are there and updated
   $location = _fix_loc_tmp($obj);
-  dpm($location);
+  //dpm($location);
   $tids = array();
   // this loops through hierarchy levels and saves terms if necessary
   for ($hlevel = 0; $hlevel < count($hierarchy); $hlevel++) {
