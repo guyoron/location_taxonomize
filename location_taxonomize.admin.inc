@@ -103,7 +103,6 @@ function location_taxonomize_form($form, &$form_state) {
     '#default_value' => $opts_vocab['fields'],
     '#disabled' => TRUE,
   );
-  dpm($opts_vocab['fields']);
   // button to empty the location vocabulary
   $form['location_taxonomize_vocab']['emptyvocab'] = array(
     '#type' => 'button',
@@ -222,7 +221,6 @@ function location_taxonomize_form($form, &$form_state) {
     '#options' => _location_taxonomize_get_hierarchy(),
     '#default_value' => $longname_opts['fields'],
   );
-  dpm($longname_opts['fields']);
   $form['location_taxonomize_settings']['longname']['separator'] = array(
     '#type' =>'textfield',
     '#title' => t('Separator'),

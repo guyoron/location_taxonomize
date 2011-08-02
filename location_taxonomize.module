@@ -31,55 +31,41 @@ function location_taxonomize_locationapi(&$obj, $op, $a3, $a4, $a5) {
  */
 function _location_taxonomy_add_longname(&$term, $hlevel, $location) {
   $settings = variable_get('location_taxonomize_settings');
-  $opts = $settings['longname'];
-  $fields = $opts['fields'];
+  $ln_settings = $settings['longname'];
+  $fields = $ln_settings['fields'];
+  $hierarchy = _location_taxonomize_get_hierarchy();
+  $term_hlevel_name = $hierarchy[$hlevel];
   $longname = array();
-  switch ($hlevel) {
-    case 0:
-      if ($fields['country_name']) $longname[] = $location['country_name'];
-    break;
-    case 1:
-      if ($fields['province_name']) {
-        $longname[] = $location['province_name'];
-      }
-      if ($fields['country_name']) {
-        if ($opts['country_code']) {
-          if ($opts['usa'] && $location['country'] == 'us') $country = 'usa';
-          else $country = 'us';
-          if ($opts['cap_co']) $longname[] = strtoupper($country);
-          else $longname[] = $country;
-        } else {
-          $longname[] = $location['country_name'];
-        }
-      }
-    break;
-    case 2:
-      if ($fields['city']) {
-        $longname[] = $location['city'];
-      }
-      if ($fields['province_name']) {
-        if ($opts['province_code']) {
-          if ($opts['cap_pr']) $longname[] = strtoupper($location['province']);
+  for ($i = 0; $i <= $hlevel; $i++) {
+    $hlevel_name = $hierarchy[$i];
+    $include = $fields[$i];
+    if ($include != -1) {
+      switch ($hlevel_name) {
+        case 'country':
+          if ($term_hlevel_name == 'country' || $ln_settings['country_naming'] == 'name') {
+            $longname[] = $location['country_name'];
+          }
+          elseif ($location['country'] == 'us' && $ln_settings['usa']) $longname[] = 'USA';
+          else $longname[] = strtoupper($location['country']);
+          break;
+        case 'province':
+          if ($term_hlevel_name == 'province' || $ln_settings['province_naming'] == 'name') {
+            $longname[] = $location['province_name'];
+          }
           else $longname[] = $location['province'];
-        } else  $longname[] = $location['province_name'];
+          break;
+        default:
+          $longname[] = $location[$hlevel_name];
+          break;
       }
-      if ($fields['country_name']) {
-        if ($opts['country_code']) {
-          if ($opts['usa'] && $location['country'] == 'us') $country = 'usa';
-          else $country = 'us';
-          if ($opts['cap_co']) $longname[] = strtoupper($country);
-          else $longname[] = $country;
-        } else {
-          $longname[] = $location['country_name'];
-        }
-      }
-    break;
+    }
   }
+  $longname = array_reverse($longname);
   $count = count($longname);
   $longname_str = '';
   for ($i = 0; $i<$count; $i++) {
     $longname_str .= $longname[$i];
-    if ($i != $count-1) $longname_str .= $opts['separator'] . ' ';
+    if ($i != $count-1) $longname_str .= $ln_settings['separator'] . ' ';
   }
   $term->location_taxonomize_longname['und'][0]['value'] = $longname_str;
 }
