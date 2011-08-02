@@ -10,22 +10,6 @@
 * in location_taxonomize_menu().
 */
 function location_taxonomize_form($form, &$form_state) {
-  $form['location_taxonomize_default'] = array(
-    '#type' => 'button',
-    '#value' => t('Set variables to defaults'),
-    '#ajax' => array(
-                'callback' => '_location_taxonomize_set_defaults',
-                'wrapper' => 'msg--div',
-                'method' => 'replace',
-                'effect' => 'fade',
-                'event' => 'mousedown',
-                ),
-  );
-  // placeholder div for ajax message
-  $form['msg--div'] = array(
-    '#type' => 'container',
-    '#id'=> 'msg--div',
-  );
   // initialization
   $opts_vocab = variable_get('location_taxonomize_vocab');
   $vid = variable_get('location_taxonomize_vid');
@@ -52,6 +36,7 @@ function location_taxonomize_form($form, &$form_state) {
       $form['location_taxonomize_vocab']['method'] = array(
         '#type' => 'radios',
         '#title' => t('Choose an initialization method'),
+        '#required' => TRUE,
         '#options' => array(
           'new' => t('Create a new Vocabulary to associate with Location Taxonomize'),
           'existing' => t('Use the existing vocabulary vid ' . $possible_vid),
@@ -66,6 +51,7 @@ function location_taxonomize_form($form, &$form_state) {
       $form['location_taxonomize_vocab']['method'] = array(
         '#type' => 'radios',
         '#title' => t('Choose an initialization method'),
+        '#required' => TRUE,
         '#options' => array(
           'new' => t('Create a new Vocabulary to associate with Location Taxonomize'),
         ),
@@ -162,11 +148,48 @@ function location_taxonomize_form($form, &$form_state) {
   );
   // option to assign terms to nodes
   $form['location_taxonomize_settings']['node_attach'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Also attach the appropriate Taxonomy Location terms to nodes'),
-    '#description' => t('If this is checked, the terms saved in the Location Taxonomy will also automatically be applied to the 
+    '#type'         => 'checkbox',
+    '#title'        => t('Also attach the appropriate Taxonomy Location terms to nodes (NOT IMPLEMENTED YET)'),
+    '#description'  => t('If this is checked, the terms saved in the Location Taxonomy will also automatically be applied to the 
                         nodes with those locations. Note that...'),
-    '#default_value' => $opts_settings['node_attach'],
+    '#default_value'=> $opts_settings['node_attach'],
+  );
+  $form['location_taxonomize_settings']['naming'] = array(
+    '#type'         => 'fieldset',
+    '#title'        => t('Term Naming Settings'),
+    '#collapsible'  => TRUE,
+    '#collapsed'    => FALSE,
+    '#tree'         => TRUE,
+  );
+  $form['location_taxonomize_settings']['naming']['country'] = array(
+    '#type'       => 'radios',
+    '#title'      => 'Country naming',
+    '#required'   => TRUE,
+    '#options'    => array(
+      'name' => t('Use full name (i.e. <em>United States</em>)'),
+      'code' => t('Use country code (i.e. <em>US</em>)'),
+    ),
+    '#default_value' => $opts_settings['naming']['country'],
+  );
+  $form['location_taxonomize_settings']['naming']['usa'] = array(
+    '#type'       => 'checkbox',
+    '#title'      => t("Use 'USA' instead of 'US'"),
+    '#default_value' => $opts_settings['naming']['usa'],
+    '#states' => array(
+      'enabled' => array(
+        ':input[name="location_taxonomize_settings[naming][country]"]' => array('value' => 'code'),
+      ),
+    ),
+  );
+  $form['location_taxonomize_settings']['naming']['province'] = array(
+    '#type'       => 'radios',
+    '#title'      => 'Province naming',
+    '#required'   => TRUE,
+    '#options'    => array(
+      'name' => t('Use full name (i.e. <em>California</em>)'),
+      'code' => t('Use province code (i.e. <em>CA</em>)'),
+    ),
+    '#default_value' => $opts_settings['naming']['province'],
   );
   // option to enable or disable the Full Name field
   $form['location_taxonomize_settings']['longname_enable'] = array(
@@ -176,6 +199,7 @@ function location_taxonomize_form($form, &$form_state) {
     '#default_value' => $opts_settings['longname_enable'],
   );
   $longname_opts = $opts_settings['longname'];
+  //dpm($longname_opts);
   // Long Name fieldset
   $form['location_taxonomize_settings']['longname'] = array(
     '#type' => 'fieldset',
@@ -195,7 +219,7 @@ function location_taxonomize_form($form, &$form_state) {
     '#type' => 'checkboxes',
     '#title' => t('Long Name fields'),
     '#description' => t('Choose which fields to use when constructing the Long Name'),
-    '#options' => _get_location_fields(),
+    '#options' => _location_taxonomize_get_hierarchy(TRUE),
     '#default_value' => $longname_opts['fields'],
   );
   $form['location_taxonomize_settings']['longname']['separator'] = array(
@@ -206,49 +230,46 @@ function location_taxonomize_form($form, &$form_state) {
     '#size' => 1,
     '#required' => TRUE,
   );
-  $form['location_taxonomize_settings']['longname']['country_code'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Use the country code instead of its name where it is not the primary item'),
-    '#default_value' => $longname_opts['country_code'],
-  );
-  $form['location_taxonomize_settings']['longname']['cap_co'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Capitalize country code in Long Name'),
-    '#default_value' => $longname_opts['cap_co'],
-    '#states' => array(
-        // Only show this field when the checkbox is enabled.
-        'enabled' => array(
-          ':input[name="location_taxonomize_settings[longname][country_code]"]' => array('checked' => TRUE),
-        ),
-      ),
-  );
-  $form['location_taxonomize_settings']['longname']['province_code'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Use the province code instead of its name where it is not the primary item'),
-    '#default_value' => $longname_opts['province_code'],
-  );
-  $form['location_taxonomize_settings']['longname']['cap_pr'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Capitalize province code in Long Name'),
-    '#default_value' => $longname_opts['cap_pr'],
-    '#states' => array(
-        // Only show this field when the checkbox is enabled.
-        'enabled' => array(
-          ':input[name="location_taxonomize_settings[longname][province_code]"]' => array('checked' => TRUE),
-        ),
-      ),
+  $form['location_taxonomize_settings']['longname']['country_naming'] = array(
+    '#type' => 'radios',
+    '#title' => t('Country naming in Long Names'),
+    '#description' => t('Determines how the country will be saved in Long Names'),
+    '#options' => array(
+      'name' => t('Always use full name (i.e. <em>United States</em>)'),
+      'code' => t('Use province code (i.e. <em>US</em>) when it is not the primary item in the Full Name'),
+    ),
+    '#default_value' => $longname_opts['country_naming'],
   );
   $form['location_taxonomize_settings']['longname']['usa'] = array(
     '#type' => 'checkbox',
     '#title' => t('Use \'USA\' instead of \'US\''),
-    '#description' => t('Capitalization will depend on capitalization settings'),
     '#default_value' => $longname_opts['usa'],
     '#states' => array(
-        // Only show this field when the checkbox is enabled.
-        'enabled' => array(
-          ':input[name="location_taxonomize_settings[longname][country_code]"]' => array('checked' => TRUE),
-        ),
+      // Only show this field when the checkbox is enabled.
+      'enabled' => array(
+        ':input[name="location_taxonomize_settings[longname][country_naming]"]' => array('value' => 'code'),
       ),
+    ),
+  );
+  $form['location_taxonomize_settings']['longname']['province_naming'] = array(
+    '#type' => 'radios',
+    '#title' => t('Province naming in Long Names'),
+    '#description' => t('Determines how the province will be saved in Long Names'),
+    '#options' => array(
+      'name' => t('Always use full name (i.e. <em>California</em>)'),
+      'code' => t('Use province code (i.e. <em>CA</em>) when it is not the primary item in the Full Name'),
+    ),
+    '#default_value' => $longname_opts['province_naming'],
+  );
+  $form['location_taxonomize_default'] = array(
+    '#type' => 'submit',
+    '#value' => t('Reset module'),
+    '#submit' => array('_location_taxonomize_reset'),
+  );
+  $form['location_taxonomize_test'] = array(
+    '#type' => 'submit',
+    '#value' => t('Test'),
+    '#submit' => array('_get_location_fields'),
   );
   return system_settings_form($form);
 }

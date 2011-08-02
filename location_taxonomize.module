@@ -14,11 +14,12 @@ require_once('location_taxonomize.admin.inc');
  */
 function location_taxonomize_locationapi(&$obj, $op, $a3, $a4, $a5) {
   $settings = variable_get('location_taxonomize_settings');
-  if (!$settings['enable']) return;
+  $vid = variable_get('location_taxonomize_vid');
+  if (!$settings['enable'] || !$vid) return;
   switch ($op) {
     // if we're saving a location, synchronize with vocab
     case 'save':
-      $saved = location_taxonomize_process_location($obj);
+      $saved = location_taxonomize_process_loc($obj);
       drupal_set_message(t('Location Taxonomize: %num new terms saved',array('%num' => $saved)));
   }
 }
@@ -29,55 +30,43 @@ function location_taxonomize_locationapi(&$obj, $op, $a3, $a4, $a5) {
  */
 function _location_taxonomy_add_longname(&$term, $hlevel, $location) {
   $settings = variable_get('location_taxonomize_settings');
-  $opts = $settings['longname'];
-  $fields = $opts['fields'];
+  $ln_settings = $settings['longname'];
+  $fields = $ln_settings['fields'];
+  //dpm($fields);
+  $hierarchy = _location_taxonomize_get_hierarchy();
+  $term_hlevel_name = $hierarchy[$hlevel];
+  if (!$fields[$term_hlevel_name]) return '';   // no Long Name if this hlevel_name is not selected in config
   $longname = array();
-  switch ($hlevel) {
-    case 0:
-      if ($fields['country_name']) $longname[] = $location['country_name'];
-    break;
-    case 1:
-      if ($fields['province_name']) {
-        $longname[] = $location['province_name'];
-      }
-      if ($fields['country_name']) {
-        if ($opts['country_code']) {
-          if ($opts['usa'] && $location['country'] == 'us') $country = 'usa';
-          else $country = 'us';
-          if ($opts['cap_co']) $longname[] = strtoupper($country);
-          else $longname[] = $country;
-        } else {
-          $longname[] = $location['country_name'];
-        }
-      }
-    break;
-    case 2:
-      if ($fields['city']) {
-        $longname[] = $location['city'];
-      }
-      if ($fields['province_name']) {
-        if ($opts['province_code']) {
-          if ($opts['cap_pr']) $longname[] = strtoupper($location['province']);
+  for ($i = 0; $i <= $hlevel; $i++) {
+    $hlevel_name = $hierarchy[$i];
+    $include = $fields[$hlevel_name];
+    if ($include) {
+      switch ($hlevel_name) {
+        case 'country':
+          if ($term_hlevel_name == 'country' || $ln_settings['country_naming'] == 'name') {
+            $longname[] = $location['country_name'];
+          }
+          elseif ($location['country'] == 'us' && $ln_settings['usa']) $longname[] = 'USA';
+          else $longname[] = strtoupper($location['country']);
+          break;
+        case 'province':
+          if ($term_hlevel_name == 'province' || $ln_settings['province_naming'] == 'name') {
+            $longname[] = $location['province_name'];
+          }
           else $longname[] = $location['province'];
-        } else  $longname[] = $location['province_name'];
+          break;
+        default:
+          $longname[] = $location[$hlevel_name];
+          break;
       }
-      if ($fields['country_name']) {
-        if ($opts['country_code']) {
-          if ($opts['usa'] && $location['country'] == 'us') $country = 'usa';
-          else $country = 'us';
-          if ($opts['cap_co']) $longname[] = strtoupper($country);
-          else $longname[] = $country;
-        } else {
-          $longname[] = $location['country_name'];
-        }
-      }
-    break;
+    }
   }
+  $longname = array_reverse($longname);
   $count = count($longname);
   $longname_str = '';
   for ($i = 0; $i<$count; $i++) {
     $longname_str .= $longname[$i];
-    if ($i != $count-1) $longname_str .= $opts['separator'] . ' ';
+    if ($i != $count-1) $longname_str .= $ln_settings['separator'] . ' ';
   }
   $term->location_taxonomize_longname['und'][0]['value'] = $longname_str;
 }
@@ -213,14 +202,9 @@ function location_taxonomize_initialize($form, $form_state) {
     );
     field_create_instance($instance);
   }
-  drupal_set_message(t('Attached the Long Name field to the vocabulary'));
-  drupal_set_message(t('Location Taxonomy initialized successfully'));
-}
-
-function location_taxonomize_disassociate($form, $form_state) {
-  // unset the vid variable
-  variable_del('location_taxonomize_vid');
-  drupal_set_message('Location Taxonomy successfully disassociated.');
+  // set defaults for longname fields
+  _location_taxonomize_init_var_longname();
+  drupal_set_message(t('Location Taxonomize initialized successfully'));
 }
 
 
@@ -228,20 +212,27 @@ function location_taxonomize_disassociate($form, $form_state) {
  * Determines if a location needs to be taxonomized. If so, it saves the appropriate terms
  * Returns the number of terms added
  */
-function location_taxonomize_process_location($obj) {
+function location_taxonomize_process_loc($obj) {
+  // get settings
   $settings = variable_get('location_taxonomize_settings');
   $vid = variable_get('location_taxonomize_vid');
-  $saved = 0;
-  $hierarchy = array ('country_name','province_name','city');
+  $hierarchy = _location_taxonomize_get_hierarchy();
+  //dpm($hierarchy);
+  $saved = 0;   // holds the number of newly saved terms
+  // make sure the province_name and country_name fields are there and updated
   $location = _fix_loc_tmp($obj);
-  dpm($location);
+  //dpm($location);
   $tids = array();
   // this loops through hierarchy levels and saves terms if necessary
   for ($hlevel = 0; $hlevel < count($hierarchy); $hlevel++) {
-    $name = $location[$hierarchy[$hlevel]];
+    $hlevel_name = $hierarchy[$hlevel];
+    // set the term name
+    $name = _location_taxonomize_create_term_name($hlevel_name, &$location, &$settings);
+    // find if the term exists already or not
     if ($hlevel == 0) $parentid = -1;
     else $parentid = $tids[$hlevel-1];
     $findterm = _find_term($name, $hlevel, $parentid);
+    // save if necessary
     if (!$findterm) {
       $term = (object) array(
         'name' => $name,
@@ -251,9 +242,9 @@ function location_taxonomize_process_location($obj) {
         _location_taxonomy_add_longname(&$term, $hlevel, $location);
       }
       if ($hlevel == 0) {
-        $term->parent = array(0, );
+        $term->parent = array(0);
       } else {
-        $term->parent = array($parentid, );
+        $term->parent = array($parentid);
       }
       taxonomy_term_save($term);
       $tids[] = $term->tid;
@@ -264,6 +255,24 @@ function location_taxonomize_process_location($obj) {
   return $saved;
 }
 
+function _location_taxonomize_create_term_name($hlevel_name, &$location, &$settings) {
+  switch ($hlevel_name) {
+    case 'country':
+      if ($settings['naming']['country'] == 'name') $name = $location['country_name'];
+      elseif ($location['country'] == 'us' && $settings['naming']['usa']) $name = 'USA';
+      else $name = strtoupper($location['country']);
+      break;
+    case 'province':
+      if ($settings['naming']['province'] == 'name') $name = $location['province_name'];
+      else $name = $location['province'];
+      break;
+    default:
+      $name = $location[$hlevel_name];
+      break;
+  }
+  return $name;
+}
+
 ////////////////////////////////////////
 // Feature: Bulk taxonomize
 ////////////////////////////////////////
@@ -271,7 +280,7 @@ function location_taxonomize_process_location($obj) {
 function location_taxonomize_bulk_taxonomize($form, $form_state) {
   $batch = array(
     'operations' => array(
-      array('location_taxonomize_bulk_taxonomize_1', array($form_state)),
+      array('location_taxonomize_bulk_taxonomize_op', array($form_state)),
       //array('batch_example_process', array($options3, $options4)),
     ),
     'finished' => 'location_taxonomize_bulk_taxonomize_finished',
@@ -284,7 +293,7 @@ function location_taxonomize_bulk_taxonomize($form, $form_state) {
   batch_set($batch);
 }
 
-function location_taxonomize_bulk_taxonomize_1($form_state, &$context) {
+function location_taxonomize_bulk_taxonomize_op($form_state, &$context) {
   // initialize progress, max, and current if this is the first iteration
   if (!isset($context['sandbox']['progress'])) {
       $context['sandbox']['progress'] = 0;
@@ -299,7 +308,7 @@ function location_taxonomize_bulk_taxonomize_1($form_state, &$context) {
   $result = db_query_range("SELECT lid, name, street, additional, city, province, postal_code, country, latitude, longitude, source FROM {location} WHERE lid != 0 ORDER BY lid ASC", $context['sandbox']['current'], $limit, array());
   $result_array = $result->fetchAllAssoc('lid');
   foreach ($result_array as $row) {
-    $added = location_taxonomize_process_location((array)$row);
+    $added = location_taxonomize_process_loc((array)$row);
     $context['results']['added'] += $added;
     $context['sandbox']['progress']++;
     $context['message'] = t('Processing location lid %n', array('%n' => $row->lid));
