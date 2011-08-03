@@ -48,7 +48,8 @@ function location_taxonomize_form($form, &$form_state) {
                             vocabulary must match the hierarchy structure you choose below, or there 
                             will be unexpected behavior.')
       );
-    } else {
+    }
+    else {
       $form['location_taxonomize_vocab']['method'] = array(
         '#type' => 'radios',
         '#title' => t('Choose an initialization method'),
@@ -133,7 +134,7 @@ function location_taxonomize_form($form, &$form_state) {
   // placeholder div for ajax message
   $form['location_taxonomize_vocab']['msg-div'] = array(
     '#type' => 'container',
-    '#id'=> 'msg-div',
+    '#id' => 'msg-div',
   );
   // get settings variables
   $opts_settings = variable_get('location_taxonomize_settings');
@@ -158,7 +159,7 @@ function location_taxonomize_form($form, &$form_state) {
     '#title'        => t('Also attach the appropriate Taxonomy Location terms to nodes (NOT IMPLEMENTED YET)'),
     '#description'  => t('If this is checked, the terms saved in the Location Taxonomy will also automatically be applied to the 
                         nodes with those locations. Note that...'),
-    '#default_value'=> $opts_settings['node_attach'],
+    '#default_value' => $opts_settings['node_attach'],
   );
   // naming fieldset
   $form['location_taxonomize_settings']['naming'] = array(
@@ -229,7 +230,7 @@ function location_taxonomize_form($form, &$form_state) {
     '#default_value' => $longname_opts['fields'],
   );
   $form['location_taxonomize_settings']['longname']['separator'] = array(
-    '#type' =>'textfield',
+    '#type' => 'textfield',
     '#title' => t('Separator'),
     '#maxlength' => 1,
     '#default_value' => $longname_opts['separator'],
@@ -291,17 +292,17 @@ function location_taxonomize_form_validate($form, $form_state) {
   if ($state == 'initialization') {
     $values_init = $values['location_taxonomize_vocab'];
     $vid = variable_get('location_taxonomize_vid');
-    if ($vid) form_set_error('',t('There seems to already be a Vocabulary
+    if ($vid) form_set_error('', t('There seems to already be a Vocabulary
                             associated with Location Taxonomize.'));
     $vocab = taxonomy_vocabulary_machine_name_load(LOCATION_TAXONOMIZE_VOCAB_NAME);
     if ($values_init['method'] == 'new' && $vocab) {
-      form_set_error('',t("Could not create new Location Taxonomy vocabulary. A vocabulary with the name
+      form_set_error('', t("Could not create new Location Taxonomy vocabulary. A vocabulary with the name
                     '@name' already exists.", array('@name' => LOCATION_TAXONOMIZE_VOCAB_NAME)));
     }
     if ($values_init['method'] == 'existing') {
       if (!$vocab) form_set_error('', t("Could not use the existing vocabulary. There is no existing vocabulary with the name 
                                   '@name'", array('@name' => LOCATION_TAXONOMIZE_VOCAB_NAME)));
-      else if ($vocab->vid != $values_init['possible_vid']) {
+      elseif ($vocab->vid != $values_init['possible_vid']) {
         form_set_error('', t('Could not use the existing vocabulary (vid @vid). Wrong vid.', array('@vid' => $values_init['possible_vid'])));
       }
     }

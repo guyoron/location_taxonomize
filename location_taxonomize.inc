@@ -1,8 +1,8 @@
-<?
+<?php
 
 /**
 * @file
-* Just some includes for Location Taxonomy
+* Some useful functions for Location taxonomize
 */
 
 define('LOCATION_TAXONOMIZE_MODULE_ID', 'location_taxonomize');
@@ -60,7 +60,7 @@ function _location_taxonomize_variables() {
 /**
  * Empties the Location Vocabulary (called as an AJAX form callback)
  */
-function location_taxonomize_empty_vocab () {
+function location_taxonomize_empty_vocab() {
   $terms = taxonomy_get_tree(variable_get('location_taxonomize_vid'));
   foreach ($terms as $term) {
     taxonomy_term_delete($term->tid);
@@ -74,7 +74,7 @@ function location_taxonomize_empty_vocab () {
  * Returns the Location module fields that can be used for the Location Vocabulary
  * @param $assoc - whether to return an associative array (TRUE) or just an indexed array (FALSE) 
  */
-function _get_location_fields ($assoc = TRUE) {
+function _get_location_fields($assoc = TRUE) {
   // get name of site database
   global $databases;
   $db = $databases['default']['default']['database'];
@@ -124,7 +124,7 @@ function location_taxonomize_disassociate($form, $form_state) {
 function _location_taxonomize_set_defaults() {
   $defaults = _location_taxonomize_variables();
   foreach ($defaults as $key => $value) {
-    if($value) variable_set($key,$value);
+    if ($value) variable_set($key, $value);
     else variable_del($key);
   } 
 }
