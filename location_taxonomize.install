@@ -13,6 +13,7 @@ require_once('location_taxonomize.inc');
 function location_taxonomize_install() {
   // set all variables to their default values
   _location_taxonomize_set_defaults();
+  drupal_set_message(t("Location taxonomize has been installed, but it doesn't do anything right away. To start using it, you have to go to the configuration page and initialize your Location Vocabulary."));
 }
 
 /**
