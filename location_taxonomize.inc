@@ -9,23 +9,10 @@ define('LOCATION_TAXONOMIZE_MODULE_ID', 'location_taxonomize');
 define('LOCATION_TAXONOMIZE_MODULE_NAME', 'Location taxonomize');
 define('LOCATION_TAXONOMIZE_VOCAB_NAME', 'location_taxonomize');
 
-function _location_taxonomize_del_variables() {
-  $vars = _location_taxonomize_variables();
-  foreach ($vars as $key => $value) {
-    variable_del($key);
-  }
-  return t('All variables deleted');
-}
 
-function _location_taxonomize_set_defaults() {
-$defaults = _location_taxonomize_variables();
-  foreach ($defaults as $key => $value) {
-    if($value) variable_set($key,$value);
-    else variable_del($key);
-  }
-  
-}
-
+/**
+ * Resets the module, as if it was uninstalled and installed again
+ */
 function _location_taxonomize_reset() {
   location_taxonomize_empty_vocab();
   _location_taxonomize_set_defaults();
@@ -70,22 +57,9 @@ function _location_taxonomize_variables() {
   );
 }
 
-function _location_taxonomize_init_var_longname() {
-  $hierarchy = _location_taxonomize_get_hierarchy(FALSE);
-  $defaults = array();
-  foreach ($hierarchy as $field) {
-    if ($field != 'country' && $field != 'province' && $field != 'city') {
-      $defaults[$field] = 0;
-    } else $defaults[$field] = $field;
-  }
-  $settings = variable_get('location_taxonomize_settings');
-  $settings['longname']['fields'] = $defaults;
-  variable_set('location_taxonomize_settings',$settings);
-}
-
 /**
-* Empties the Location Vocabulary
-*/
+ * Empties the Location Vocabulary (called as an AJAX form callback)
+ */
 function location_taxonomize_empty_vocab () {
   $terms = taxonomy_get_tree(variable_get('location_taxonomize_vid'));
   foreach ($terms as $term) {
@@ -135,13 +109,36 @@ function _location_taxonomize_get_hierarchy($assoc = FALSE) {
   return $hierarchy;
 }
 
+/**
+ * Disassociates the vocabulary - unlinks the current Location Vocabulary from the module
+ */
 function location_taxonomize_disassociate($form, $form_state) {
   // unset the vid variable
   variable_del('location_taxonomize_vid');
   drupal_set_message(t('Location Taxonomy successfully disassociated'));
 }
 
+/**
+ * Sets all this module's variables to their default values
+ */
+function _location_taxonomize_set_defaults() {
+  $defaults = _location_taxonomize_variables();
+  foreach ($defaults as $key => $value) {
+    if($value) variable_set($key,$value);
+    else variable_del($key);
+  } 
+}
 
+/**
+ * Deletes all variables set by this module
+ */
+function _location_taxonomize_del_variables() {
+  $vars = _location_taxonomize_variables();
+  foreach ($vars as $key => $value) {
+    variable_del($key);
+  }
+  return t('All variables deleted');
+}
 
 
 

@@ -6,13 +6,29 @@
 */
 
 /**
-* Form function, called by drupal_get_form()
-* in location_taxonomize_menu().
+* Implements hook_menu()
+*/
+function location_taxonomize_menu() {
+  $items = array(); 
+  // module configuration page
+  $items['admin/config/content/location_taxonomize'] = array(
+    'title' => 'Location Taxonomize',
+    'description' => 'Configuration for Location taxonomize module',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('location_taxonomize_form'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  return $items;
+}
+
+/**
+* Location Taxonomize administration form
 */
 function location_taxonomize_form($form, &$form_state) {
-  // initialization
   $opts_vocab = variable_get('location_taxonomize_vocab');
   $vid = variable_get('location_taxonomize_vid');
+  // initialization
   if (!$vid) {
     $form['location_taxonomize_vocab'] = array(
       '#type' => 'fieldset',
@@ -21,11 +37,12 @@ function location_taxonomize_form($form, &$form_state) {
       '#collapsed' => FALSE,
       '#tree' => TRUE,
     );
+    // hidden form element used to determine if LT is initialized already or not
     $form['location_taxonomize_vocab']['state'] = array(
       '#type' => 'hidden',
       '#value' => 'initialization',
     );
-    // check if there is already a Location vocab
+    // check if there is already a Location vocab we could use
     $vocab = taxonomy_vocabulary_machine_name_load(LOCATION_TAXONOMIZE_VOCAB_NAME);
     if ($vocab) {
       $possible_vid = $vocab->vid;
@@ -62,6 +79,7 @@ function location_taxonomize_form($form, &$form_state) {
       );
       
     }
+    // possible fields to use for hierarchy
     $form['location_taxonomize_vocab']['fields'] = array(
       '#type' => 'checkboxes',
       '#title' => t('Location Taxonomy Hierachy'),
@@ -83,6 +101,7 @@ function location_taxonomize_form($form, &$form_state) {
     '#collapsed' => FALSE,
     '#tree' => TRUE,
   );
+  // hidden form element used to determine if LT is initialized already or not
   $form['location_taxonomize_vocab']['state'] = array(
     '#type' => 'hidden',
     '#value' => 'settings',
@@ -94,7 +113,7 @@ function location_taxonomize_form($form, &$form_state) {
     '#markup' => t('Currently using Vocabulary vid @vid', array('@vid' => variable_get('location_taxonomize_vid'))),
   );
   $opts_vocab = variable_get('location_taxonomize_vocab');
-  // fields used for hierarchy, none editable now
+  // fields used for hierarchy, not editable now
   $form['location_taxonomize_vocab']['fields'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Location Taxonomy Hierachy'),
@@ -115,11 +134,13 @@ function location_taxonomize_form($form, &$form_state) {
                 'event' => 'mousedown',
                 ),
   );
+  // disassociate button
   $form['location_taxonomize_vocab']['disassociate'] = array(
     '#type' => 'submit',
     '#value' => t('Disassociate Vocab'),
     '#submit' => array('location_taxonomize_disassociate', ),
   );
+  // bulk taxonomize button
   $form['location_taxonomize_vocab']['bulk_taxonomize'] = array(
     '#type' => 'submit',
     '#value' => t('Bulk Taxonomize Locations'),
@@ -132,6 +153,7 @@ function location_taxonomize_form($form, &$form_state) {
   );
   // get settings variables
   $opts_settings = variable_get('location_taxonomize_settings');
+  // settings fieldset
   $form['location_taxonomize_settings'] = array(
     '#type' => 'fieldset',
     '#title' => t('Settings'),
@@ -154,6 +176,7 @@ function location_taxonomize_form($form, &$form_state) {
                         nodes with those locations. Note that...'),
     '#default_value'=> $opts_settings['node_attach'],
   );
+  // naming fieldset
   $form['location_taxonomize_settings']['naming'] = array(
     '#type'         => 'fieldset',
     '#title'        => t('Term Naming Settings'),
@@ -199,7 +222,6 @@ function location_taxonomize_form($form, &$form_state) {
     '#default_value' => $opts_settings['longname_enable'],
   );
   $longname_opts = $opts_settings['longname'];
-  //dpm($longname_opts);
   // Long Name fieldset
   $form['location_taxonomize_settings']['longname'] = array(
     '#type' => 'fieldset',
@@ -261,6 +283,7 @@ function location_taxonomize_form($form, &$form_state) {
     ),
     '#default_value' => $longname_opts['province_naming'],
   );
+  // resets the module - for dev and testing purposes
   $form['location_taxonomize_default'] = array(
     '#type' => 'submit',
     '#value' => t('Reset module'),
@@ -272,4 +295,31 @@ function location_taxonomize_form($form, &$form_state) {
     '#submit' => array('_get_location_fields'),
   );*/
   return system_settings_form($form);
+}
+
+/**
+ * Validation hook for the module's admin form
+ */
+function location_taxonomize_form_validate($form, $form_state) {
+  $values = $form_state['values'];
+  //  if we're initializing, make sure that there are no interfering vocabs
+  $state = $values['location_taxonomize_vocab']['state']; 
+  if ($state == 'initialization') {
+    $values_init = $values['location_taxonomize_vocab'];
+    $vid = variable_get('location_taxonomize_vid');
+    if ($vid) form_set_error('',t('There seems to already be a Vocabulary
+                            associated with Location Taxonomize.'));
+    $vocab = taxonomy_vocabulary_machine_name_load(LOCATION_TAXONOMIZE_VOCAB_NAME);
+    if ($values_init['method'] == 'new' && $vocab) {
+      form_set_error('',t("Could not create new Location Taxonomy vocabulary. A vocabulary with the name
+                    '@name' already exists.", array('@name' => LOCATION_TAXONOMIZE_VOCAB_NAME)));
+    }
+    if ($values_init['method'] == 'existing') {
+      if (!$vocab) form_set_error('', t("Could not use the existing vocabulary. There is no existing vocabulary with the name 
+                                  '@name'", array('@name' => LOCATION_TAXONOMIZE_VOCAB_NAME)));
+      else if ($vocab->vid != $values_init['possible_vid']) {
+        form_set_error('', t('Could not use the existing vocabulary (vid @vid). Wrong vid.', array('@vid' => $values_init['possible_vid'])));
+      }
+    }
+  }
 }

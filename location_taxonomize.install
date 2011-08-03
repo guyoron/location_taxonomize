@@ -11,11 +11,15 @@ require_once('location_taxonomize.inc');
  * Implementation of hook_install()
  */
 function location_taxonomize_install() {
+  // set all variables to their default values
   _location_taxonomize_set_defaults();
 }
 
+/**
+ * Implementation of hook_enable()
+ */
 function location_taxonomize_enable() {
-
+  // nothing to do here for now, everything is done during initialization
 }
 
 /**
