@@ -5,22 +5,6 @@
 * Contains the admin forms for Location Taxonomize
 */
 
-/**
-* Implements hook_menu()
-*/
-function location_taxonomize_menu() {
-  $items = array(); 
-  // module configuration page
-  $items['admin/config/content/location_taxonomize'] = array(
-    'title' => 'Location Taxonomize',
-    'description' => 'Configuration for Location taxonomize module',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('location_taxonomize_form'),
-    'access arguments' => array('access administration pages'),
-    'type' => MENU_NORMAL_ITEM,
-  );
-  return $items;
-}
 
 /**
 * Location Taxonomize administration form

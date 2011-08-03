@@ -10,8 +10,36 @@ require_once('location_taxonomize.inc');
 require_once('location_taxonomize.admin.inc');
 
 /**
- * Implements hook_locationapi(). Used to save terms when locations are saved.
- */
+* Implements hook_menu()
+*/
+function location_taxonomize_menu() {
+  $items = array(); 
+  // module configuration page
+  $items['admin/config/content/location_taxonomize'] = array(
+    'title' => 'Location Taxonomize',
+    'description' => 'Configuration for Location taxonomize module',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('location_taxonomize_form'),
+    'access arguments' => array('access administration pages', 'administer location_taxonomize'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  return $items;
+}
+
+/**
+* Implements hook_permission().
+*/
+function location_taxonomize_permission(){
+  return array(
+    'administer location_taxonomize' => array(
+      'title' => t('Administer Location taxonomize'),
+    ) 
+  ); 
+}
+
+/**
+* Implements hook_locationapi(). Used to save terms when locations are saved.
+*/
 function location_taxonomize_locationapi(&$obj, $op, $a3, $a4, $a5) {
   $settings = variable_get('location_taxonomize_settings');
   $vid = variable_get('location_taxonomize_vid');
