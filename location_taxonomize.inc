@@ -14,7 +14,7 @@ function _location_taxonomize_del_variables() {
   foreach ($vars as $key => $value) {
     variable_del($key);
   }
-  return "All variables deleted";
+  return t('All variables deleted');
 }
 
 function _location_taxonomize_set_defaults() {
@@ -29,7 +29,7 @@ $defaults = _location_taxonomize_variables();
 function _location_taxonomize_reset() {
   location_taxonomize_empty_vocab();
   _location_taxonomize_set_defaults();
-  drupal_set_message('Module reset');
+  drupal_set_message(t('Module reset'));
 }
 
 /**
@@ -138,7 +138,7 @@ function _location_taxonomize_get_hierarchy($assoc = FALSE) {
 function location_taxonomize_disassociate($form, $form_state) {
   // unset the vid variable
   variable_del('location_taxonomize_vid');
-  drupal_set_message('Location Taxonomy successfully disassociated.');
+  drupal_set_message(t('Location Taxonomy successfully disassociated'));
 }
 
 

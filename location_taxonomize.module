@@ -146,10 +146,10 @@ function location_taxonomize_form_validate($form, $form_state) {
                     '@name' already exists.", array('@name' => LOCATION_TAXONOMIZE_VOCAB_NAME)));
     }
     if ($values_init['method'] == 'existing') {
-      if (!$vocab) form_set_error('', 'Could not use the existing vocabulary. There is no existing vocabulary with the name 
-                                  \'' . LOCATION_TAXONOMIZE_VOCAB_NAME . '\'');
+      if (!$vocab) form_set_error('', t("Could not use the existing vocabulary. There is no existing vocabulary with the name 
+                                  '@name'", array('@name' => LOCATION_TAXONOMIZE_VOCAB_NAME)));
       else if ($vocab->vid != $values_init['possible_vid']) {
-        form_set_error('', 'Could not use the existing vocabulary (vid ' . $values_init['possible_vid'] . '). Wrong vid.');
+        form_set_error('', t('Could not use the existing vocabulary (vid @vid). Wrong vid.', array('@vid' => $values_init['possible_vid'])));
       }
     }
   }
@@ -168,19 +168,19 @@ function location_taxonomize_initialize($form, $form_state) {
       taxonomy_vocabulary_save((object) array(
         'name' => 'Location',
         'machine_name' => LOCATION_TAXONOMIZE_VOCAB_NAME,
-        'description' => 'This vocabulary is synchronized with Location data automatically by the ' . LOCATION_TAXONOMIZE_MODULE_NAME . ' module',
+        'description' => t('This vocabulary is synchronized with Location data automatically by the ' . LOCATION_TAXONOMIZE_MODULE_NAME . ' module'),
       ));
       // save the vid of the newly created vocabulary
       $vocab = taxonomy_vocabulary_machine_name_load(LOCATION_TAXONOMIZE_VOCAB_NAME);
       $vid = $vocab->vid;
       variable_set('location_taxonomize_vid', $vid);
-      $msg = 'Successfully created the Location taxonomy (vid ' . $vid . ')';
+      $msg = t('Successfully created the Location taxonomy (vid @vid)', array('@vid' => $vid));
     break;
     case 'existing':
       // save the vid of the existing vocabulary
       $vid = $values_init['possible_vid'];
       variable_set('location_taxonomize_vid', $vid);
-      $msg = 'Successfully connected to the existing Location Vocabulary (vid ' . $vid . ')';
+      $msg = t('Successfully connected to the existing Location Vocabulary (vid @vid)', array('@vid' => $vid));
     break;
   }
   drupal_set_message($msg);
@@ -196,7 +196,7 @@ function location_taxonomize_initialize($form, $form_state) {
     // Create the instance on the bundle.
     $instance = array(
       'field_name' => 'location_taxonomize_longname',
-      'label' => 'Long Name', 
+      'label' => t('Long Name'), 
       'entity_type' => 'taxonomy_term', 
       'bundle' => 'location_taxonomize',
     );
@@ -217,11 +217,9 @@ function location_taxonomize_process_loc($obj) {
   $settings = variable_get('location_taxonomize_settings');
   $vid = variable_get('location_taxonomize_vid');
   $hierarchy = _location_taxonomize_get_hierarchy();
-  //dpm($hierarchy);
   $saved = 0;   // holds the number of newly saved terms
   // make sure the province_name and country_name fields are there and updated
   $location = _fix_loc_tmp($obj);
-  //dpm($location);
   $tids = array();
   // this loops through hierarchy levels and saves terms if necessary
   for ($hlevel = 0; $hlevel < count($hierarchy); $hlevel++) {
@@ -288,7 +286,6 @@ function location_taxonomize_bulk_taxonomize($form, $form_state) {
     'init_message' => t('Initializing...'),
     'progress_message' => t('Processed @current out of @total.'),
     'error_message' => t('Bulk Taxonomize encountered an error.'),
-    //'file' => drupal_get_path('module', 'batch_example') . '/batch_example.inc',
   );
   batch_set($batch);
 }
@@ -320,8 +317,8 @@ function location_taxonomize_bulk_taxonomize_op($form_state, &$context) {
 
 function location_taxonomize_bulk_taxonomize_finished($success, $results, $operations) {
   drupal_set_message(t('Bulk Taxonomize completed successfully!'));
-  drupal_set_message(t('Processed %num locations', array('%num' => $results['processed'])));
-  drupal_set_message(t('Saved %num new terms to the Location Vocabulary', array('%num' => $results['added'])));
+  drupal_set_message(t('Processed @num locations', array('@num' => $results['processed'])));
+  drupal_set_message(t('Saved @num new terms to the Location Vocabulary', array('@num' => $results['added'])));
 }
 
 

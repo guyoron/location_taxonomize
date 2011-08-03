@@ -39,7 +39,7 @@ function location_taxonomize_form($form, &$form_state) {
         '#required' => TRUE,
         '#options' => array(
           'new' => t('Create a new Vocabulary to associate with Location Taxonomize'),
-          'existing' => t('Use the existing vocabulary vid ' . $possible_vid),
+          'existing' => t('Use the existing vocabulary vid @vid', array('@vid' => $possible_vid)),
         ),
         '#default_value' => $opts_vocab['method'],
         '#description' => t('If you use the existing vocabulary, all your terms will be maintained, and Location 
@@ -56,9 +56,9 @@ function location_taxonomize_form($form, &$form_state) {
           'new' => t('Create a new Vocabulary to associate with Location Taxonomize'),
         ),
         '#default_value' => 'new',
-        '#description' => t('If you want to use an existing Vocabulary, you must change that 
-                            Vocabulary\'s machine name to \'' . LOCATION_TAXONOMIZE_VOCAB_NAME . '\'.
-                             It will then be available here as an option.'),
+        '#description' => t("If you want to use an existing Vocabulary, you must change that 
+                            Vocabulary's machine name to '@name'.
+                             It will then be available here as an option.", array('@name' => LOCATION_TAXONOMIZE_VOCAB_NAME)),
       );
       
     }
@@ -90,8 +90,8 @@ function location_taxonomize_form($form, &$form_state) {
   // display the status of the current Location Taxonomy
   $form['location_taxonomize_vocab']['vid'] = array(
     '#type' => 'item',
-    '#title' => 'Vocabulary',
-    '#markup' => 'Currently using Vocabulary vid ' . variable_get('location_taxonomize_vid'),
+    '#title' => t('Vocabulary'),
+    '#markup' => t('Currently using Vocabulary vid @vid', array('@vid' => variable_get('location_taxonomize_vid'))),
   );
   $opts_vocab = variable_get('location_taxonomize_vocab');
   // fields used for hierarchy, none editable now
@@ -117,12 +117,12 @@ function location_taxonomize_form($form, &$form_state) {
   );
   $form['location_taxonomize_vocab']['disassociate'] = array(
     '#type' => 'submit',
-    '#value' => 'Disassociate Vocab',
+    '#value' => t('Disassociate Vocab'),
     '#submit' => array('location_taxonomize_disassociate', ),
   );
   $form['location_taxonomize_vocab']['bulk_taxonomize'] = array(
     '#type' => 'submit',
-    '#value' => 'Bulk Taxonomize Locations',
+    '#value' => t('Bulk Taxonomize Locations'),
     '#submit' => array('location_taxonomize_bulk_taxonomize', ),
   );
   // placeholder div for ajax message
@@ -163,7 +163,7 @@ function location_taxonomize_form($form, &$form_state) {
   );
   $form['location_taxonomize_settings']['naming']['country'] = array(
     '#type'       => 'radios',
-    '#title'      => 'Country naming',
+    '#title'      => t('Country naming'),
     '#required'   => TRUE,
     '#options'    => array(
       'name' => t('Use full name (i.e. <em>United States</em>)'),
@@ -183,7 +183,7 @@ function location_taxonomize_form($form, &$form_state) {
   );
   $form['location_taxonomize_settings']['naming']['province'] = array(
     '#type'       => 'radios',
-    '#title'      => 'Province naming',
+    '#title'      => t('Province naming'),
     '#required'   => TRUE,
     '#options'    => array(
       'name' => t('Use full name (i.e. <em>California</em>)'),
@@ -242,7 +242,7 @@ function location_taxonomize_form($form, &$form_state) {
   );
   $form['location_taxonomize_settings']['longname']['usa'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Use \'USA\' instead of \'US\''),
+    '#title' => t("Use 'USA' instead of 'US'"),
     '#default_value' => $longname_opts['usa'],
     '#states' => array(
       // Only show this field when the checkbox is enabled.
@@ -266,10 +266,10 @@ function location_taxonomize_form($form, &$form_state) {
     '#value' => t('Reset module'),
     '#submit' => array('_location_taxonomize_reset'),
   );
-  $form['location_taxonomize_test'] = array(
+  /*$form['location_taxonomize_test'] = array(
     '#type' => 'submit',
     '#value' => t('Test'),
     '#submit' => array('_get_location_fields'),
-  );
+  );*/
   return system_settings_form($form);
 }
