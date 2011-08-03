@@ -3,7 +3,7 @@ description = Creates and maintains a Location taxonomy, synchronized with data 
 core = 7.x
 
 dependencies[] = taxonomy
-dependencies[] = location (>3.x)
+dependencies[] = location
 
 files[] = location_taxonomize.module
 files[] = location_taxonomize.install

@@ -20,10 +20,17 @@ function location_taxonomize_menu() {
     'description' => 'Configuration for Location taxonomize module',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('location_taxonomize_form'),
-    'access arguments' => array('access administration pages', 'administer location_taxonomize'),
+    'access callback' => array('location_taxonomize_access_admin'),
     'type' => MENU_NORMAL_ITEM,
   );
   return $items;
+}
+
+/**
+* custom access callback for admin form
+*/
+function location_taxonomize_access_admin() {
+  return user_access('administer location_taxonomize') && user_access('access administration pages');
 }
 
 /**
