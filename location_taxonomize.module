@@ -170,14 +170,11 @@ function _find_term($name, $hlevel, $parentid) {
   $withparent = array();      
   // look through matching terms and find the one(s) with the right parent
   foreach ($terms as $term) {
-    //dpm($term);
     $parents = taxonomy_get_parents($term->tid);
     if (!$parents && $parentid == -1) $withparent[] = $term;    // for root-level terms  
     else if (array_pop($parents)->tid == $parentid) $withparent[] = $term;  // for all other terms (one parent is assumed)
-    //dpm($withparent);
   }
   if (count($withparent) == 1) {      // there is one term that matches exactly
-    //drupal_set_message($name . ' is already in, with the right parent. Not saving.');
     return array_pop($withparent);
   } else if (count($withparent) == 0){  // there are no terms that match exactly
     //drupal_set_message('it\'s in, but with different parent. Saving new term: ' . $name);
