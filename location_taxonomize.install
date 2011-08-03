@@ -29,3 +29,11 @@ function location_taxonomize_requirements($phase) {
   $requirements = array();
   return $requirements;
 }
+
+/**
+ * Implementation of hook_uninstall()
+ */
+function location_taxonomize_uninstall() {
+  // delete all variables set by this module
+  _location_taxonomize_del_variables();
+}
