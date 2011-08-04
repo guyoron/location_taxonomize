@@ -241,7 +241,7 @@ function _location_taxonomy_add_longname(&$term, $hlevel, $location) {
   $longname_str = '';
   for ($i = 0; $i<$count; $i++) {
     $longname_str .= $longname[$i];
-    if ($i != $count-1) $longname_str .= $ln_settings['separator'] . ' ';
+    if ($i != $count-1) $longname_str .= check_plain($ln_settings['separator']) . ' ';
   }
   // add the longname to the term
   $term->location_taxonomize_longname['und'][0]['value'] = $longname_str;

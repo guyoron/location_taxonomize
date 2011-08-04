@@ -79,7 +79,7 @@ function _get_location_fields($assoc = TRUE) {
   global $databases;
   $db = $databases['default']['default']['database'];
   // get names of fields in the location table
-  $result = db_query("SELECT column_name FROM information_schema.columns WHERE table_name = 'location' AND table_schema = :db ORDER BY ordinal_position", array(':db' => $db));
+  $result = db_query("SELECT column_name FROM {information_schema.columns} WHERE table_name = 'location' AND table_schema = :db ORDER BY ordinal_position", array(':db' => $db));
   $fields = $result->fetchCol();
   $return = array();
   // remove unsupported fields
