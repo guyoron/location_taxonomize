@@ -20,6 +20,7 @@ function location_taxonomize_form($form, &$form_state) {
       '#collapsible' => TRUE,
       '#collapsed' => FALSE,
       '#tree' => TRUE,
+      '#description' => 'Before you use Location Taxonomize, you need to initialize it. This will bind Location Taxonomize to a specific vocabulary, and determine the hierarchy structure of the vocabulary. A new Location Vocabulary can be created automatically (you need to not have any vocabularies named location_taxonomize for this), or you can start with an existing vocabulary (to do this you must change its name to location_taxonomize first). These settings cannot be changed after initialization. But you can always disassociate the vocabulary you choose here, and then initialize again with other settings.',
     );
     // hidden form element used to determine if LT is initialized already or not
     $form['location_taxonomize_vocab']['state'] = array(
@@ -69,7 +70,7 @@ function location_taxonomize_form($form, &$form_state) {
       '#type' => 'checkboxes',
       '#title' => t('Location Taxonomy Hierachy'),
       '#description' => t('Choose which Location fields to save as terms in the Location Taxonomy. For now, their 
-                          relative hierarchy cannot be changed.'),
+                          relative hierarchy cannot be changed. They will be nested hierarchically in the order shown above.'),
       '#options' => _get_location_fields(),
       '#default_value' => $opts_vocab['fields'],
     );
@@ -96,43 +97,53 @@ function location_taxonomize_form($form, &$form_state) {
     '#type' => 'item',
     '#title' => t('Vocabulary'),
     '#markup' => t('Currently using Vocabulary vid @vid', array('@vid' => variable_get('location_taxonomize_vid'))),
+    '#description' => t('If you want to change this, you need to disassociate the vocabulary first, using the button below.')
   );
   $opts_vocab = variable_get('location_taxonomize_vocab');
   // fields used for hierarchy, not editable now
   $form['location_taxonomize_vocab']['fields'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Location Taxonomy Hierachy'),
-    '#description' => t('This cannot be changed once the vocabulary is initialized. If you want to change them, you have to unassociate this vocabulary and initialize a new one.'),
+    '#description' => t('This cannot be changed once the vocabulary is initialized. If you want to change them, you have to disassociate this vocabulary and initialize a new one.'),
     '#options' => _get_location_fields(),
     '#default_value' => $opts_vocab['fields'],
     '#disabled' => TRUE,
   );
+  // operations fieldset
+  $form['location_taxonomize_ops'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Operations',
+    '#tree' => FALSE,
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+    '#description' => t('<p>The three buttons below will let you:</p><ul><li><strong>Empty Vocab:</strong> Remove all terms from the location vocabulary (All terms will be removed IMMEDIATELY. Mostly here for testing purposes)</li><li><strong>Disassociate Vocab:</strong> Remove the association with the current Location Vocabulary. The vocabulary will remain with all its terms, but it will not be connected to this module. You can then change basic settings and re-associate it.</li><li><strong>Bulk Taxonomize Locations:</strong> This will process all locations that have been saved on this site by the Location module and add them to the Location Vocabulary</li></ul>'),
+  );
   // button to empty the location vocabulary
-  $form['location_taxonomize_vocab']['emptyvocab'] = array(
+  $form['location_taxonomize_ops']['emptyvocab'] = array(
     '#type' => 'button',
     '#value' => t('Empty Location Vocab'),
     '#ajax' => array(
-                'callback' => 'location_taxonomize_empty_vocab',
-                'wrapper' => 'msg-div',
-                'method' => 'replace',
-                'effect' => 'fade',
-                'event' => 'mousedown',
-                ),
+      'callback' => 'location_taxonomize_empty_vocab',
+      'wrapper' => 'msg-div',
+      'method' => 'replace',
+      'effect' => 'fade',
+      'event' => 'mousedown',
+    ),
   );
   // disassociate button
-  $form['location_taxonomize_vocab']['disassociate'] = array(
+  $form['location_taxonomize_ops']['disassociate'] = array(
     '#type' => 'submit',
     '#value' => t('Disassociate Vocab'),
     '#submit' => array('location_taxonomize_disassociate', ),
   );
   // bulk taxonomize button
-  $form['location_taxonomize_vocab']['bulk_taxonomize'] = array(
+  $form['location_taxonomize_ops']['bulk_taxonomize'] = array(
     '#type' => 'submit',
     '#value' => t('Bulk Taxonomize Locations'),
     '#submit' => array('location_taxonomize_bulk_taxonomize', ),
   );
   // placeholder div for ajax message
-  $form['location_taxonomize_vocab']['msg-div'] = array(
+  $form['location_taxonomize_ops']['msg-div'] = array(
     '#type' => 'container',
     '#id' => 'msg-div',
   );
@@ -168,6 +179,7 @@ function location_taxonomize_form($form, &$form_state) {
     '#collapsible'  => TRUE,
     '#collapsed'    => FALSE,
     '#tree'         => TRUE,
+    '#description' => t('Change the way Location terms are named in the Location Vocabulary.'),
   );
   $form['location_taxonomize_settings']['naming']['country'] = array(
     '#type'       => 'radios',
@@ -243,7 +255,7 @@ function location_taxonomize_form($form, &$form_state) {
     '#description' => t('Determines how the country will be saved in Long Names'),
     '#options' => array(
       'name' => t('Always use full name (i.e. <em>United States</em>)'),
-      'code' => t('Use province code (i.e. <em>US</em>) when it is not the primary item in the Full Name'),
+      'code' => t('Use province code (i.e. <em>US</em>) when it is not the primary item in the Full Name (i.e. <em>California, US</em>)'),
     ),
     '#default_value' => $longname_opts['country_naming'],
   );
@@ -264,7 +276,7 @@ function location_taxonomize_form($form, &$form_state) {
     '#description' => t('Determines how the province will be saved in Long Names'),
     '#options' => array(
       'name' => t('Always use full name (i.e. <em>California</em>)'),
-      'code' => t('Use province code (i.e. <em>CA</em>) when it is not the primary item in the Full Name'),
+      'code' => t('Use province code (i.e. <em>CA</em>) when it is not the primary item in the Full Name (i.e. <em>San Francisco, CA</em>)'),
     ),
     '#default_value' => $longname_opts['province_naming'],
   );
@@ -273,6 +285,7 @@ function location_taxonomize_form($form, &$form_state) {
     '#type' => 'submit',
     '#value' => t('Reset module'),
     '#submit' => array('_location_taxonomize_reset'),
+    '#prefix' => t("<p><strong>Reset Module button: </strong>This is for development and testing use. Reseting the module will set all settings and variables to defaults, empty the location vocabulary, and disassociate the vocabulary. It's as if you emptied the vocabulary, and then uninstalled and reinstalled the module</p>"),
   );
   /*$form['location_taxonomize_test'] = array(
     '#type' => 'submit',
