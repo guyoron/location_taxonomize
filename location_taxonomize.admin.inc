@@ -211,6 +211,14 @@ function location_taxonomize_form($form, &$form_state) {
     ),
     '#default_value' => $opts_settings['naming']['province'],
   );
+  // text to use if there is no value to save for a term
+  $form['location_taxonomize_settings']['na_text'] = array(
+    '#type'           => 'textfield',
+    '#title'          => 'N/A text',
+    '#description'    => "This text will be saved if there is nothing to save for a term. For instance, if your hierarchy includes the City field, but it is not required. If a user doesn't enter a city, this text will appear as the term name instead. To avoid this being entered in your Location Vocabulary, make sure that all the fields in your hierarchy are also required by the Location module settings.",
+    '#default_value'  => $opts_settings['na_text'],
+    '#required'       => 1,
+  );
   // option to enable or disable the Full Name field
   $form['location_taxonomize_settings']['longname_enable'] = array(
     '#type' => 'checkbox',

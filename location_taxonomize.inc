@@ -45,6 +45,7 @@ function _location_taxonomize_variables() {
         'province' => 'name',
         'usa' => 1,
       ),
+      'na_text' => 'Unknown',
       'longname_enable' => 0,
       'longname' => array(
         'fields' => NULL,   // this is set by the initialization process
