@@ -13,6 +13,16 @@ require_once('location_taxonomize.inc');
 function location_taxonomize_install() {
   // set all variables to their default values
   _location_taxonomize_set_defaults();
+  // change the module weight so it is above location_node and location
+ /*$weight = db_select('system', 's')
+                ->fields('s', array('weight'))
+                ->condition('name', 'location_node', '=')
+                ->execute()
+                ->fetchField();
+  db_update('system')
+      ->fields(array('weight' => $weight + 1))
+      ->condition('name', 'location_taxonomize', '=')
+      ->execute();*/
   drupal_set_message(st("Location taxonomize has been installed, but it doesn't do anything right away. To start using it, you have to go to the configuration page and initialize your Location Vocabulary."));
 }
 
@@ -37,4 +47,10 @@ function location_taxonomize_requirements($phase) {
 function location_taxonomize_uninstall() {
   // delete all variables set by this module
   _location_taxonomize_del_variables();
+}
+
+function location_taxonomize_module_implements_alter(&$implementations, $hook) {
+  if($hook == 'node_update') {
+    dd($hook);
+  } else dd($hook);
 }

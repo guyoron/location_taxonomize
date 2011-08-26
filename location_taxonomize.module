@@ -9,6 +9,7 @@
 require_once('location_taxonomize.inc');
 require_once('location_taxonomize.admin.inc');
 
+
 /**
 * Implements hook_menu()
 */
@@ -52,10 +53,21 @@ function location_taxonomize_locationapi(&$obj, $op, $a3, $a4, $a5) {
   $vid = variable_get('location_taxonomize_vid');
   if (!$settings['enable'] || !$vid) return;    // check module settings
   switch ($op) {
-    // if we're saving a location, synchronize with vocab
+    // if we're saving a location:
+    //   - add vocab terms if necessary
     case 'save':
-      $saved = location_taxonomize_process_loc($obj);
-      drupal_set_message(t('Location Taxonomize: @num new terms saved', array('@num' => $saved)));
+    dpm('in locationapi save');
+    dpm($obj);
+    break;
+    case 'validate':
+    //dpm('in locationapi validate');
+    //dpm($obj);
+      //$saved = location_taxonomize_process_loc($obj);
+      //dd(debug_backtrace());
+      //drupal_set_message(t('Location Taxonomize: @num new terms saved', array('@num' => $saved)));
+      break;
+    
+    //dpm('locationapi validate');
   }
 }
 
@@ -115,7 +127,7 @@ function location_taxonomize_initialize($form, $form_state) {
  * Returns the number of terms added
  * @param $obj - a location object
  */
-function location_taxonomize_process_loc($obj) {
+function location_taxonomize_process_loc(&$obj) {
   // get settings
   $settings = variable_get('location_taxonomize_settings');
   $vid = variable_get('location_taxonomize_vid');
@@ -154,8 +166,11 @@ function location_taxonomize_process_loc($obj) {
       $tids[] = $term->tid;
       $saved++;
     }
-    elseif ($findterm->tid) $tids[] = $findterm->tid;
+    elseif ($findterm->tid) {
+      $tids[] = $findterm->tid;
+    }
   }
+  $obj['terms'] = $tids;
   return $saved;
 }
 
@@ -328,7 +343,8 @@ function location_taxonomize_bulk_taxonomize_op($form_state, &$context) {
   $result = db_query_range("SELECT lid, name, street, additional, city, province, postal_code, country, latitude, longitude, source FROM {location} WHERE lid <> 0 ORDER BY lid ASC", $context['sandbox']['current'], $limit, array());
   $result_array = $result->fetchAllAssoc('lid');
   foreach ($result_array as $row) {
-    $added = location_taxonomize_process_loc((array)$row);
+    $row_array = (array)$row; // @TODO - make sure this still works when passing by reference
+    $added = location_taxonomize_process_loc($row_array);
     $context['results']['added'] += $added;
     $context['sandbox']['progress']++;
     $context['message'] = t('Processing location lid %n', array('%n' => $row->lid));
@@ -347,4 +363,47 @@ function location_taxonomize_bulk_taxonomize_finished($success, $results, $opera
   drupal_set_message(t('Saved @num new terms to the Location Vocabulary', array('@num' => $results['added'])));
 }
 
+////////////////////////////////////////
+// Feature: Node Term Attach
+////////////////////////////////////////
 
+function location_taxonomize_node_submit($node, $form, &$form_state) {
+  dpm('in submit');
+  dd($form_state);
+  dpm($node);
+  //$tids = $node->locations[0]['terms'];
+  //dpm($tids);
+
+  //$settings = variable_get('location_taxonomize_settings');
+  //$obj = $node->locations[0];
+  
+  // if the Node Attach feature is enabled in the settings, attach these terms to the node
+  //if ($settings['node_attach']) {
+    // get the nid for this lid
+    //$lid = $obj['lid'];
+    //$nid = $node->nid;
+    // attach the terms to the node
+    //$node = node_load($nid);
+    //dpm($node);
+    //foreach($tids as $tid) {
+    //  $node->field_tax['und'][] = array('tid' => $tid);
+    //}
+    //node_save($node);
+    //dpm(node_load($nid));
+   // //dpm($node);
+  //}
+}
+
+function location_taxonomize_test($element, &$form_state, $complete_form) {
+  dpm('in test');
+  dpm($element);
+  //dd($form_state);
+  return $element;
+}
+
+function location_taxonomize_test2($element, &$form_state) {
+  dpm('in test2');
+  dpm($element);
+  //dpm($form_state);
+  return $element;
+}
