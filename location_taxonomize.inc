@@ -1,9 +1,9 @@
 <?php
 
 /**
-* @file
-* Some useful functions for Location taxonomize
-*/
+ * @file
+ * Some useful functions for Location taxonomize
+ */
 
 define('LOCATION_TAXONOMIZE_MODULE_ID', 'location_taxonomize');
 define('LOCATION_TAXONOMIZE_MODULE_NAME', 'Location taxonomize');
@@ -73,7 +73,7 @@ function location_taxonomize_empty_vocab() {
 
 /**
  * Returns the Location module fields that can be used for the Location Vocabulary
- * @param $assoc - whether to return an associative array (TRUE) or just an indexed array (FALSE) 
+ * @param $assoc - whether to return an associative array (TRUE) or just an indexed array (FALSE)
  */
 function _get_location_fields($assoc = TRUE) {
   // get name of site database
@@ -127,7 +127,7 @@ function _location_taxonomize_set_defaults() {
   foreach ($defaults as $key => $value) {
     if ($value) variable_set($key, $value);
     else variable_del($key);
-  } 
+  }
 }
 
 /**

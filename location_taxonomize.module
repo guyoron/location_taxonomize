@@ -1,19 +1,19 @@
 <?php
 
 /**
-* @file
-* A module which creates and maintains a Location Taxonomy
-* which is synchronized with Data from the Location module
-*/
+ * @file
+ * A module which creates and maintains a Location Taxonomy
+ * which is synchronized with Data from the Location module
+ */
 
 require_once('location_taxonomize.inc');
 require_once('location_taxonomize.admin.inc');
 
 /**
-* Implements hook_menu()
-*/
+ * Implements hook_menu().
+ */
 function location_taxonomize_menu() {
-  $items = array(); 
+  $items = array();
   // module configuration page
   $items['admin/config/content/location_taxonomize'] = array(
     'title' => 'Location Taxonomize',
@@ -27,26 +27,26 @@ function location_taxonomize_menu() {
 }
 
 /**
-* custom access callback for admin form
-*/
+ * custom access callback for admin form
+ */
 function location_taxonomize_access_admin() {
   return user_access('administer location_taxonomize') && user_access('access administration pages');
 }
 
 /**
-* Implements hook_permission().
-*/
+ * Implements hook_permission().
+ */
 function location_taxonomize_permission() {
   return array(
     'administer location_taxonomize' => array(
       'title' => t('Administer Location taxonomize'),
-    ) 
-  ); 
+    )
+  );
 }
 
 /**
-* Implements hook_locationapi(). Used to save terms when locations are saved.
-*/
+ * Implements hook_locationapi(). Used to save terms when locations are saved.
+ */
 function location_taxonomize_locationapi(&$obj, $op, $a3, $a4, $a5) {
   $settings = variable_get('location_taxonomize_settings');
   $vid = variable_get('location_taxonomize_vid');
@@ -90,8 +90,8 @@ function location_taxonomize_initialize($form, $form_state) {
   // Create the 'taxonomy_longname' field if it doesn't already exist.
   if (!field_info_field('location_taxonomize_longname')) {
     $field = array(
-      'field_name' => 'location_taxonomize_longname', 
-      'type' => 'text', 
+      'field_name' => 'location_taxonomize_longname',
+      'type' => 'text',
     );
     field_create_field($field);
   }
@@ -99,8 +99,8 @@ function location_taxonomize_initialize($form, $form_state) {
   if (!field_info_instance('taxonomy_term', 'location_taxonomize_longname', 'location_taxonomize')) {
     $instance = array(
       'field_name' => 'location_taxonomize_longname',
-      'label' => t('Long Name'), 
-      'entity_type' => 'taxonomy_term', 
+      'label' => t('Long Name'),
+      'entity_type' => 'taxonomy_term',
       'bundle' => 'location_taxonomize',
     );
     field_create_instance($instance);
@@ -146,7 +146,7 @@ function location_taxonomize_process_loc($obj) {
       // set term parent
       if ($hlevel == 0) {
         $term->parent = array(0);
-      } 
+      }
       else {
         $term->parent = array($parentid);
       }
@@ -168,16 +168,16 @@ function location_taxonomize_process_loc($obj) {
 function _find_term($name, $hlevel, $parentid) {
   $terms = taxonomy_get_term_by_name($name);
   if (!$terms) return FALSE;      // there are no terms that match
-  $withparent = array();      
+  $withparent = array();
   // look through matching terms and find the one(s) with the right parent
   foreach ($terms as $term) {
     $parents = taxonomy_get_parents($term->tid);
-    if (!$parents && $parentid == -1) $withparent[] = $term;    // for root-level terms  
+    if (!$parents && $parentid == -1) $withparent[] = $term;    // for root-level terms
     elseif (array_pop($parents)->tid == $parentid) $withparent[] = $term;  // for all other terms (one parent is assumed)
   }
   if (count($withparent) == 1) {      // there is one term that matches exactly
     return array_pop($withparent);
-  } 
+  }
   elseif (count($withparent) == 0) {  // there are no terms that match exactly
     //drupal_set_message('it\'s in, but with different parent. Saving new term: ' . $name);
     return FALSE;
@@ -189,7 +189,7 @@ function _find_term($name, $hlevel, $parentid) {
 
 /**
  * A temporary fix for an apparent bug, due to which the country_name field is not updated during the call to
- * hook_locationapi. Also used to add the country_name and province_name fields to the location in cases 
+ * hook_locationapi. Also used to add the country_name and province_name fields to the location in cases
  * where the location is read from the database
  */
 function _fix_loc_tmp($loc) {
@@ -221,7 +221,7 @@ function _location_taxonomy_add_longname(&$term, $hlevel, $location) {
             $longname[] = $location['country_name'];
           }
           elseif ($location['country'] == 'us' && $ln_settings['usa']) $longname[] = 'USA';
-          else $longname[] = strtoupper($location['country']);
+          else $longname[] = drupal_strtoupper($location['country']);
           break;
         case 'province':
           if ($term_hlevel_name == 'province' || $ln_settings['province_naming'] == 'name') {
@@ -273,7 +273,7 @@ function _location_taxonomize_create_term_name($hlevel_name, &$location, &$setti
       if (empty($location['country'])) $name = $settings['na_text'];
       elseif ($settings['naming']['country'] == 'name') $name = $location['country_name'];
       elseif ($location['country'] == 'us' && $settings['naming']['usa']) $name = 'USA';
-      else $name = strtoupper($location['country']);
+      else $name = drupal_strtoupper($location['country']);
       break;
     case 'province':
       if (empty($location['province'])) $name = $settings['na_text'];

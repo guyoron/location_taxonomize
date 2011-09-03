@@ -8,7 +8,7 @@
 require_once('location_taxonomize.inc');
 
 /**
- * Implementation of hook_install()
+ * Implements hook_install().
  */
 function location_taxonomize_install() {
   // set all variables to their default values
@@ -17,22 +17,22 @@ function location_taxonomize_install() {
 }
 
 /**
- * Implementation of hook_enable()
+ * Implements hook_enable().
  */
 function location_taxonomize_enable() {
   // nothing to do here for now, everything is done during initialization
 }
 
 /**
-* Implementation of hook_requirements()
-*/
+ * Implements hook_requirements().
+ */
 function location_taxonomize_requirements($phase) {
   $requirements = array();
   return $requirements;
 }
 
 /**
- * Implementation of hook_uninstall()
+ * Implements hook_uninstall().
  */
 function location_taxonomize_uninstall() {
   // delete all variables set by this module
