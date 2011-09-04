@@ -128,7 +128,7 @@ function location_taxonomize_process_loc($obj) {
   for ($hlevel = 0; $hlevel < count($hierarchy); $hlevel++) {
     $hlevel_name = $hierarchy[$hlevel];
     // set the term name
-    $name = _location_taxonomize_create_term_name($hlevel_name, &$location, &$settings);
+    $name = _location_taxonomize_create_term_name($hlevel_name, $location, $settings);
     // find if the term exists already or not
     if ($hlevel == 0) $parentid = -1;
     else $parentid = $tids[$hlevel-1];
@@ -141,7 +141,7 @@ function location_taxonomize_process_loc($obj) {
       );
       // add longname if necessary
       if ($settings['longname_enable']) {
-        _location_taxonomy_add_longname(&$term, $hlevel, $location);
+        _location_taxonomy_add_longname($term, $hlevel, $location);
       }
       // set term parent
       if ($hlevel == 0) {
