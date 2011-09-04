@@ -165,6 +165,7 @@ function location_taxonomize_form($form, &$form_state) {
     '#description' => t('Turn on or off the main functionality of this module.'),
   );
   // option to assign terms to nodes
+  /* (not functional yet)
   $form['location_taxonomize_settings']['node_attach'] = array(
     '#type'         => 'checkbox',
     '#title'        => t('Also attach the appropriate Taxonomy Location terms to nodes (NOT IMPLEMENTED YET)'),
@@ -172,6 +173,7 @@ function location_taxonomize_form($form, &$form_state) {
                         nodes with those locations. Note that...'),
     '#default_value' => $opts_settings['node_attach'],
   );
+  */
   // naming fieldset
   $form['location_taxonomize_settings']['naming'] = array(
     '#type'         => 'fieldset',
@@ -293,7 +295,7 @@ function location_taxonomize_form($form, &$form_state) {
     '#type' => 'submit',
     '#value' => t('Reset module'),
     '#submit' => array('_location_taxonomize_reset'),
-    '#prefix' => t("<p><strong>Reset Module button: </strong>This is for development and testing use. Reseting the module will set all settings and variables to defaults, empty the location vocabulary, and disassociate the vocabulary. It's as if you emptied the vocabulary, and then uninstalled and reinstalled the module</p>"),
+    '#prefix' => t("<p><strong>Reset Module button: </strong>This is for development and testing use. It will be removed once there is a stable release. Reseting the module will set all settings and variables to defaults, empty the location vocabulary, and disassociate the vocabulary. It's as if you emptied the vocabulary, and then uninstalled and reinstalled the module</p>"),
   );
   /* $form['location_taxonomize_test'] = array(
     '#type' => 'submit',
