@@ -164,16 +164,6 @@ function location_taxonomize_form($form, &$form_state) {
     '#default_value' => $opts_settings['enable'],
     '#description' => t('Turn on or off the main functionality of this module.'),
   );
-  // option to assign terms to nodes
-  /* (not functional yet)
-  $form['location_taxonomize_settings']['node_attach'] = array(
-    '#type'         => 'checkbox',
-    '#title'        => t('Also attach the appropriate Taxonomy Location terms to nodes (NOT IMPLEMENTED YET)'),
-    '#description'  => t('If this is checked, the terms saved in the Location Taxonomy will also automatically be applied to the
-                        nodes with those locations. Note that...'),
-    '#default_value' => $opts_settings['node_attach'],
-  );
-  */
   // naming fieldset
   $form['location_taxonomize_settings']['naming'] = array(
     '#type'         => 'fieldset',
