@@ -50,7 +50,8 @@ function location_taxonomize_permission() {
 function location_taxonomize_locationapi(&$obj, $op, $a3, $a4, $a5) {
   $settings = variable_get('location_taxonomize_settings');
   $vid = variable_get('location_taxonomize_vid');
-  if (!$settings['enable'] || !$vid) return;    // check module settings
+  // check module settings
+  if (!$settings['enable'] || !$vid) return;
   switch ($op) {
     // if we're saving a location, synchronize with vocab
     case 'save':
@@ -120,7 +121,8 @@ function location_taxonomize_process_loc($obj) {
   $settings = variable_get('location_taxonomize_settings');
   $vid = variable_get('location_taxonomize_vid');
   $hierarchy = _location_taxonomize_get_hierarchy();
-  $saved = 0;   // holds the number of newly saved terms
+  // holds the number of newly saved terms
+  $saved = 0;
   // make sure the province_name and country_name fields are there and updated
   $location = _fix_loc_tmp($obj);
   $tids = array();
@@ -167,23 +169,27 @@ function location_taxonomize_process_loc($obj) {
  */
 function _find_term($name, $hlevel, $parentid) {
   $terms = taxonomy_get_term_by_name($name);
-  if (!$terms) return FALSE;      // there are no terms that match
+  // there are no terms that match
+  if (!$terms) return FALSE;
   $withparent = array();
   // look through matching terms and find the one(s) with the right parent
   foreach ($terms as $term) {
     $parents = taxonomy_get_parents($term->tid);
-    if (!$parents && $parentid == -1) $withparent[] = $term;    // for root-level terms
-    elseif (array_pop($parents)->tid == $parentid) $withparent[] = $term;  // for all other terms (one parent is assumed)
+    // for root-level terms:
+    if (!$parents && $parentid == -1) $withparent[] = $term;
+    // for all other terms (one parent is assumed):
+    elseif (array_pop($parents)->tid == $parentid) $withparent[] = $term;
   }
-  if (count($withparent) == 1) {      // there is one term that matches exactly
+  // there is one term that matches exactly
+  if (count($withparent) == 1) {
     return array_pop($withparent);
   }
-  elseif (count($withparent) == 0) {  // there are no terms that match exactly
-    //drupal_set_message('it\'s in, but with different parent. Saving new term: ' . $name);
+  // there are no terms that match exactly
+  elseif (count($withparent) == 0) {
     return FALSE;
   }
   // if we get here, there was more than one term that matched exactly
-  drupal_set_message(t("too many terms! couldn't save!"));
+  drupal_set_message(t("Location taxonomize couldn't save a term because its hierarchy location was ambiguous."));
   return TRUE;
 }
 
@@ -207,8 +213,10 @@ function _location_taxonomy_add_longname(&$term, $hlevel, $location) {
   $ln_settings = $settings['longname'];
   $fields = $ln_settings['fields'];
   $hierarchy = _location_taxonomize_get_hierarchy();
-  $term_hlevel_name = $hierarchy[$hlevel];    // the name of the hierarchy level of this term (i.e. 'city')
-  if (!$fields[$term_hlevel_name]) return '';   // no Long Name if this hlevel_name is not selected in config
+  // the name of the hierarchy level of this term (i.e. 'city')
+  $term_hlevel_name = $hierarchy[$hlevel];
+  // no Long Name if this hlevel_name is not selected in config
+  if (!$fields[$term_hlevel_name]) return '';
   $longname = array();
   // collect parts of longname
   for ($i = 0; $i <= $hlevel; $i++) {
@@ -299,7 +307,6 @@ function location_taxonomize_bulk_taxonomize($form, $form_state) {
   $batch = array(
     'operations' => array(
       array('location_taxonomize_bulk_taxonomize_op', array($form_state)),
-      //array('batch_example_process', array($options3, $options4)),
     ),
     'finished' => 'location_taxonomize_bulk_taxonomize_finished',
     'title' => t('Taxonomizing Locations'),
