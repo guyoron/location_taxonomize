@@ -287,11 +287,6 @@ function location_taxonomize_form($form, &$form_state) {
     '#submit' => array('_location_taxonomize_reset'),
     '#prefix' => t("<p><strong>Reset Module button: </strong>This is for development and testing use. It will be removed once there is a stable release. Reseting the module will set all settings and variables to defaults, empty the location vocabulary, and disassociate the vocabulary. It's as if you emptied the vocabulary, and then uninstalled and reinstalled the module</p>"),
   );
-  /* $form['location_taxonomize_test'] = array(
-    '#type' => 'submit',
-    '#value' => t('Test'),
-    '#submit' => array('_get_location_fields'),
-  );*/
   return system_settings_form($form);
 }
 
