@@ -30,7 +30,9 @@ function location_taxonomize_menu() {
  * custom access callback for admin form
  */
 function location_taxonomize_access_admin() {
-  return user_access('administer location_taxonomize') && user_access('access administration pages');
+  $access_lt = user_access('administer location_taxonomize');
+  $access_admin = user_access('access administration pages');
+  return $access_lt && $access_admin;
 }
 
 /**
@@ -56,7 +58,8 @@ function location_taxonomize_locationapi(&$obj, $op, $a3, $a4, $a5) {
     // if we're saving a location, synchronize with vocab
     case 'save':
       $saved = location_taxonomize_process_loc($obj);
-      drupal_set_message(t('Location Taxonomize: @num new terms saved', array('@num' => $saved)));
+      $msg = t('Location taxonomize: @num new terms saved', array('@num' => $saved));
+      drupal_set_message($msg);
   }
 }
 
@@ -72,19 +75,22 @@ function location_taxonomize_initialize($form, $form_state) {
       taxonomy_vocabulary_save((object) array(
         'name' => t('Location'),
         'machine_name' => LOCATION_TAXONOMIZE_VOCAB_NAME,
-        'description' => t('This vocabulary is synchronized with Location data automatically by the @name module', array('@name' => LOCATION_TAXONOMIZE_MODULE_NAME)),
+        'description' => t('This vocabulary is synchronized with Location data automatically by the @name module', 
+                         array('@name' => LOCATION_TAXONOMIZE_MODULE_NAME)),
       ));
       // save the vid of the newly created vocabulary
       $vocab = taxonomy_vocabulary_machine_name_load(LOCATION_TAXONOMIZE_VOCAB_NAME);
       $vid = $vocab->vid;
       variable_set('location_taxonomize_vid', $vid);
-      $msg = t('Successfully created the Location taxonomy (vid @vid)', array('@vid' => $vid));
+      $msg = t('Successfully created the Location taxonomy (vid @vid)', 
+              array('@vid' => $vid));
     break;
     case 'existing':
       // save the vid of the existing vocabulary
       $vid = $values_init['possible_vid'];
       variable_set('location_taxonomize_vid', $vid);
-      $msg = t('Successfully connected to the existing Location Vocabulary (vid @vid)', array('@vid' => $vid));
+      $msg = t('Successfully connected to the existing Location Vocabulary (vid @vid)',
+              array('@vid' => $vid));
     break;
   }
   drupal_set_message($msg);
@@ -112,7 +118,8 @@ function location_taxonomize_initialize($form, $form_state) {
 }
 
 /**
- * Determines if a location needs to be taxonomized. If so, it saves the appropriate terms
+ * Determines if a location needs to be taxonomized. 
+ * If so, it saves the appropriate terms
  * Returns the number of terms added
  * @param $obj - a location object
  */
@@ -162,8 +169,8 @@ function location_taxonomize_process_loc($obj) {
 }
 
 /**
- * Given a name, hierarchy level, and parent id, this function returns the term if such a term
- * exists, and FALSE if it doesn't.
+ * Given a name, hierarchy level, and parent id, this function returns the term
+ * if such a term exists, and FALSE if it doesn't.
  * It returns TRUE if the term was not found but should not be saved
  * NOTE: $parentid is only necessary if $hlevel > 0. Otherwise, set $parentid = -1
  */
@@ -189,14 +196,17 @@ function _find_term($name, $hlevel, $parentid) {
     return FALSE;
   }
   // if we get here, there was more than one term that matched exactly
-  drupal_set_message(t("Location taxonomize couldn't save a term because its hierarchy location was ambiguous."));
+  $msg = t("Location taxonomize couldn't save a term because its hierarchy
+          location was ambiguous.");
+  drupal_set_message($msg);
   return TRUE;
 }
 
 /**
- * A temporary fix for an apparent bug, due to which the country_name field is not updated during the call to
- * hook_locationapi. Also used to add the country_name and province_name fields to the location in cases
- * where the location is read from the database
+ * A temporary fix for an apparent bug, due to which the country_name field is
+ * not updated during the call to hook_locationapi. Also used to add the
+ * country_name and province_name fields to the location in cases where the
+ * location is read from the database
  */
 function _fix_loc_tmp($loc) {
   $loc['country_name'] = location_country_name($loc['country']);
@@ -249,7 +259,9 @@ function _location_taxonomy_add_longname(&$term, $hlevel, $location) {
   $longname_str = '';
   for ($i = 0; $i<$count; $i++) {
     $longname_str .= $longname[$i];
-    if ($i != $count-1) $longname_str .= check_plain($ln_settings['separator']) . ' ';
+    if ($i != $count-1) {
+      $longname_str .= check_plain($ln_settings['separator']) . ' ';
+    }
   }
   // add the longname to the term
   $term->location_taxonomize_longname['und'][0]['value'] = $longname_str;
@@ -273,19 +285,30 @@ function _location_taxonomize_init_var_longname() {
 }
 
 /**
- * Helper function to create the name for a term to be saved, considering all the config options
+ * Helper function to create the name for a term to be saved, considering
+ * all the config options
  */
 function _location_taxonomize_create_term_name($hlevel_name, &$location, &$settings) {
   switch ($hlevel_name) {
     case 'country':
-      if (empty($location['country'])) $name = $settings['na_text'];
-      elseif ($settings['naming']['country'] == 'name') $name = $location['country_name'];
-      elseif ($location['country'] == 'us' && $settings['naming']['usa']) $name = 'USA';
+      if (empty($location['country'])) {
+        $name = $settings['na_text'];
+      }
+      elseif ($settings['naming']['country'] == 'name') {
+        $name = $location['country_name'];
+      }
+      elseif ($location['country'] == 'us' && $settings['naming']['usa']) {
+        $name = 'USA';
+      }
       else $name = drupal_strtoupper($location['country']);
       break;
     case 'province':
-      if (empty($location['province'])) $name = $settings['na_text'];
-      elseif ($settings['naming']['province'] == 'name') $name = $location['province_name'];
+      if (empty($location['province'])) {
+        $name = $settings['na_text'];
+      }
+      elseif ($settings['naming']['province'] == 'name') {
+        $name = $location['province_name'];
+      }
       else $name = $location['province'];
       break;
     default:
@@ -323,11 +346,12 @@ function location_taxonomize_bulk_taxonomize($form, $form_state) {
 function location_taxonomize_bulk_taxonomize_op($form_state, &$context) {
   // initialize progress, max, and current if this is the first iteration
   if (!isset($context['sandbox']['progress'])) {
-      $context['sandbox']['progress'] = 0;
-      $context['sandbox']['max'] = db_query('SELECT COUNT(DISTINCT lid) FROM {location}')->fetchField();
-      $context['sandbox']['current'] = 0;
-      $context['results']['added'] = 0;
-      $context['results']['processed'] = 0;
+    $max = db_query('SELECT COUNT(DISTINCT lid) FROM {location}')->fetchField();
+    $context['sandbox']['progress'] = 0;
+    $context['sandbox']['max'] = $max;
+    $context['sandbox']['current'] = 0;
+    $context['results']['added'] = 0;
+    $context['results']['processed'] = 0;
   }
   // maximum 20 locations per function iteration
   $limit = 10;
@@ -349,9 +373,13 @@ function location_taxonomize_bulk_taxonomize_op($form_state, &$context) {
  * Last function to run after bulk taxonomize operation
  */
 function location_taxonomize_bulk_taxonomize_finished($success, $results, $operations) {
-  drupal_set_message(t('Bulk Taxonomize completed successfully!'));
-  drupal_set_message(t('Processed @num locations', array('@num' => $results['processed'])));
-  drupal_set_message(t('Saved @num new terms to the Location Vocabulary', array('@num' => $results['added'])));
+  $success = t('Bulk Taxonomize completed successfully!');
+  $locs = t('Processed @num locations', array('@num' => $results['processed']));
+  $terms = t('Saved @num new terms to the Location Vocabulary',
+           array('@num' => $results['added']));
+  drupal_set_message($success);
+  drupal_set_message($locs);
+  drupal_set_message($terms);
 }
 
 

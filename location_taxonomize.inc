@@ -20,7 +20,8 @@ function _location_taxonomize_reset() {
 }
 
 /**
- * Keeps a list of all the variables maintained by this module, with their default values.
+ * Keeps a list of all the variables maintained by this module, with their
+ * default values.
  */
 function _location_taxonomize_variables() {
   $fields = _get_location_fields();
@@ -47,7 +48,8 @@ function _location_taxonomize_variables() {
       'na_text' => 'Unknown',
       'longname_enable' => 0,
       'longname' => array(
-        'fields' => NULL,   // this is set by the initialization process
+        // this is set by the initialization process
+        'fields' => NULL,
         'separator' => ',',
         'country_naming' => 'code',
         'province_naming' => 'code',
@@ -72,7 +74,8 @@ function location_taxonomize_empty_vocab() {
 
 /**
  * Returns the Location module fields that can be used for the Location Vocabulary
- * @param $assoc - whether to return an associative array (TRUE) or just an indexed array (FALSE)
+ * @param $assoc - whether to return an associative array (TRUE) or just an
+ *                 indexed array (FALSE)
  */
 function _get_location_fields($assoc = TRUE) {
   // get name of site database
@@ -84,7 +87,16 @@ function _get_location_fields($assoc = TRUE) {
   $return = array();
   // remove unsupported fields
   foreach ($fields as $field) {
-    if ($field != 'lid' && $field != 'additional' && $field != 'latitude' && $field != 'longitude' && $field != 'source' && $field != 'is_primary' && $field != 'postal_code') {
+    /* formatted this way to try to preserve readability as well as accpetable
+       line lengths */
+    if ($field != 'lid' &&
+        $field != 'additional' &&
+        $field != 'latitude' &&
+        $field != 'longitude' &&
+        $field != 'source' &&
+        $field != 'is_primary' &&
+        $field != 'postal_code'
+    ) {
       if ($assoc) $return[$field] = $field;
       else $return[] = $field;
     }
@@ -94,7 +106,8 @@ function _get_location_fields($assoc = TRUE) {
 
 /**
  * Returns the hierarchy configured for the current Location Vocabulary
- * @param $assoc - whether to return an associative array (TRUE) or keyed array (FALSE)
+ * @param $assoc - whether to return an associative array (TRUE) or
+ *                keyed array (FALSE)
  */
 function _location_taxonomize_get_hierarchy($assoc = FALSE) {
   $vocab = variable_get('location_taxonomize_vocab');
@@ -110,7 +123,8 @@ function _location_taxonomize_get_hierarchy($assoc = FALSE) {
 }
 
 /**
- * Disassociates the vocabulary - unlinks the current Location Vocabulary from the module
+ * Disassociates the vocabulary - unlinks the current Location Vocabulary
+ * from the module
  */
 function location_taxonomize_disassociate($form, $form_state) {
   // unset the vid variable

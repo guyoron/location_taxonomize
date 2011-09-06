@@ -20,7 +20,15 @@ function location_taxonomize_form($form, &$form_state) {
       '#collapsible' => TRUE,
       '#collapsed' => FALSE,
       '#tree' => TRUE,
-      '#description' => 'Before you use Location Taxonomize, you need to initialize it. This will bind Location Taxonomize to a specific vocabulary, and determine the hierarchy structure of the vocabulary. A new Location Vocabulary can be created automatically (you need to not have any vocabularies named location_taxonomize for this), or you can start with an existing vocabulary (to do this you must change its name to location_taxonomize first). These settings cannot be changed after initialization. But you can always disassociate the vocabulary you choose here, and then initialize again with other settings.',
+      '#description' => 'Before you use Location Taxonomize, you need to
+      initialize it. This will bind Location Taxonomize to a specific vocabulary,
+      and determine the hierarchy structure of the vocabulary. A new Location
+      Vocabulary can be created automatically (you need to not have any
+      vocabularies named location_taxonomize for this), or you can start with
+      an existing vocabulary (to do this you must change its name to
+      location_taxonomize first). These settings cannot be changed after
+      initialization. But you can always disassociate the vocabulary you
+      choose here, and then initialize again with other settings.',
     );
     // hidden form element used to determine if LT is initialized already or not
     $form['location_taxonomize_vocab']['state'] = array(
@@ -41,13 +49,16 @@ function location_taxonomize_form($form, &$form_state) {
         '#required' => TRUE,
         '#options' => array(
           'new' => t('Create a new Vocabulary to associate with Location Taxonomize'),
-          'existing' => t('Use the existing vocabulary vid @vid', array('@vid' => $possible_vid)),
+          'existing' => t('Use the existing vocabulary vid @vid',
+                          array('@vid' => $possible_vid)),
         ),
         '#default_value' => $opts_vocab['method'],
-        '#description' => t('If you use the existing vocabulary, all your terms will be maintained, and Location
-                            Taxonomize will start adding terms on top of the existing ones. Note that your
-                            vocabulary must match the hierarchy structure you choose below, or there
-                            will be unexpected behavior.')
+        '#description' => t('If you use the existing vocabulary, all your terms
+                            will be maintained, and Location Taxonomize will
+                            start adding terms on top of the existing ones. Note
+                            that your vocabulary must match the hierarchy
+                            structure you choose below, or there will be
+                            unexpected behavior.')
       );
     }
     else {
@@ -59,9 +70,10 @@ function location_taxonomize_form($form, &$form_state) {
           'new' => t('Create a new Vocabulary to associate with Location Taxonomize'),
         ),
         '#default_value' => 'new',
-        '#description' => t("If you want to use an existing Vocabulary, you must change that
-                            Vocabulary's machine name to '@name'.
-                             It will then be available here as an option.", array('@name' => LOCATION_TAXONOMIZE_VOCAB_NAME)),
+        '#description' => t("If you want to use an existing Vocabulary, you must
+                            change that Vocabulary's machine name to '@name'.
+                            It will then be available here as an option.",
+                            array('@name' => LOCATION_TAXONOMIZE_VOCAB_NAME)),
       );
 
     }
@@ -69,8 +81,10 @@ function location_taxonomize_form($form, &$form_state) {
     $form['location_taxonomize_vocab']['fields'] = array(
       '#type' => 'checkboxes',
       '#title' => t('Location Taxonomy Hierachy'),
-      '#description' => t('Choose which Location fields to save as terms in the Location Taxonomy. For now, their
-                          relative hierarchy cannot be changed. They will be nested hierarchically in the order shown above.'),
+      '#description' => t('Choose which Location fields to save as terms in the
+                          Location Taxonomy. For now, their relative hierarchy
+                          cannot be changed. They will be nested hierarchically
+                          in the order shown above.'),
       '#options' => _get_location_fields(),
       '#default_value' => $opts_vocab['fields'],
     );
@@ -96,15 +110,19 @@ function location_taxonomize_form($form, &$form_state) {
   $form['location_taxonomize_vocab']['vid'] = array(
     '#type' => 'item',
     '#title' => t('Vocabulary'),
-    '#markup' => t('Currently using Vocabulary vid @vid', array('@vid' => variable_get('location_taxonomize_vid'))),
-    '#description' => t('If you want to change this, you need to disassociate the vocabulary first, using the button below.')
+    '#markup' => t('Currently using Vocabulary vid @vid',
+                  array('@vid' => variable_get('location_taxonomize_vid'))),
+    '#description' => t('If you want to change this, you need to disassociate
+                        the vocabulary first, using the button below.')
   );
   $opts_vocab = variable_get('location_taxonomize_vocab');
   // fields used for hierarchy, not editable now
   $form['location_taxonomize_vocab']['fields'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Location Taxonomy Hierachy'),
-    '#description' => t('This cannot be changed once the vocabulary is initialized. If you want to change them, you have to disassociate this vocabulary and initialize a new one.'),
+    '#description' => t('This cannot be changed once the vocabulary is
+                        initialized. If you want to change them, you have
+                        to disassociate this vocabulary and initialize a new one.'),
     '#options' => _get_location_fields(),
     '#default_value' => $opts_vocab['fields'],
     '#disabled' => TRUE,
@@ -116,7 +134,15 @@ function location_taxonomize_form($form, &$form_state) {
     '#tree' => FALSE,
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
-    '#description' => t('<p>The three buttons below will let you:</p><ul><li><strong>Empty Vocab:</strong> Remove all terms from the location vocabulary (All terms will be removed IMMEDIATELY. Mostly here for testing purposes)</li><li><strong>Disassociate Vocab:</strong> Remove the association with the current Location Vocabulary. The vocabulary will remain with all its terms, but it will not be connected to this module. You can then change basic settings and re-associate it.</li><li><strong>Bulk Taxonomize Locations:</strong> This will process all locations that have been saved on this site by the Location module and add them to the Location Vocabulary</li></ul>'),
+    '#description' => t('<p>The three buttons below will let you:</p><ul><li>
+      <strong>Empty Vocab:</strong> Remove all terms from the location vocabulary
+      (All terms will be removed IMMEDIATELY. Mostly here for testing purposes)</li>
+      <li><strong>Disassociate Vocab:</strong> Remove the association with the current
+      Location Vocabulary. The vocabulary will remain with all its terms, but it will
+      not be connected to this module. You can then change basic settings and
+      re-associate it.</li><li><strong>Bulk Taxonomize Locations:</strong> This will
+      process all locations that have been saved on this site by the Location module
+      and add them to the Location Vocabulary</li></ul>'),
   );
   // button to empty the location vocabulary
   $form['location_taxonomize_ops']['emptyvocab'] = array(
@@ -160,7 +186,8 @@ function location_taxonomize_form($form, &$form_state) {
   // option to enable or disable synchronization
   $form['location_taxonomize_settings']['enable'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Synchronize the Location Taxonomy with data from the Location module'),
+    '#title' => t('Synchronize the Location Taxonomy with data from 
+                  the Location module'),
     '#default_value' => $opts_settings['enable'],
     '#description' => t('Turn on or off the main functionality of this module.'),
   );
@@ -171,7 +198,8 @@ function location_taxonomize_form($form, &$form_state) {
     '#collapsible'  => TRUE,
     '#collapsed'    => FALSE,
     '#tree'         => TRUE,
-    '#description' => t('Change the way Location terms are named in the Location Vocabulary.'),
+    '#description' => t('Change the way Location terms are named in the
+                        Location Vocabulary.'),
   );
   $form['location_taxonomize_settings']['naming']['country'] = array(
     '#type'       => 'radios',
@@ -207,7 +235,12 @@ function location_taxonomize_form($form, &$form_state) {
   $form['location_taxonomize_settings']['na_text'] = array(
     '#type'           => 'textfield',
     '#title'          => 'N/A text',
-    '#description'    => "This text will be saved if there is nothing to save for a term. For instance, if your hierarchy includes the City field, but it is not required. If a user doesn't enter a city, this text will appear as the term name instead. To avoid this being entered in your Location Vocabulary, make sure that all the fields in your hierarchy are also required by the Location module settings.",
+    '#description'    => "This text will be saved if there is nothing to save
+      for a term. For instance, if your hierarchy includes the City field, but
+      it is not required. If a user doesn't enter a city, this text will appear
+      as the term name instead. To avoid this being entered in your Location
+      Vocabulary, make sure that all the fields in your hierarchy are also
+      required by the Location module settings.",
     '#default_value'  => $opts_settings['na_text'],
     '#required'       => 1,
   );
@@ -237,7 +270,8 @@ function location_taxonomize_form($form, &$form_state) {
   $form['location_taxonomize_settings']['longname']['fields'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Long Name fields'),
-    '#description' => t('Choose which fields to use when constructing the Long Name'),
+    '#description' => t('Choose which fields to use when
+                        constructing the Long Name'),
     '#options' => _location_taxonomize_get_hierarchy(TRUE),
     '#default_value' => $longname_opts['fields'],
   );
@@ -255,7 +289,8 @@ function location_taxonomize_form($form, &$form_state) {
     '#description' => t('Determines how the country will be saved in Long Names'),
     '#options' => array(
       'name' => t('Always use full name (i.e. <em>United States</em>)'),
-      'code' => t('Use province code (i.e. <em>US</em>) when it is not the primary item in the Full Name (i.e. <em>California, US</em>)'),
+      'code' => t('Use province code (i.e. <em>US</em>) when it is not the primary
+                  item in the Full Name (i.e. <em>California, US</em>)'),
     ),
     '#default_value' => $longname_opts['country_naming'],
   );
@@ -276,7 +311,8 @@ function location_taxonomize_form($form, &$form_state) {
     '#description' => t('Determines how the province will be saved in Long Names'),
     '#options' => array(
       'name' => t('Always use full name (i.e. <em>California</em>)'),
-      'code' => t('Use province code (i.e. <em>CA</em>) when it is not the primary item in the Full Name (i.e. <em>San Francisco, CA</em>)'),
+      'code' => t('Use province code (i.e. <em>CA</em>) when it is not the primary
+                  item in the Full Name (i.e. <em>San Francisco, CA</em>)'),
     ),
     '#default_value' => $longname_opts['province_naming'],
   );
@@ -285,7 +321,12 @@ function location_taxonomize_form($form, &$form_state) {
     '#type' => 'submit',
     '#value' => t('Reset module'),
     '#submit' => array('_location_taxonomize_reset'),
-    '#prefix' => t("<p><strong>Reset Module button: </strong>This is for development and testing use. It will be removed once there is a stable release. Reseting the module will set all settings and variables to defaults, empty the location vocabulary, and disassociate the vocabulary. It's as if you emptied the vocabulary, and then uninstalled and reinstalled the module</p>"),
+    '#prefix' => t("<p><strong>Reset Module button: </strong>This is for
+      development and testing use. It will be removed once there is a stable
+      release. Reseting the module will set all settings and variables to
+      defaults, empty the location vocabulary, and disassociate the vocabulary.
+      It's as if you emptied the vocabulary, and then uninstalled and reinstalled
+      the module</p>"),
   );
   return system_settings_form($form);
 }
@@ -304,14 +345,17 @@ function location_taxonomize_form_validate($form, $form_state) {
                             associated with Location Taxonomize.'));
     $vocab = taxonomy_vocabulary_machine_name_load(LOCATION_TAXONOMIZE_VOCAB_NAME);
     if ($values_init['method'] == 'new' && $vocab) {
-      form_set_error('', t("Could not create new Location Taxonomy vocabulary. A vocabulary with the name
-                    '@name' already exists.", array('@name' => LOCATION_TAXONOMIZE_VOCAB_NAME)));
+      form_set_error('', t("Could not create new Location Taxonomy vocabulary.
+                     A vocabulary with the name '@name' already exists.",
+                     array('@name' => LOCATION_TAXONOMIZE_VOCAB_NAME)));
     }
     if ($values_init['method'] == 'existing') {
-      if (!$vocab) form_set_error('', t("Could not use the existing vocabulary. There is no existing vocabulary with the name
+      if (!$vocab) form_set_error('', t("Could not use the existing vocabulary.
+                                  There is no existing vocabulary with the name
                                   '@name'", array('@name' => LOCATION_TAXONOMIZE_VOCAB_NAME)));
       elseif ($vocab->vid != $values_init['possible_vid']) {
-        form_set_error('', t('Could not use the existing vocabulary (vid @vid). Wrong vid.', array('@vid' => $values_init['possible_vid'])));
+        form_set_error('', t('Could not use the existing vocabulary (vid @vid). Wrong vid.',
+                             array('@vid' => $values_init['possible_vid'])));
       }
     }
   }
