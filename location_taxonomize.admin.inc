@@ -93,12 +93,12 @@ function location_taxonomize_form($form, &$form_state) {
     $form['#submit'][] = 'location_taxonomize_initialize';
     return $form;
   }
-  // Vocabulary info
+  // Vocabulary info (if a vocab has already been initialized)
   $form['location_taxonomize_vocab'] = array(
     '#type' => 'fieldset',
     '#title' => t('Location Vocabulary Info'),
     '#collapsible' => TRUE,
-    '#collapsed' => FALSE,
+    '#collapsed' => TRUE,
     '#tree' => TRUE,
   );
   // hidden form element used to determine if LT is initialized already or not
@@ -237,10 +237,10 @@ function location_taxonomize_form($form, &$form_state) {
     '#title'          => 'N/A text',
     '#description'    => "This text will be saved if there is nothing to save
       for a term. For instance, if your hierarchy includes the City field, but
-      it is not required. If a user doesn't enter a city, this text will appear
-      as the term name instead. To avoid this being entered in your Location
-      Vocabulary, make sure that all the fields in your hierarchy are also
-      required by the Location module settings.",
+      the field is not required. If a user doesn't enter a city, this text will
+      appear as the term name instead. To avoid this being entered in your
+      Location Vocabulary, make sure that all the fields in your hierarchy are
+      also required by the Location module settings.",
     '#default_value'  => $opts_settings['na_text'],
     '#required'       => 1,
   );
@@ -315,18 +315,6 @@ function location_taxonomize_form($form, &$form_state) {
                   item in the Full Name (i.e. <em>San Francisco, CA</em>)'),
     ),
     '#default_value' => $longname_opts['province_naming'],
-  );
-  // resets the module - for dev and testing purposes
-  $form['location_taxonomize_default'] = array(
-    '#type' => 'submit',
-    '#value' => t('Reset module'),
-    '#submit' => array('_location_taxonomize_reset'),
-    '#prefix' => t("<p><strong>Reset Module button: </strong>This is for
-      development and testing use. It will be removed once there is a stable
-      release. Reseting the module will set all settings and variables to
-      defaults, empty the location vocabulary, and disassociate the vocabulary.
-      It's as if you emptied the vocabulary, and then uninstalled and reinstalled
-      the module</p>"),
   );
   return system_settings_form($form);
 }
