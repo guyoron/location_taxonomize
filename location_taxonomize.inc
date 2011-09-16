@@ -78,12 +78,8 @@ function location_taxonomize_empty_vocab() {
  *                 indexed array (FALSE)
  */
 function _get_location_fields($assoc = TRUE) {
-  // get name of site database
-  global $databases;
-  $db = $databases['default']['default']['database'];
   // get names of fields in the location table
-  $result = db_query("SELECT column_name FROM {information_schema.columns} WHERE table_name = 'location' AND table_schema = :db ORDER BY ordinal_position", array(':db' => $db));
-  $fields = $result->fetchCol();
+  $fields = drupal_schema_fields_sql('location');
   $return = array();
   // remove unsupported fields
   foreach ($fields as $field) {
