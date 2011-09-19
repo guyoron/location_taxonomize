@@ -281,7 +281,13 @@ function location_taxonomize_form($form, &$form_state) {
     '#maxlength' => 1,
     '#default_value' => $longname_opts['separator'],
     '#size' => 1,
-    '#required' => TRUE,
+    '#required' => FALSE,
+    '#states' => array(
+      // Mark this field required when the Long Name checkbox is enabled.
+      'required' => array(
+        ':input[name="location_taxonomize_settings[longname_enable]"]' => array('checked' => TRUE),
+      ),
+    ),
   );
   $form['location_taxonomize_settings']['longname']['country_naming'] = array(
     '#type' => 'radios',
@@ -322,7 +328,7 @@ function location_taxonomize_form($form, &$form_state) {
 /**
  * Validation hook for the module's admin form
  */
-function location_taxonomize_form_validate($form, $form_state) {
+function location_taxonomize_form_validate($form, &$form_state) {
   $values = $form_state['values'];
   //  if we're initializing, make sure that there are no interfering vocabs
   $state = $values['location_taxonomize_vocab']['state'];
@@ -346,5 +352,15 @@ function location_taxonomize_form_validate($form, $form_state) {
                              array('@vid' => $values_init['possible_vid'])));
       }
     }
+  }
+  
+  // if the Long Name option is on, the Separator field is required
+  $longname_enabled = $form_state['values']['location_taxonomize_settings']['longname_enable'];
+  $separator_empty = empty($form_state['values']['location_taxonomize_settings']['longname']['separator']);
+  if ($longname_enabled && $separator_empty) {
+    form_set_error(
+      'location_taxonomize_settings][longname][separator', 
+      t('Separator field is required.')
+    );
   }
 }
