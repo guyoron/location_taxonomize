@@ -30,11 +30,23 @@ function location_taxonomize_form($form, &$form_state) {
       initialization. But you can always disassociate the vocabulary you
       choose here, and then initialize again with other settings.',
     );
-    // hidden form element used to determine if LT is initialized already or not
+    // hidden form element used to indicate if LT is initialized already or not
     $form['location_taxonomize_vocab']['state'] = array(
       '#type' => 'hidden',
       '#value' => 'initialization',
     );
+    // Determine source
+    $source_options = location_taxonomize_get_sources();
+    $form['location_taxonomize_vocab']['source'] = array(
+      '#type'     => 'radios',
+      '#title'    => t('Location data source'),
+      '#options'  => $source_options,
+      '#default_value'  => $opts_vocab['source'],
+      '#required' => TRUE,
+    );
+    if (empty($source_options)) {
+      $form['location_taxonomize_vocab']['source']['#description'] = 'You must enable one of the available source modules first.';
+    }
     // check if there is already a Location vocab we could use
     $vocab = taxonomy_vocabulary_machine_name_load(LOCATION_TAXONOMIZE_VOCAB_NAME);
     if ($vocab) {

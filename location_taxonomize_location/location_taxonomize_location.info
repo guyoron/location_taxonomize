@@ -1,0 +1,13 @@
+name = Location taxonomize - Location
+description = Enables Location Taxonomize to use Location module as a source.
+core = 7.x
+
+dependencies[] = location_taxonomize
+dependencies[] = location
+
+files[] = location_taxonomize_location.module
+files[] = location_taxonomize_location.install
+files[] = location_taxonomize_location.inc
+
+package = "Location"
+

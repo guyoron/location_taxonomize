@@ -32,26 +32,27 @@ function _location_taxonomize_variables() {
     }
   }
   return array(
-    'location_taxonomize_vid' => NULL,
+    'location_taxonomize_vid'   => NULL,
     'location_taxonomize_vocab' => array(
-      'method' => 'existing',
-      'possible_vid' => NULL,
-      'fields' => $fields,
+      'source'        => 'location',
+      'method'        => 'existing',
+      'possible_vid'  => NULL,
+      'fields'        => $fields,
     ),
     'location_taxonomize_settings' => array(
-      'enable' => 1,
-      'naming' => array(
-        'country' => 'name',
-        'province' => 'name',
-        'usa' => 1,
+      'enable'  => 1,
+      'naming'  => array(
+        'country'   => 'name',
+        'province'  => 'name',
+        'usa'   => 1,
       ),
-      'na_text' => 'Unknown',
+      'na_text'         => 'Unknown',
       'longname_enable' => 0,
-      'longname' => array(
+      'longname'        => array(
         // this is set by the initialization process
-        'fields' => NULL,
-        'separator' => ',',
-        'country_naming' => 'code',
+        'fields'          => NULL,
+        'separator'       => ',',
+        'country_naming'  => 'code',
         'province_naming' => 'code',
         'usa' => 1,
       ),
@@ -116,6 +117,22 @@ function _location_taxonomize_get_hierarchy($assoc = FALSE) {
     }
   }
   return $hierarchy;
+}
+/**
+ * Returns an array indicating which of the possible Source modules are available
+ */
+function location_taxonomize_get_sources() {
+  $possibilities = array(
+    'location_taxonomize_location' => 'Location',
+    'location_taxonomize_af' => 'Address Field'
+  );
+  $available = array();
+  foreach ($possibilities as $module => $name) {
+    if (module_exists($module)) {
+      $available[$module] = $name;
+    }
+  }
+  return $available;
 }
 
 /**

@@ -1,0 +1,7 @@
+<?php
+
+/**
+ * @file
+ */
+
+require_once('location_taxonomize.inc');
