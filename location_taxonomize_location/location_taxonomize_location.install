@@ -12,7 +12,6 @@ require_once('location_taxonomize_location.inc');
  */
 function location_taxonomize_location_install() {
   _location_taxonomize_location_set_defaults();
-  variable_set('location_taxonomize_source', 'location_taxonomize_location');
 }
 
 /**

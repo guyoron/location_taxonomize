@@ -27,8 +27,8 @@ function _location_taxonomize_reset() {
 function _location_taxonomize_variables() {
   return array(
     'location_taxonomize_vid'   => NULL,
-    'location_taxonomize_source'  => NULL,
     'location_taxonomize_vocab' => array(
+      'source'        => 'location_taxonomize_location',
       'method'        => 'existing',
       'possible_vid'  => NULL,
     ),
@@ -72,8 +72,8 @@ function location_taxonomize_empty_vocab() {
  *                keyed array (FALSE)
  */
 function _location_taxonomize_get_hierarchy($assoc = FALSE) {
-  $vocab = variable_get('location_taxonomize_vocab');
-  $fields = $vocab['fields'];
+  $source_settings = _location_taxonomize_get_source_settings();
+  $fields = $source_settings['fields'];
   $hierarchy = array();
   foreach ($fields as $key => $value) {
     if ($value) {
@@ -150,5 +150,20 @@ function _location_taxonomize_del_variables() {
   return t('All variables deleted');
 }
 
+function _location_taxonomize_get_fields($assoc = TRUE) {
+  $source = _location_taxonomize_get_source();
+  $suffix = '_get_fields';
+  $function = $source . $suffix;
+  return $function($assoc);
+}
 
+function _location_taxonomize_get_source() {
+  $settings = variable_get('location_taxonomize_vocab');
+  return $settings['source'];
+}
 
+function _location_taxonomize_get_source_settings() {
+  $source = _location_taxonomize_get_source();
+  $suffix = '_settings';
+  return variable_get($source . $suffix);
+}

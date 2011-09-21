@@ -29,7 +29,7 @@ function _location_taxonomize_location_variables() {
  * @param $assoc - whether to return an associative array (TRUE) or just an
  *                 indexed array (FALSE)
  */
-function _get_location_fields($assoc = TRUE) {
+function location_taxonomize_location_get_fields($assoc = TRUE) {
   // get names of fields in the location table
   $fields = drupal_schema_fields_sql('location');
   $return = array();

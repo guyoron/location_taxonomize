@@ -11,8 +11,8 @@
  */
 function location_taxonomize_form($form, &$form_state) {
   $opts_vocab = variable_get('location_taxonomize_vocab');
+  $source = $opts_vocab['source'];
   $vid = variable_get('location_taxonomize_vid');
-  $source = variable_get('location_taxonomize_source');
   // initialization
   if (!$vid) {
     $form['location_taxonomize_vocab'] = array(
@@ -47,10 +47,10 @@ function location_taxonomize_form($form, &$form_state) {
     );
     if (empty($source_options)) {
       $form['location_taxonomize_vocab']['source']['#description'] = 'You must enable one of the available source modules first.';
-      return system_settings_form($form);
     }
     // get the options for the selected or default source
     $source_settings = variable_get($source . '_settings');
+    
     // check if there is already a Location vocab we could use
     $vocab = taxonomy_vocabulary_machine_name_load(LOCATION_TAXONOMIZE_VOCAB_NAME);
     if ($vocab) {
@@ -63,18 +63,18 @@ function location_taxonomize_form($form, &$form_state) {
         '#type' => 'radios',
         '#title' => t('Choose an initialization method'),
         '#required' => TRUE,
+        '#default_value'  => 'existing',
         '#options' => array(
           'new' => t('Create a new Vocabulary to associate with Location Taxonomize'),
           'existing' => t('Use the existing vocabulary vid @vid',
                           array('@vid' => $possible_vid)),
         ),
-        '#default_value' => $opts_vocab['method'],
         '#description' => t('If you use the existing vocabulary, all your terms
                             will be maintained, and Location Taxonomize will
                             start adding terms on top of the existing ones. Note
                             that your vocabulary must match the hierarchy
                             structure you choose below, or there will be
-                            unexpected behavior.')
+                            unexpected behavior.'),
       );
     }
     else {
@@ -101,7 +101,7 @@ function location_taxonomize_form($form, &$form_state) {
                           Location Taxonomy. For now, their relative hierarchy
                           cannot be changed. They will be nested hierarchically
                           in the order shown above.'),
-      '#options' => _get_location_fields(),
+      '#options' => _location_taxonomize_get_fields(),
       '#default_value' => $source_settings['fields'],
     );
     $form = system_settings_form($form);
