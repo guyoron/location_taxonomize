@@ -10,7 +10,7 @@
  * default values.
  */
 function _location_taxonomize_location_variables() {
-  $fields = _get_location_fields();
+  $fields = location_taxonomize_location_get_fields();
   // set field defaults
   foreach ($fields as $key => $value) {
     if ($key != 'country' && $key != 'province' && $key != 'city') {
