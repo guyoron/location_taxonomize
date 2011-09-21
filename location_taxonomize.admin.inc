@@ -12,6 +12,7 @@
 function location_taxonomize_form($form, &$form_state) {
   $opts_vocab = variable_get('location_taxonomize_vocab');
   $vid = variable_get('location_taxonomize_vid');
+  $source = variable_get('location_taxonomize_source');
   // initialization
   if (!$vid) {
     $form['location_taxonomize_vocab'] = array(
@@ -41,12 +42,15 @@ function location_taxonomize_form($form, &$form_state) {
       '#type'     => 'radios',
       '#title'    => t('Location data source'),
       '#options'  => $source_options,
-      '#default_value'  => $opts_vocab['source'],
+      '#default_value'  => $source,
       '#required' => TRUE,
     );
     if (empty($source_options)) {
       $form['location_taxonomize_vocab']['source']['#description'] = 'You must enable one of the available source modules first.';
+      return system_settings_form($form);
     }
+    // get the options for the selected or default source
+    $source_settings = variable_get($source . '_settings');
     // check if there is already a Location vocab we could use
     $vocab = taxonomy_vocabulary_machine_name_load(LOCATION_TAXONOMIZE_VOCAB_NAME);
     if ($vocab) {
@@ -98,7 +102,7 @@ function location_taxonomize_form($form, &$form_state) {
                           cannot be changed. They will be nested hierarchically
                           in the order shown above.'),
       '#options' => _get_location_fields(),
-      '#default_value' => $opts_vocab['fields'],
+      '#default_value' => $source_settings['fields'],
     );
     $form = system_settings_form($form);
     $form['actions']['submit']['#value'] = t('Initialize Location Taxonomy');

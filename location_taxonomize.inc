@@ -11,7 +11,8 @@ define('LOCATION_TAXONOMIZE_VOCAB_NAME', 'location_taxonomize');
 
 
 /**
- * Resets the module, as if it was uninstalled and installed again
+ * Resets the module, as if it was uninstalled and installed again and the
+ * vocab was emptied.
  */
 function _location_taxonomize_reset() {
   location_taxonomize_empty_vocab();
@@ -24,20 +25,12 @@ function _location_taxonomize_reset() {
  * default values.
  */
 function _location_taxonomize_variables() {
-  $fields = _get_location_fields();
-  // set field defaults
-  foreach ($fields as $key => $value) {
-    if ($key != 'country' && $key != 'province' && $key != 'city') {
-      $fields[$key] = 0;
-    }
-  }
   return array(
     'location_taxonomize_vid'   => NULL,
+    'location_taxonomize_source'  => NULL,
     'location_taxonomize_vocab' => array(
-      'source'        => 'location',
       'method'        => 'existing',
       'possible_vid'  => NULL,
-      'fields'        => $fields,
     ),
     'location_taxonomize_settings' => array(
       'enable'  => 1,
@@ -74,34 +67,6 @@ function location_taxonomize_empty_vocab() {
 }
 
 /**
- * Returns the Location module fields that can be used for the Location Vocabulary
- * @param $assoc - whether to return an associative array (TRUE) or just an
- *                 indexed array (FALSE)
- */
-function _get_location_fields($assoc = TRUE) {
-  // get names of fields in the location table
-  $fields = drupal_schema_fields_sql('location');
-  $return = array();
-  // remove unsupported fields
-  foreach ($fields as $field) {
-    /* formatted this way to try to preserve readability as well as accpetable
-       line lengths */
-    if ($field != 'lid' &&
-        $field != 'additional' &&
-        $field != 'latitude' &&
-        $field != 'longitude' &&
-        $field != 'source' &&
-        $field != 'is_primary' &&
-        $field != 'postal_code'
-    ) {
-      if ($assoc) $return[$field] = $field;
-      else $return[] = $field;
-    }
-  }
-  return array_reverse($return);
-}
-
-/**
  * Returns the hierarchy configured for the current Location Vocabulary
  * @param $assoc - whether to return an associative array (TRUE) or
  *                keyed array (FALSE)
@@ -118,6 +83,24 @@ function _location_taxonomize_get_hierarchy($assoc = FALSE) {
   }
   return $hierarchy;
 }
+
+/**
+ * Initializes the longname fields variable
+ */
+function _location_taxonomize_init_var_longname() {
+  $hierarchy = _location_taxonomize_get_hierarchy(FALSE);
+  $defaults = array();
+  foreach ($hierarchy as $field) {
+    if ($field != 'country' && $field != 'province' && $field != 'city') {
+      $defaults[$field] = 0;
+    }
+    else $defaults[$field] = $field;
+  }
+  $settings = variable_get('location_taxonomize_settings');
+  $settings['longname']['fields'] = $defaults;
+  variable_set('location_taxonomize_settings', $settings);
+}
+
 /**
  * Returns an array indicating which of the possible Source modules are available
  */

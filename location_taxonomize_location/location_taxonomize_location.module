@@ -4,4 +4,50 @@
  * @file
  */
 
-require_once('location_taxonomize.inc');
+require_once('location_taxonomize_location.inc');
+
+/**
+ * Implements hook_locationapi().
+ */
+function location_taxonomize_location_locationapi(&$obj, $op, $a3, $a4, $a5) {
+  $settings = variable_get('location_taxonomize_settings');
+  $vid = variable_get('location_taxonomize_vid');
+  // check module settings
+  if (!$settings['enable'] || !$vid) return;
+  switch ($op) {
+    // if we're saving a location, synchronize with vocab
+    case 'save':
+      $saved = location_taxonomize_process_loc($obj);
+      $msg = t('Location taxonomize: @num new terms saved', array('@num' => $saved));
+      drupal_set_message($msg);
+  }
+}
+
+/**
+ * Runs the bulk taxonomize operation
+ */
+function location_taxonomize_location_bulk_taxonomize_op($form_state, &$context) {
+  // initialize progress, max, and current if this is the first iteration
+  if (!isset($context['sandbox']['progress'])) {
+    $max = db_query('SELECT COUNT(DISTINCT lid) FROM {location}')->fetchField();
+    $context['sandbox']['progress'] = 0;
+    $context['sandbox']['max'] = $max;
+    $context['sandbox']['current'] = 0;
+    $context['results']['added'] = 0;
+    $context['results']['processed'] = 0;
+  }
+  // maximum 20 locations per function iteration
+  $limit = 10;
+  // iterate through the next group of locations
+  $result = db_query_range("SELECT lid, name, street, additional, city, province, postal_code, country, latitude, longitude, source FROM {location} WHERE lid <> 0 ORDER BY lid ASC", $context['sandbox']['current'], $limit, array());
+  $result_array = $result->fetchAllAssoc('lid');
+  foreach ($result_array as $row) {
+    $added = location_taxonomize_process_loc((array)$row);
+    $context['results']['added'] += $added;
+    $context['sandbox']['progress']++;
+    $context['message'] = t('Processing location lid %n', array('%n' => $row->lid));
+    $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['max'];
+  }
+  $context['sandbox']['current'] = $context['sandbox']['progress'];
+  $context['results']['processed'] = $context['sandbox']['progress'];
+}
