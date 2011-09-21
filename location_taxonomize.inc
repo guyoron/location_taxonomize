@@ -150,6 +150,9 @@ function _location_taxonomize_del_variables() {
   return t('All variables deleted');
 }
 
+/**
+ * Returns the possible fields for the hierarchy
+ */
 function _location_taxonomize_get_fields($assoc = TRUE) {
   $source = _location_taxonomize_get_source();
   $suffix = '_get_fields';
@@ -157,11 +160,17 @@ function _location_taxonomize_get_fields($assoc = TRUE) {
   return $function($assoc);
 }
 
+/**
+ * Returns the name of the current source module
+ */
 function _location_taxonomize_get_source() {
   $settings = variable_get('location_taxonomize_vocab');
   return $settings['source'];
 }
 
+/**
+ * Returns the settings array for the current source module
+ */
 function _location_taxonomize_get_source_settings() {
   $source = _location_taxonomize_get_source();
   $suffix = '_settings';

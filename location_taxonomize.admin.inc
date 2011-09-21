@@ -393,7 +393,7 @@ function location_taxonomize_form_validate($form, &$form_state) {
                                array('@vid' => $values_init['possible_vid'])));
         }
       }
-      break;
+    break;
     case 'settings':
       // if the Long Name option is on, the Separator field is required
       $longname_enabled = $form_state['values']['location_taxonomize_settings']['longname_enable'];
@@ -404,6 +404,6 @@ function location_taxonomize_form_validate($form, &$form_state) {
           t('Separator field is required.')
         );
       }
-      break;
+    break;
   }
 }
