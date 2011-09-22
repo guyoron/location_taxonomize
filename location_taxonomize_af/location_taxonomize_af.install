@@ -11,10 +11,12 @@ require_once('location_taxonomize_af.inc');
  * Implements hook_install().
  */
 function location_taxonomize_af_install() {
-  /*_location_taxonomize_af_set_defaults();
+  _location_taxonomize_af_set_defaults();
   $main_settings = variable_get('location_taxonomize_vocab');
-  $main_settings['source'] = 'location_taxonomize_af';
-  variable_set('location_taxonomize_vocab', $main_settings);*/
+  if(empty($main_settings['source'])) {
+    $main_settings['source'] = 'location_taxonomize_af';
+    variable_set('location_taxonomize_vocab', $main_settings);
+  }
 }
 
 /**

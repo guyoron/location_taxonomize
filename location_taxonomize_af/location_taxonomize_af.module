@@ -6,6 +6,36 @@
 
 require_once('location_taxonomize_af.inc');
 
-function location_taxonomize_af_field_widget_form_alter(&$element, &$form_state, $context) {
-  dpm('hello there');
+function location_taxonomize_af_field_widget_addressfield_standard_form_alter(&$element, &$form_state, $context) {
+  dpm('widget form alter');
+  $element['#process'][] = 'location_taxonomize_af_process_address';
+}
+
+function location_taxonomize_af_process_address($element, &$form_state, &$form) {
+  //dpm('process function');
+  // add a submit handler to forms that have this widget
+  $form['#submit'][] = 'location_taxonomize_af_element_submitted';
+  $form_state['temporary']['addressfields'][] = $element['#field_name'];
+  dpm($form_state);
+  return $element;
+}
+
+function location_taxonomize_af_element_submitted($form, &$form_state) {
+  dpm('added submit callback 2');
+  $lang = 'und';
+  // Act on values
+  $fields = $form_state['temporary']['addressfields'];
+  foreach ($fields as $field) {
+    $deltas = $form_state['values'][$field][$lang];
+    foreach ($deltas as $delta) {
+       // Process field
+      dpm($delta);
+      location_taxonomize_af_process_item($delta);
+    }
+  }
+}
+
+function location_taxonomize_af_process_item($address) {
+  dpm('processing address');
+  dpm($address);
 }
