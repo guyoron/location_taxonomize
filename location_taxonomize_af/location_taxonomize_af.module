@@ -4,4 +4,8 @@
  * @file
  */
 
-require_once('location_taxonomize.inc');
+require_once('location_taxonomize_af.inc');
+
+function location_taxonomize_af_field_widget_form_alter(&$element, &$form_state, $context) {
+  dpm('hello there');
+}

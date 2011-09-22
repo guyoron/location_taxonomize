@@ -1,0 +1,42 @@
+<?php
+
+/*
+ * @file
+ * Installer
+ */
+
+require_once('location_taxonomize_af.inc');
+
+/**
+ * Implements hook_install().
+ */
+function location_taxonomize_af_install() {
+  /*_location_taxonomize_af_set_defaults();
+  $main_settings = variable_get('location_taxonomize_vocab');
+  $main_settings['source'] = 'location_taxonomize_af';
+  variable_set('location_taxonomize_vocab', $main_settings);*/
+}
+
+/**
+ * Implements hook_enable().
+ */
+function location_taxonomize_af_enable() {
+  // ...
+}
+
+/**
+ * Implements hook_requirements().
+ */
+function location_taxonomize_af_requirements($phase) {
+  $requirements = array();
+  return $requirements;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function location_taxonomize_af_uninstall() {
+  // delete all variables created by this modules
+  //_location_taxonomize_af_del_variables();
+}
+
