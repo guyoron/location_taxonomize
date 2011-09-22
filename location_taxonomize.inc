@@ -152,9 +152,14 @@ function _location_taxonomize_del_variables() {
 
 /**
  * Returns the possible fields for the hierarchy
+ * if $assoc, return value is in form key => key
+ * if $opt, return value is in form key => value
+ * if $source is set, gets the fields for that source
  */
-function _location_taxonomize_get_fields($assoc = TRUE) {
-  $source = _location_taxonomize_get_source();
+function _location_taxonomize_get_fields($assoc = TRUE, $opt = FALSE, $source = NULL) {
+  if (!isset($source)) {
+    $source = _location_taxonomize_get_source();
+  }
   $suffix = '_get_fields';
   $function = $source . $suffix;
   return $function($assoc);

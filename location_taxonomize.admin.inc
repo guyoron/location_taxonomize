@@ -11,7 +11,13 @@
  */
 function location_taxonomize_form($form, &$form_state) {
   $opts_vocab = variable_get('location_taxonomize_vocab');
-  $source = $opts_vocab['source'];
+  // check if there is already a source selected in form_state
+  if (!empty($form_state['values']['location_taxonomize_vocab']['source'])) {
+    $source = $form_state['values']['location_taxonomize_vocab']['source'];
+    // remove the choices for the previous Fields field
+    unset($form_state['input']['location_taxonomize_vocab']['fields']);
+  }
+  else $source = $opts_vocab['source'];
   $vid = variable_get('location_taxonomize_vid');
   $initialized = !empty($vid);
   
@@ -68,6 +74,13 @@ function location_taxonomize_form($form, &$form_state) {
     '#options'  => $source_options,
     '#default_value'  => $source,
     '#required' => TRUE,
+    '#ajax'     => array(
+      'wrapper' => 'source-ajax-wrapper',
+      'callback'=> 'location_taxonomize_source_ajax_callback',
+      'progress'  => array(
+        'message' => ''
+      ),
+    ),
   );
   if (empty($source_options)) {
     $form['location_taxonomize_vocab']['source']['#description'] = 'You must enable one of the available source modules first.';
@@ -129,7 +142,6 @@ function location_taxonomize_form($form, &$form_state) {
 
   // get the options for the selected or default source
   $source_settings = variable_get($source . '_settings');
-
   // Hierarchy selection
   $form['location_taxonomize_vocab']['fields'] = array(
     '#type' => 'checkboxes',
@@ -138,8 +150,10 @@ function location_taxonomize_form($form, &$form_state) {
                         Location Taxonomy. For now, their relative hierarchy
                         cannot be changed. They will be nested hierarchically
                         in the order shown above.'),
-    '#options' => _location_taxonomize_get_fields(),
+    '#options' => _location_taxonomize_get_fields(TRUE, TRUE, $source),
     '#default_value' => $source_settings['fields'],
+    '#prefix' => '<div id="source-ajax-wrapper">',
+    '#suffix' => '</div>'
   );
   if ($initialized) {
     $form['location_taxonomize_vocab']['fields']['#disabled'] = TRUE;
@@ -368,6 +382,11 @@ function location_taxonomize_form($form, &$form_state) {
     '#default_value' => $longname_opts['province_naming'],
   );
   return system_settings_form($form);
+}
+
+function location_taxonomize_source_ajax_callback($form, &$form_state) {
+  //dpm('ajax callback');
+  return $form['location_taxonomize_vocab']['fields'];
 }
 
 /**
