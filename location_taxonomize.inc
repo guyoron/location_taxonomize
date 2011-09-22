@@ -181,3 +181,20 @@ function _location_taxonomize_get_source_settings() {
   $suffix = '_settings';
   return variable_get($source . $suffix);
 }
+
+/**
+ * Sets the default source to $module if the default source is not already set
+ * Returns TRUE if set, FALSE if not set
+ */
+function location_taxonomize_source_default_set($module) {
+  $settings = variable_get('location_taxonomize_vocab');
+  if(empty($settings['source'])) {
+    $settings['source'] = $module;
+    variable_set('location_taxonomize_vocab', $settings);
+    return TRUE;
+  }
+  return FALSE;
+}
+
+
+

@@ -6,22 +6,29 @@
 
 require_once('location_taxonomize_af.inc');
 
+/**
+ * Implements hook_field_widget_WIDGET_TYPE_form_alter().
+ */
 function location_taxonomize_af_field_widget_addressfield_standard_form_alter(&$element, &$form_state, $context) {
-  dpm('widget form alter');
+  // add a process function to addressfield widgets
   $element['#process'][] = 'location_taxonomize_af_process_address';
 }
 
+/**
+ * A #process callback function for the addressfield widget
+ */
 function location_taxonomize_af_process_address($element, &$form_state, &$form) {
-  //dpm('process function');
   // add a submit handler to forms that have this widget
   $form['#submit'][] = 'location_taxonomize_af_element_submitted';
+  // make note that this field needs to be processed in the submit handler
   $form_state['temporary']['addressfields'][] = $element['#field_name'];
-  dpm($form_state);
   return $element;
 }
 
+/**
+ * A submit handler for forms that contain an addressfield
+ */
 function location_taxonomize_af_element_submitted($form, &$form_state) {
-  dpm('added submit callback 2');
   $lang = 'und';
   // Act on values
   $fields = $form_state['temporary']['addressfields'];
@@ -29,12 +36,15 @@ function location_taxonomize_af_element_submitted($form, &$form_state) {
     $deltas = $form_state['values'][$field][$lang];
     foreach ($deltas as $delta) {
        // Process field
-      dpm($delta);
       location_taxonomize_af_process_item($delta);
     }
   }
 }
 
+/**
+ * Central function that processes an addressfield item and sends it to 
+ * Location Taxonomize to be saved into the taxonomy
+ */
 function location_taxonomize_af_process_item($address) {
   dpm('processing address');
   dpm($address);

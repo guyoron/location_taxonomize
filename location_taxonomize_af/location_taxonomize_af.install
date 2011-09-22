@@ -12,11 +12,8 @@ require_once('location_taxonomize_af.inc');
  */
 function location_taxonomize_af_install() {
   _location_taxonomize_af_set_defaults();
-  $main_settings = variable_get('location_taxonomize_vocab');
-  if(empty($main_settings['source'])) {
-    $main_settings['source'] = 'location_taxonomize_af';
-    variable_set('location_taxonomize_vocab', $main_settings);
-  }
+  // set this module as the default source module if another is not already set
+  location_taxonomize_source_default_set(LT_AF_MODULE_ID);
 }
 
 /**
@@ -39,6 +36,6 @@ function location_taxonomize_af_requirements($phase) {
  */
 function location_taxonomize_af_uninstall() {
   // delete all variables created by this modules
-  //_location_taxonomize_af_del_variables();
+  _location_taxonomize_af_del_variables();
 }
 

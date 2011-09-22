@@ -5,6 +5,10 @@
  * Some useful functions for Location taxonomize
  */
  
+define('LT_AF_MODULE_ID', 'location_taxonomize_af');
+define('LT_AF_MODULE_NAME', 'Location Taxonomize Address Field');
+ 
+
 /**
  * Keeps a list of all the variables maintained by this module, with their
  * default values.
@@ -69,8 +73,8 @@ function _location_taxonomize_af_set_defaults() {
  * Deletes all variables set by this module
  */
 function _location_taxonomize_af_del_variables() {
-  /*$vars = _location_taxonomize_location_variables();
+  $vars = _location_taxonomize_af_variables();
   foreach ($vars as $key => $value) {
     variable_del($key);
-  }*/
+  }
 }
