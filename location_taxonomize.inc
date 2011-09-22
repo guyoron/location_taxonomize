@@ -28,7 +28,7 @@ function _location_taxonomize_variables() {
   return array(
     'location_taxonomize_vid'   => NULL,
     'location_taxonomize_vocab' => array(
-      'source'        => 'location_taxonomize_location',
+      'source'        => NULL,
       'method'        => 'existing',
       'possible_vid'  => NULL,
     ),

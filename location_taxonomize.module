@@ -106,15 +106,13 @@ function location_taxonomize_initialize($form, $form_state) {
  * Returns the number of terms added
  * @param $obj - a location object
  */
-function location_taxonomize_process_loc($obj) {
+function location_taxonomize_process_item($obj) {
   // get settings
   $settings = variable_get('location_taxonomize_settings');
   $vid = variable_get('location_taxonomize_vid');
   $hierarchy = _location_taxonomize_get_hierarchy();
   // holds the number of newly saved terms
   $saved = 0;
-  // make sure the province_name and country_name fields are there and updated
-  $location = _fix_loc_tmp($obj);
   $tids = array();
   // this loops through hierarchy levels and saves terms if necessary
   for ($hlevel = 0; $hlevel < count($hierarchy); $hlevel++) {
@@ -183,18 +181,6 @@ function _find_term($name, $hlevel, $parentid) {
           location was ambiguous.");
   drupal_set_message($msg);
   return TRUE;
-}
-
-/**
- * A temporary fix for an apparent bug, due to which the country_name field is
- * not updated during the call to hook_locationapi. Also used to add the
- * country_name and province_name fields to the location in cases where the
- * location is read from the database
- */
-function _fix_loc_tmp($loc) {
-  $loc['country_name'] = location_country_name($loc['country']);
-  $loc['province_name'] = location_province_name($loc['country'], $loc['province']);
-  return $loc;
 }
 
 /**
@@ -293,7 +279,7 @@ function _location_taxonomize_create_term_name($hlevel_name, &$location, &$setti
  * Calls the Batch API to run the bulk operation function
  */
 function location_taxonomize_bulk_taxonomize($form, $form_state) {
-  $source = variable_get('location_taxonomize_source');
+  $source = _location_taxonomize_get_source();
   $batch_function = $source . '_bulk_taxonomize_op';
   $batch = array(
     'operations' => array(

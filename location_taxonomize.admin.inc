@@ -71,6 +71,11 @@ function location_taxonomize_form($form, &$form_state) {
   );
   if (empty($source_options)) {
     $form['location_taxonomize_vocab']['source']['#description'] = 'You must enable one of the available source modules first.';
+    // Stop the form here
+    $form = system_settings_form($form);
+    $form['actions']['submit']['#value'] = t('Initialize Location Taxonomy');
+    $form['#submit'][] = 'location_taxonomize_initialize';
+    return $form;
   }
   if ($initialized) {
     $form['location_taxonomize_vocab']['source']['#disabled'] = TRUE;
