@@ -83,5 +83,5 @@ function location_taxonomize_af_element_submitted($form, &$form_state) {
  */
 function location_taxonomize_af_process_item($address) {
   dpm('processing address');
-  //dpm($address);
+  dpm($address);
 }

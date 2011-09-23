@@ -72,3 +72,15 @@ function _location_taxonomize_location_del_variables() {
     variable_del($key);
   }
 }
+
+/**
+ * Tells Location Taxonomize the names used in this module for the 'Primary
+ * Fields' Country, State/Province, City
+ */
+function location_taxonomize_af_primary_field_names() {
+  return array(
+    'country',
+    'province',
+    'city',
+  );
+}

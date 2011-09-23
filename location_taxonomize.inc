@@ -196,5 +196,36 @@ function location_taxonomize_source_default_set($module) {
   return FALSE;
 }
 
+/**
+ * Country, State/Province, and City are defined as 'Primary Fields'. 
+ * This function returns a list of primary field names from the current source
+ */
+function location_taxonomize_get_primary_fields() {
+  $source = _location_taxonomize_get_source();
+  $suffix = '_primary_field_names';
+  $function = $source . $suffix;
+  $source_fields = $function($assoc);
+  
+  $primary_fields = array(
+    'country' => $source_fields[0],
+    'province'=> $source_fields[1],
+    'city' => $source_fields[2],
+  );
+  
+  return $primary_fields;
+}
 
-
+/**
+ * Converts a field name from the current source to an internal primary field
+ * name if necessary. Otherwise returns the given name.
+ */
+function location_taxonomize_convert_field_name($name) {
+  $primary_fields = location_taxonomize_get_primary_fields();
+  foreach ($primary_fields as $key => $value) {
+    if ($value == $name) {
+      $name = $key;
+      break;
+    }
+  }
+  return $name;
+}

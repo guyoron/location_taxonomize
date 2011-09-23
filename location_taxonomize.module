@@ -241,7 +241,9 @@ function _location_taxonomy_add_longname(&$term, $hlevel, $location) {
  * all the config options
  */
 function _location_taxonomize_create_term_name($hlevel_name, &$location, &$settings) {
-  switch ($hlevel_name) {
+  // convert this hlevel_name to an internal primary field name if necessary
+  $field_name = location_taxonomize_convert_field_name($hlevel_name);
+  switch ($field_name) {
     case 'country':
       if (empty($location['country'])) {
         $name = $settings['na_text'];
