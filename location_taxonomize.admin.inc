@@ -244,7 +244,7 @@ function location_taxonomize_form($form, &$form_state) {
     '#default_value'  => $opts_settings['na_text'],
     '#required'       => 1,
   );
-  // option to enable or disable the Full Name field
+  // option to enable or disable the Long Name field
   $form['location_taxonomize_settings']['longname_enable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Save a Long Name field for every term'),
@@ -266,7 +266,7 @@ function location_taxonomize_form($form, &$form_state) {
       ),
     ),
   );
-  // choose fields to use for Full Name field
+  // choose fields to use for Long Name field
   $form['location_taxonomize_settings']['longname']['fields'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Long Name fields'),
@@ -295,8 +295,8 @@ function location_taxonomize_form($form, &$form_state) {
     '#description' => t('Determines how the country will be saved in Long Names'),
     '#options' => array(
       'name' => t('Always use full name (i.e. <em>United States</em>)'),
-      'code' => t('Use province code (i.e. <em>US</em>) when it is not the primary
-                  item in the Full Name (i.e. <em>California, US</em>)'),
+      'code' => t('Use country code (i.e. <em>US</em>) when the country is not the primary
+                  item in the Long Name (i.e. <em>California, US</em>)'),
     ),
     '#default_value' => $longname_opts['country_naming'],
   );
@@ -317,8 +317,8 @@ function location_taxonomize_form($form, &$form_state) {
     '#description' => t('Determines how the province will be saved in Long Names'),
     '#options' => array(
       'name' => t('Always use full name (i.e. <em>California</em>)'),
-      'code' => t('Use province code (i.e. <em>CA</em>) when it is not the primary
-                  item in the Full Name (i.e. <em>San Francisco, CA</em>)'),
+      'code' => t('Use province code (i.e. <em>CA</em>) when the province is not the primary
+                  item in the Long Name (i.e. <em>San Francisco, CA</em>)'),
     ),
     '#default_value' => $longname_opts['province_naming'],
   );
