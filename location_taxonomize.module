@@ -107,18 +107,26 @@ function location_taxonomize_initialize($form, $form_state) {
  * @param $obj - a location object
  */
 function location_taxonomize_process_item($obj) {
+  dpm('in process item');
   // get settings
   $settings = variable_get('location_taxonomize_settings');
   $vid = variable_get('location_taxonomize_vid');
   $hierarchy = _location_taxonomize_get_hierarchy();
+  dpm('hierarcy');
+  dpm($hierarchy);
   // holds the number of newly saved terms
   $saved = 0;
   $tids = array();
   // this loops through hierarchy levels and saves terms if necessary
   for ($hlevel = 0; $hlevel < count($hierarchy); $hlevel++) {
+    dpm('in for loop');
+    dpm("hlevel: $hlevel");
     $hlevel_name = $hierarchy[$hlevel];
+    dpm("hlevel_name: $hlevel_name");
     // set the term name
-    $name = _location_taxonomize_create_term_name($hlevel_name, $location, $settings);
+    $name = _location_taxonomize_create_term_name($hlevel_name, $obj, $settings);
+    dpm('name');
+    dpm($name);
     // find if the term exists already or not
     if ($hlevel == 0) $parentid = -1;
     else $parentid = $tids[$hlevel-1];
@@ -156,17 +164,30 @@ function location_taxonomize_process_item($obj) {
  * NOTE: $parentid is only necessary if $hlevel > 0. Otherwise, set $parentid = -1
  */
 function _find_term($name, $hlevel, $parentid) {
+  dpm("in find_tem. name is $name, hlevel is $hlevel, parentid is $parentid");
   $terms = taxonomy_get_term_by_name($name);
+  dpm('terms');
+  dpm($terms);
   // there are no terms that match
   if (!$terms) return FALSE;
+  dpm('still here');
   $withparent = array();
   // look through matching terms and find the one(s) with the right parent
   foreach ($terms as $term) {
+    dpm('term');
+    dpm($term);
     $parents = taxonomy_get_parents($term->tid);
+    dpm('parents');
+    dpm($parents);
     // for root-level terms:
-    if (!$parents && $parentid == -1) $withparent[] = $term;
+    if (empty($parents) && $parentid == -1) {
+      $withparent[] = $term;
+      dpm('this is a root level term');
+    }
     // for all other terms (one parent is assumed):
     elseif (array_pop($parents)->tid == $parentid) $withparent[] = $term;
+    dpm('withparent');
+    dpm($withparent);
   }
   // there is one term that matches exactly
   if (count($withparent) == 1) {
@@ -241,29 +262,38 @@ function _location_taxonomy_add_longname(&$term, $hlevel, $location) {
  * all the config options
  */
 function _location_taxonomize_create_term_name($hlevel_name, &$location, &$settings) {
+  dpm('in create name');
+  dpm('hlevel_name');
+  dpm($hlevel_name);
+  dpm('location');
+  dpm($location);
+  dpm('settings');
+  dpm($settings);
   // convert this hlevel_name to an internal primary field name if necessary
   $field_name = location_taxonomize_convert_field_name($hlevel_name);
+  dpm('field name');
+  dpm($field_name);
   switch ($field_name) {
     case 'country':
-      if (empty($location['country'])) {
+      if (empty($location[$hlevel_name])) {
         $name = $settings['na_text'];
       }
       elseif ($settings['naming']['country'] == 'name') {
         $name = $location['country_name'];
       }
-      elseif ($location['country'] == 'us' && $settings['naming']['usa']) {
+      elseif ($location[$hlevel_name] == 'us' && $settings['naming']['usa']) {
         $name = 'USA';
       }
-      else $name = drupal_strtoupper($location['country']);
+      else $name = drupal_strtoupper($location[$hlevel_name]);
       break;
     case 'province':
-      if (empty($location['province'])) {
+      if (empty($location[$hlevel_name])) {
         $name = $settings['na_text'];
       }
       elseif ($settings['naming']['province'] == 'name') {
         $name = $location['province_name'];
       }
-      else $name = $location['province'];
+      else $name = $location[$hlevel_name];
       break;
     default:
       if (empty($location[$hlevel_name])) $name = $settings['na_text'];

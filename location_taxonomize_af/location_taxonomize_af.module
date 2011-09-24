@@ -19,8 +19,7 @@ function location_taxonomize_af_field_widget_info_alter(&$info) {
 function location_taxonomize_af_form_field_ui_field_edit_form_alter(&$form, $form_state, $form_id) {
   dpm('2');
   //dpm($form['#field']);
-  if ($form['#field']['type'] != 'addressfield') return;  // only applies for references fields
-  
+  if ($form['#field']['type'] != 'addressfield') return;
   $settings = $form['#instance']['widget']['settings'];
   dpm($settings);
   $enable = array(
@@ -36,7 +35,8 @@ function location_taxonomize_af_form_field_ui_field_edit_form_alter(&$form, $for
  */
 function location_taxonomize_af_field_widget_addressfield_standard_form_alter(&$element, &$form_state, $context) {
   //dpm('widget form alter');
-  dpm($context);
+  // check if this module is enabled as the current source
+  if (_location_taxonomize_get_source() != LT_AF_MODULE_ID) return;
   // apply this only if we are on a node-edit form
   if (!isset($context['form']['#node_edit_form'])) return;
   // check field settings
@@ -83,5 +83,14 @@ function location_taxonomize_af_element_submitted($form, &$form_state) {
  */
 function location_taxonomize_af_process_item($address) {
   dpm('processing address');
-  dpm($address);
+  //dpm($address);
+  $settings = variable_get('location_taxonomize_settings');
+  $vid = variable_get('location_taxonomize_vid');
+  // check module settings
+  if (!$settings['enable'] || !$vid) return;
+  // make sure the province_name and country_name fields are there and updated
+  $location = _fix_loc_tmp($address);
+  $saved = location_taxonomize_process_item($location);
+  $msg = t('Location taxonomize: @num new terms saved', array('@num' => $saved));
+  drupal_set_message($msg);
 }

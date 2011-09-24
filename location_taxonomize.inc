@@ -204,7 +204,7 @@ function location_taxonomize_get_primary_fields() {
   $source = _location_taxonomize_get_source();
   $suffix = '_primary_field_names';
   $function = $source . $suffix;
-  $source_fields = $function($assoc);
+  $source_fields = $function();
   
   $primary_fields = array(
     'country' => $source_fields[0],
@@ -221,6 +221,8 @@ function location_taxonomize_get_primary_fields() {
  */
 function location_taxonomize_convert_field_name($name) {
   $primary_fields = location_taxonomize_get_primary_fields();
+  dpm('primary fields');
+  dpm($primary_fields);
   foreach ($primary_fields as $key => $value) {
     if ($value == $name) {
       $name = $key;

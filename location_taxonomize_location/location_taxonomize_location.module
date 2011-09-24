@@ -61,7 +61,10 @@ function location_taxonomize_location_bulk_taxonomize_op($form_state, &$context)
  * location is read from the database
  */
 function _fix_loc_tmp($loc) {
-  $loc['country_name'] = location_country_name($loc['country']);
-  $loc['province_name'] = location_province_name($loc['country'], $loc['province']);
+  $primary_fields = location_taxonomize_get_primary_fields();
+  $country_name = $primary_fields['country'];
+  $province_name = $primary_fields['province'];
+  $loc['country_name'] = location_country_name($loc[$country_name]);
+  $loc['province_name'] = location_province_name($loc[$country_name], $loc[$province_name]);
   return $loc;
 }
