@@ -11,13 +11,13 @@ require_once('location_taxonomize_location.inc');
  */
 function location_taxonomize_location_locationapi(&$obj, $op, $a3, $a4, $a5) {
   // check if this module is enabled as the current source
-  if (_location_taxonomize_get_source() != LT_AF_MODULE_ID) return;
+  if (_location_taxonomize_get_source() != LT_LOC_MODULE_ID) return;
   $settings = variable_get('location_taxonomize_settings');
   $vid = variable_get('location_taxonomize_vid');
   // check module settings
   if (!$settings['enable'] || !$vid) return;
   switch ($op) {
-    // if we're saving a location, synchronize with vocab
+    // if we're saving a location, send it to LT for processing
     case 'save':
       dpm('hi');
       // make sure the province_name and country_name fields are there and updated

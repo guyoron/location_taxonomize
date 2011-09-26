@@ -5,6 +5,9 @@
  * Some useful functions for Location taxonomize
  */
  
+define('LT_LOC_MODULE_ID', 'location_taxonomize_location');
+define('LT_LOC_MODULE_NAME', 'Location Taxonomize Location');
+ 
 /**
  * Keeps a list of all the variables maintained by this module, with their
  * default values.
