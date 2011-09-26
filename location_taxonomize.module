@@ -139,7 +139,7 @@ function location_taxonomize_process_item($obj) {
       );
       // add longname if necessary
       if ($settings['longname_enable']) {
-        _location_taxonomy_add_longname($term, $hlevel, $location);
+        _location_taxonomy_add_longname($term, $hlevel, $obj);
       }
       // set term parent
       if ($hlevel == 0) {
@@ -215,27 +215,30 @@ function _location_taxonomy_add_longname(&$term, $hlevel, $location) {
   $hierarchy = _location_taxonomize_get_hierarchy();
   // the name of the hierarchy level of this term (i.e. 'city')
   $term_hlevel_name = $hierarchy[$hlevel];
+  // translate the name into an internal field name if necessary
+  $term_hlevel_name_lt = location_taxonomize_convert_field_name($term_hlevel_name);
   // no Long Name if this hlevel_name is not selected in config
   if (!$fields[$term_hlevel_name]) return '';
   $longname = array();
   // collect parts of longname
   for ($i = 0; $i <= $hlevel; $i++) {
     $hlevel_name = $hierarchy[$i];
+    $hlevel_name_lt = location_taxonomize_convert_field_name($hlevel_name);
     $include = $fields[$hlevel_name];
     if ($include) {
-      switch ($hlevel_name) {
+      switch ($hlevel_name_lt) {
         case 'country':
-          if ($term_hlevel_name == 'country' || $ln_settings['country_naming'] == 'name') {
-            $longname[] = $location['country_name'];
+          if ($term_hlevel_name_lt == 'country' || $ln_settings['country_naming'] == 'name') {
+            $longname[] = $location[location_taxonomize_source_field_name('country_name')];
           }
-          elseif ($location['country'] == 'us' && $ln_settings['usa']) $longname[] = 'USA';
-          else $longname[] = drupal_strtoupper($location['country']);
+          elseif ($location[$hlevel_name] == 'us' && $ln_settings['usa']) $longname[] = 'USA';
+          else $longname[] = drupal_strtoupper($location[$hlevel_name]);
           break;
         case 'province':
-          if ($term_hlevel_name == 'province' || $ln_settings['province_naming'] == 'name') {
-            $longname[] = $location['province_name'];
+          if ($term_hlevel_name_lt == 'province' || $ln_settings['province_naming'] == 'name') {
+            $longname[] = $location[location_taxonomize_source_field_name('province_name')];
           }
-          else $longname[] = $location['province'];
+          else $longname[] = $location[$hlevel_name];
           break;
         default:
           $longname[] = $location[$hlevel_name];
@@ -279,7 +282,7 @@ function _location_taxonomize_create_term_name($hlevel_name, &$location, &$setti
         $name = $settings['na_text'];
       }
       elseif ($settings['naming']['country'] == 'name') {
-        $name = $location['country_name'];
+        $name = $location[location_taxonomize_source_field_name('country_name')];
       }
       elseif ($location[$hlevel_name] == 'us' && $settings['naming']['usa']) {
         $name = 'USA';
@@ -291,7 +294,7 @@ function _location_taxonomize_create_term_name($hlevel_name, &$location, &$setti
         $name = $settings['na_text'];
       }
       elseif ($settings['naming']['province'] == 'name') {
-        $name = $location['province_name'];
+        $name = $location[location_taxonomize_source_field_name('province_name')];
       }
       else $name = $location[$hlevel_name];
       break;

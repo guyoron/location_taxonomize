@@ -66,13 +66,21 @@ function location_taxonomize_af_process_address($element, &$form_state, &$form) 
 function location_taxonomize_af_element_submitted($form, &$form_state) {
   $lang = 'und';
   // Act on values
-  //dpm($form_state);
   $fields = $form_state['temporary']['addressfields'];
   foreach ($fields as $field) {
     $deltas = $form_state['values'][$field][$lang];
+    $actual_delta = 0;
     foreach ($deltas as $delta) {
-       // Process field
+       // Add the Administrative Area name, if possible
+       if(isset($form[$field][$lang][$actual_delta]['locality_block']['administrative_area']['#options'])) {
+         $options = $form[$field][$lang][$actual_delta]['locality_block']['administrative_area']['#options'];
+         $delta['administrative_area_name'] = $options[$delta['administrative_area']];
+       }
+      // Add the country name
+      $delta['country_name'] = location_taxonomize_get_country_name($delta['country']);
+      dpm($delta);
       location_taxonomize_af_process_item($delta);
+      $actual_delta++;
     }
   }
 }
@@ -83,14 +91,13 @@ function location_taxonomize_af_element_submitted($form, &$form_state) {
  */
 function location_taxonomize_af_process_item($address) {
   dpm('processing address');
-  //dpm($address);
+  dpm($address);
   $settings = variable_get('location_taxonomize_settings');
   $vid = variable_get('location_taxonomize_vid');
   // check module settings
   if (!$settings['enable'] || !$vid) return;
   // make sure the province_name and country_name fields are there and updated
-  $location = _fix_loc_tmp($address);
-  $saved = location_taxonomize_process_item($location);
+  $saved = location_taxonomize_process_item($address);
   $msg = t('Location taxonomize: @num new terms saved', array('@num' => $saved));
   drupal_set_message($msg);
 }

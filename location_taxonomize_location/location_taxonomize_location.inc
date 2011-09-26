@@ -74,13 +74,24 @@ function _location_taxonomize_location_del_variables() {
 }
 
 /**
+ * Adds the country name and province name fields to a Location
+ */
+function location_taxonomize_location_fixup($loc) {
+  $loc['country_name'] = location_country_name($loc['country']);
+  $loc['province_name'] = location_province_name($loc['country'], $loc['province']);
+  return $loc;
+}
+
+/**
  * Tells Location Taxonomize the names used in this module for the 'Primary
  * Fields' Country, State/Province, City
  */
 function location_taxonomize_location_primary_field_names() {
   return array(
     'country',
+    'country_name',
     'province',
+    'province_name',
     'city',
   );
 }

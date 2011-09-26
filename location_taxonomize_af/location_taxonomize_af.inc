@@ -86,7 +86,9 @@ function _location_taxonomize_af_del_variables() {
 function location_taxonomize_af_primary_field_names() {
   return array(
     'country',
+    'country_name',
     'administrative_area',
+    'administrative_area_name',
     'locality',
   );
 }

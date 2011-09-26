@@ -10,6 +10,8 @@ require_once('location_taxonomize_location.inc');
  * Implements hook_locationapi().
  */
 function location_taxonomize_location_locationapi(&$obj, $op, $a3, $a4, $a5) {
+  // check if this module is enabled as the current source
+  if (_location_taxonomize_get_source() != LT_AF_MODULE_ID) return;
   $settings = variable_get('location_taxonomize_settings');
   $vid = variable_get('location_taxonomize_vid');
   // check module settings
@@ -17,8 +19,9 @@ function location_taxonomize_location_locationapi(&$obj, $op, $a3, $a4, $a5) {
   switch ($op) {
     // if we're saving a location, synchronize with vocab
     case 'save':
+      dpm('hi');
       // make sure the province_name and country_name fields are there and updated
-      $location = _fix_loc_tmp($obj);
+      $location = location_taxonomize_location_fixup($obj);
       $saved = location_taxonomize_process_item($location);
       $msg = t('Location taxonomize: @num new terms saved', array('@num' => $saved));
       drupal_set_message($msg);
@@ -52,19 +55,4 @@ function location_taxonomize_location_bulk_taxonomize_op($form_state, &$context)
   }
   $context['sandbox']['current'] = $context['sandbox']['progress'];
   $context['results']['processed'] = $context['sandbox']['progress'];
-}
-
-/**
- * A temporary fix for an apparent bug, due to which the country_name field is
- * not updated during the call to hook_locationapi. Also used to add the
- * country_name and province_name fields to the location in cases where the
- * location is read from the database
- */
-function _fix_loc_tmp($loc) {
-  $primary_fields = location_taxonomize_get_primary_fields();
-  $country_name = $primary_fields['country'];
-  $province_name = $primary_fields['province'];
-  $loc['country_name'] = location_country_name($loc[$country_name]);
-  $loc['province_name'] = location_province_name($loc[$country_name], $loc[$province_name]);
-  return $loc;
 }

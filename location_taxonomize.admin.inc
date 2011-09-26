@@ -327,7 +327,7 @@ function location_taxonomize_form($form, &$form_state) {
     '#title' => t('Long Name fields'),
     '#description' => t('Choose which fields to use when
                         constructing the Long Name'),
-    '#options' => _location_taxonomize_get_hierarchy(TRUE),
+    '#options' => _location_taxonomize_get_hierarchy(TRUE, TRUE),
     '#default_value' => $longname_opts['fields'],
   );
   

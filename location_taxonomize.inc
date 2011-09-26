@@ -70,14 +70,20 @@ function location_taxonomize_empty_vocab() {
  * Returns the hierarchy configured for the current Location Vocabulary
  * @param $assoc - whether to return an associative array (TRUE) or
  *                keyed array (FALSE)
+ * @param $labels - if TRUE and $assoc is TRUE, returns the labels
+ *                  of the fields as values 
  */
-function _location_taxonomize_get_hierarchy($assoc = FALSE) {
+function _location_taxonomize_get_hierarchy($assoc = FALSE, $labels = FALSE) {
   $source_settings = _location_taxonomize_get_source_settings();
   $fields = $source_settings['fields'];
+  if ($labels) $withlabels = _location_taxonomize_get_fields(TRUE, TRUE);
   $hierarchy = array();
   foreach ($fields as $key => $value) {
     if ($value) {
-      if ($assoc) $hierarchy[$key] = $key;
+      if ($assoc) {
+        if ($labels) $hierarchy[$key] = $withlabels[$key];
+        else $hierarchy[$key] = $key;
+      }
       else $hierarchy[] = $key;
     }
   }
@@ -200,19 +206,26 @@ function location_taxonomize_source_default_set($module) {
  * Country, State/Province, and City are defined as 'Primary Fields'. 
  * This function returns a list of primary field names from the current source
  */
-function location_taxonomize_get_primary_fields() {
+function location_taxonomize_get_primary_fields($reverse = FALSE) {
   $source = _location_taxonomize_get_source();
   $suffix = '_primary_field_names';
   $function = $source . $suffix;
   $source_fields = $function();
   
-  $primary_fields = array(
-    'country' => $source_fields[0],
-    'province'=> $source_fields[1],
-    'city' => $source_fields[2],
+  $internal_fields = array(
+    'country',
+    'country_name',
+    'province',
+    'province_name',
+    'city',
   );
   
-  return $primary_fields;
+  if(!$reverse) {
+    return array_combine($internal_fields, $source_fields);
+  }
+  else {
+    return array_combine($source_fields, $internal_fields);
+  }
 }
 
 /**
@@ -230,4 +243,36 @@ function location_taxonomize_convert_field_name($name) {
     }
   }
   return $name;
+}
+
+function location_taxonomize_source_field_name($internal_name) {
+  $primary_fields = location_taxonomize_get_primary_fields();
+  if (isset($primary_fields[$internal_name])) return $primary_fields[$internal_name];
+  return $internal_name;
+}
+
+function location_taxonomize_normalize_field_names($items) {
+  foreach ($items as $field_name => $value) {
+    $internal_name = location_taxonomize_convert_field_name($field_name);
+    if ($internal_name != $field_name) {
+      $items[$internal_name] = $value;
+      unset($items[$field_name]);
+    }
+  }
+  return $items;
+}
+
+function location_taxonomize_get_country_code($name) {
+  require_once DRUPAL_ROOT . '/includes/locale.inc';
+  $countries = country_get_list();
+  $names = array_keys($countries, $name);
+  if (!empty($names)) return array_pop($names);
+  return NULL;
+}
+
+function location_taxonomize_get_country_name($code) {
+  require_once DRUPAL_ROOT . '/includes/locale.inc';
+  $countries = country_get_list();
+  if (isset($countries[strtoupper($code)])) return $countries[strtoupper($code)];
+  return NULL;
 }
