@@ -159,10 +159,10 @@ function _location_taxonomize_del_variables() {
 /**
  * Returns the possible fields for the hierarchy
  * if $assoc, return value is in form key => key
- * if $opt, return value is in form key => value
+ * if $labels, return value is in form key => value
  * if $source is set, gets the fields for that source
  */
-function _location_taxonomize_get_fields($assoc = TRUE, $opt = FALSE, $source = NULL) {
+function _location_taxonomize_get_fields($assoc = TRUE, $labels = FALSE, $source = NULL) {
   if (!isset($source)) {
     $source = _location_taxonomize_get_source();
   }
@@ -203,15 +203,15 @@ function location_taxonomize_source_default_set($module) {
 }
 
 /**
- * Country, State/Province, and City are defined as 'Primary Fields'. 
- * This function returns a list of primary field names from the current source
+ * Some fields are defined as 'Primary Fields'. 
+ * This function returns a dictionary mapping internal field names
+ * to source field names, or the other direction, if $reverse is TRUE
  */
 function location_taxonomize_get_primary_fields($reverse = FALSE) {
   $source = _location_taxonomize_get_source();
   $suffix = '_primary_field_names';
   $function = $source . $suffix;
   $source_fields = $function();
-  
   $internal_fields = array(
     'country',
     'country_name',
@@ -219,7 +219,6 @@ function location_taxonomize_get_primary_fields($reverse = FALSE) {
     'province_name',
     'city',
   );
-  
   if(!$reverse) {
     return array_combine($internal_fields, $source_fields);
   }
@@ -234,8 +233,6 @@ function location_taxonomize_get_primary_fields($reverse = FALSE) {
  */
 function location_taxonomize_convert_field_name($name) {
   $primary_fields = location_taxonomize_get_primary_fields();
-  dpm('primary fields');
-  dpm($primary_fields);
   foreach ($primary_fields as $key => $value) {
     if ($value == $name) {
       $name = $key;
@@ -245,23 +242,18 @@ function location_taxonomize_convert_field_name($name) {
   return $name;
 }
 
+/** 
+ * Converts an internal name to a source name
+ */
 function location_taxonomize_source_field_name($internal_name) {
   $primary_fields = location_taxonomize_get_primary_fields();
   if (isset($primary_fields[$internal_name])) return $primary_fields[$internal_name];
   return $internal_name;
 }
 
-function location_taxonomize_normalize_field_names($items) {
-  foreach ($items as $field_name => $value) {
-    $internal_name = location_taxonomize_convert_field_name($field_name);
-    if ($internal_name != $field_name) {
-      $items[$internal_name] = $value;
-      unset($items[$field_name]);
-    }
-  }
-  return $items;
-}
-
+/**
+ * Uses the core countries list to return a country code given a name
+ */
 function location_taxonomize_get_country_code($name) {
   require_once DRUPAL_ROOT . '/includes/locale.inc';
   $countries = country_get_list();
@@ -270,6 +262,9 @@ function location_taxonomize_get_country_code($name) {
   return NULL;
 }
 
+/**
+ * Uses the core countries list to return a country name given a code
+ */
 function location_taxonomize_get_country_name($code) {
   require_once DRUPAL_ROOT . '/includes/locale.inc';
   $countries = country_get_list();
