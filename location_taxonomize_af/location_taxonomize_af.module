@@ -106,29 +106,84 @@ function location_taxonomize_af_process_item($address) {
  * Runs the bulk taxonomize operation
  */
 function location_taxonomize_af_bulk_taxonomize_op($form_state, &$context) {
-  // find the number of entries that need taxonomizing
-  dpm(field_info_fields())
   // initialize progress, max, and current if this is the first iteration
   if (!isset($context['sandbox']['progress'])) {
-    $max = db_query('SELECT COUNT(DISTINCT lid) FROM {location}')->fetchField();
+    $field_refs = array();
+    // get all fields
+    $fields = field_info_fields();
+    // take out all non-addressfield fields
+    foreach($fields as $field => $data) {
+      if ($data['type'] != 'addressfield') unset($fields[$field]);
+    }
+    // collect references to all the fields for which taxonomize is enabled
+    foreach($fields as $field) {
+      foreach($field['bundles'] as $entity => $bundles) {
+        foreach ($bundles as $bundle) {
+          $instance =  field_info_instance($entity, $field['field_name'], $bundle);
+          if ($instance['widget']['settings']['location_taxonomize'] == 1) {
+            $field_refs[] = array($entity, $bundle, $field['field_name']);
+          }
+        }
+      }
+    }
+    // collect node ids
+    $final = array();
+    $count = 0;
+    foreach($field_refs as $field) {
+      $e_type = $field[0];
+      $bundle = $field[1]; 
+      $field_name = $field[2]; 
+      $replace = array(
+        ':etype'  => $e_type,
+        ':bundle' => $bundle,
+      );
+      $table = 'field_data_' . $field_name;
+      $result = db_query("SELECT entity_id FROM {$table} WHERE entity_type = :etype AND bundle = :bundle ORDER BY entity_id ASC", $replace);
+      $result_array = $result->fetchAllAssoc('entity_id');
+      foreach($result_array as $e) {
+        if ($e_type == 'node') {
+          $id = $e->entity_id;
+          $final[$id][] = $field_name;
+          $count++;
+        }
+      }
+    }
     $context['sandbox']['progress'] = 0;
-    $context['sandbox']['max'] = $max;
+    $context['sandbox']['max'] = $count;
     $context['sandbox']['current'] = 0;
     $context['results']['added'] = 0;
     $context['results']['processed'] = 0;
+    $context['sandbox']['fields'] = $final;
   }
-  // maximum 20 locations per function iteration
+  // maximum 10 addresses per function iteration
   $limit = 10;
-  // iterate through the next group of locations
-  /*$result = db_query_range("SELECT lid, name, street, additional, city, province, postal_code, country, latitude, longitude, source FROM {location} WHERE lid <> 0 ORDER BY lid ASC", $context['sandbox']['current'], $limit, array());
-  $result_array = $result->fetchAllAssoc('lid');
-  foreach ($result_array as $row) {
-    $added = location_taxonomize_process_loc((array)$row);
-    $context['results']['added'] += $added;
-    $context['sandbox']['progress']++;
-    $context['message'] = t('Processing location lid %n', array('%n' => $row->lid));
-    $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['max'];
+  // iterate through the next group of addresses
+  $i = 0;
+  $saved = 0;
+  if (!empty($context['sandbox']['fields'])) {
+    foreach ($context['sandbox']['fields'] as $nid => $fields) {
+      $node = node_load($nid);
+      foreach ($fields as $field) {
+        $items = field_get_items('node', $node, $field);
+        foreach ($items as $address) {
+          // Add the country name
+          $fields['country_name'] = location_taxonomize_get_country_name($fields['country']);
+          // save contents
+          $saved += location_taxonomize_process_item($address);
+        }
+        $i++;
+        if ($i > $limit) break;
+        unset($context['sandbox']['fields'][$nid][$field]);
+      }
+      if ($i > $limit) break;
+    }
   }
+
+  $added = $saved;
+  $context['results']['added'] += $added;
+  $context['sandbox']['progress'] += $i;
+  $context['message'] = t('Processing address');
+  $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['max'];
   $context['sandbox']['current'] = $context['sandbox']['progress'];
-  $context['results']['processed'] = $context['sandbox']['progress'];*/
+  $context['results']['processed'] = $context['sandbox']['progress'];
 }

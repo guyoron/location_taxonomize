@@ -47,7 +47,8 @@ function location_taxonomize_location_bulk_taxonomize_op($form_state, &$context)
   $result = db_query_range("SELECT lid, name, street, additional, city, province, postal_code, country, latitude, longitude, source FROM {location} WHERE lid <> 0 ORDER BY lid ASC", $context['sandbox']['current'], $limit, array());
   $result_array = $result->fetchAllAssoc('lid');
   foreach ($result_array as $row) {
-    $added = location_taxonomize_process_loc((array)$row);
+    $address = location_taxonomize_location_fixup((array)$row);
+    $added = location_taxonomize_process_item($address);
     $context['results']['added'] += $added;
     $context['sandbox']['progress']++;
     $context['message'] = t('Processing location lid %n', array('%n' => $row->lid));
