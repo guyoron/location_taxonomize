@@ -408,7 +408,7 @@ function location_taxonomize_form($form, &$form_state) {
     '#title' => t('Province naming in Long Names'),
     '#description' => t('Determines how the province will be saved in Long Names'),
     '#options' => array(
-      'name' => t('Always use full name (i.e. <em>California</em>)'),
+      'name' => t('Always use full name (i.e. <em>California</em>) if available'),
       'code' => t('Use province code (i.e. <em>CA</em>) when it is not the primary
                   item in the Full Name (i.e. <em>San Francisco, CA</em>)'),
     ),

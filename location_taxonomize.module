@@ -15,7 +15,7 @@ require_once('location_taxonomize.admin.inc');
 function location_taxonomize_menu() {
   $items = array();
   // module configuration page
-  $items['admin/config/content/location_taxonomize'] = array(
+  $items['admin/config/content/' . LT_MODULE_ID] = array(
     'title' => 'Location Taxonomize',
     'description' => 'Configuration for Location taxonomize module',
     'page callback' => 'drupal_get_form',
@@ -57,12 +57,12 @@ function location_taxonomize_initialize($form, $form_state) {
       // create a new location vocabulary
       taxonomy_vocabulary_save((object) array(
         'name' => t('Location'),
-        'machine_name' => LOCATION_TAXONOMIZE_VOCAB_NAME,
+        'machine_name' => LT_VOCAB_NAME,
         'description' => t('This vocabulary is synchronized with Location data automatically by the @name module', 
-                         array('@name' => LOCATION_TAXONOMIZE_MODULE_NAME)),
+                         array('@name' => LT_MODULE_NAME)),
       ));
       // save the vid of the newly created vocabulary
-      $vocab = taxonomy_vocabulary_machine_name_load(LOCATION_TAXONOMIZE_VOCAB_NAME);
+      $vocab = taxonomy_vocabulary_machine_name_load(LT_VOCAB_NAME);
       $vid = $vocab->vid;
       variable_set('location_taxonomize_vid', $vid);
       $msg = t('Successfully created the Location taxonomy (vid @vid)', 

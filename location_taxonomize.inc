@@ -5,9 +5,9 @@
  * Some useful functions for Location taxonomize
  */
 
-define('LOCATION_TAXONOMIZE_MODULE_ID', 'location_taxonomize');
-define('LOCATION_TAXONOMIZE_MODULE_NAME', 'Location taxonomize');
-define('LOCATION_TAXONOMIZE_VOCAB_NAME', 'location_taxonomize');
+define('LT_MODULE_ID', 'location_taxonomize');
+define('LT_MODULE_NAME', 'Location taxonomize');
+define('LT_VOCAB_NAME', 'location_taxonomize');
 
 
 /**
