@@ -141,9 +141,9 @@ function location_taxonomize_form($form, &$form_state) {
   }
 
   // get the options for the selected or default source
-  $source_settings = variable_get($source . '_settings');
+  $source_settings = _location_taxonomize_get_source_settings($source);
   // Hierarchy selection
-  $form['location_taxonomize_vocab']['fields'] = array(
+  $form['location_taxonomize_vocab']['hierarchy'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Location Taxonomy Hierarchy'),
     '#description' => t('Choose which Location fields to save as terms in the
@@ -156,7 +156,8 @@ function location_taxonomize_form($form, &$form_state) {
     '#suffix' => '</div>'
   );
   if ($initialized) {
-    $form['location_taxonomize_vocab']['fields']['#disabled'] = TRUE;
+    $form['location_taxonomize_vocab']['hierarchy']['#disabled'] = TRUE;
+    $form['location_taxonomize_vocab']['hierarchy']['#default_value'] = $opts_vocab['hierarchy'];
   }
   
   // Stop the form here if we have not yet initialized
@@ -277,11 +278,22 @@ function location_taxonomize_form($form, &$form_state) {
     '#title'      => t('Province naming'),
     '#required'   => TRUE,
     '#options'    => array(
-      'name' => t('Use full name (i.e. <em>California</em>)'),
+      'name' => t('Use full name (i.e. <em>California</em>) if available (will default to the province code if name is unavailable)'),
       'code' => t('Use province code (i.e. <em>CA</em>)'),
     ),
     '#default_value' => $opts_settings['naming']['province'],
   );
+  
+  // hide provine naming if there is no province field
+  $province_name = location_taxonomize_source_field_name('province');
+  //debug($province_name, 'province_name');
+  $has_province_field = isset($source_settings['fields'][$province_name]);
+  //debug($has_province_field, 'has_province_field');
+  $province_field_on = $source_settings['fields'][$province_name] != 0;
+  //debug($province_field_on, 'province_field_on');
+  if (!$has_province_field || !$province_field_on) {
+    $form['location_taxonomize_settings']['naming']['province']['#access'] = FALSE;
+  }
   
   // text to use if there is no value to save for a term
   $form['location_taxonomize_settings']['na_text'] = array(
@@ -381,6 +393,9 @@ function location_taxonomize_form($form, &$form_state) {
     ),
     '#default_value' => $longname_opts['province_naming'],
   );
+  if (!$has_province_field || !$province_field_on) {
+    $form['location_taxonomize_settings']['longname']['province_naming']['#access'] = FALSE;
+  }
   return system_settings_form($form);
 }
 

@@ -31,6 +31,7 @@ function _location_taxonomize_variables() {
       'source'        => NULL,
       'method'        => 'existing',
       'possible_vid'  => NULL,
+      'hierarchy'        => NULL,
     ),
     'location_taxonomize_settings' => array(
       'enable'  => 1,
@@ -74,8 +75,8 @@ function location_taxonomize_empty_vocab() {
  *                  of the fields as values 
  */
 function _location_taxonomize_get_hierarchy($assoc = FALSE, $labels = FALSE) {
-  $source_settings = _location_taxonomize_get_source_settings();
-  $fields = $source_settings['fields'];
+  $settings = variable_get('location_taxonomize_vocab');
+  $fields = $settings['hierarchy'];
   if ($labels) $withlabels = _location_taxonomize_get_fields(TRUE, TRUE);
   $hierarchy = array();
   foreach ($fields as $key => $value) {
@@ -180,10 +181,12 @@ function _location_taxonomize_get_source() {
 }
 
 /**
- * Returns the settings array for the current source module
+ * Returns the settings array for the current source module, or a given source
  */
-function _location_taxonomize_get_source_settings() {
-  $source = _location_taxonomize_get_source();
+function _location_taxonomize_get_source_settings($source = NULL) {
+  if ($source == NULL) {
+    $source = _location_taxonomize_get_source();
+  }
   $suffix = '_settings';
   return variable_get($source . $suffix);
 }
