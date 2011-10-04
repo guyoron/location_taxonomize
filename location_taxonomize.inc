@@ -196,6 +196,7 @@ function _location_taxonomize_get_source_settings($source = NULL) {
 
 /**
  * Sets the default source to $module if the default source is not already set
+ * or if the default source is set to a module that is no longer enabled
  * Returns TRUE if set, FALSE if not set
  */
 function location_taxonomize_source_default_set($module) {
