@@ -1,0 +1,56 @@
+<?php
+
+/**
+ * @file
+ */
+
+require_once('location_taxonomize_location.inc');
+
+/**
+ * Implements hook_locationapi().
+ */
+function location_taxonomize_location_locationapi(&$obj, $op, $a3, $a4, $a5) {
+  // check if this module is enabled as the current source
+  if (_location_taxonomize_get_source() != LT_LOC_MODULE_ID) return;
+  // check module settings
+  if (!location_taxonomize_enabled()) return;
+  switch ($op) {
+    // if we're saving a location, send it to LT for processing
+    case 'save':
+      // make sure the province_name and country_name fields are there and updated
+      $location = location_taxonomize_location_fixup($obj);
+      $saved = location_taxonomize_process_item($location);
+      $msg = t('Location taxonomize: @num new terms saved', array('@num' => $saved));
+      drupal_set_message($msg);
+  }
+}
+
+/**
+ * Runs the bulk taxonomize operation
+ */
+function location_taxonomize_location_bulk_taxonomize_op($form_state, &$context) {
+  // initialize progress, max, and current if this is the first iteration
+  if (!isset($context['sandbox']['progress'])) {
+    $max = db_query('SELECT COUNT(DISTINCT lid) FROM {location}')->fetchField();
+    $context['sandbox']['progress'] = 0;
+    $context['sandbox']['max'] = $max;
+    $context['sandbox']['current'] = 0;
+    $context['results']['added'] = 0;
+    $context['results']['processed'] = 0;
+  }
+  // maximum 20 locations per function iteration
+  $limit = 10;
+  // iterate through the next group of locations
+  $result = db_query_range("SELECT lid, name, street, additional, city, province, postal_code, country, latitude, longitude, source FROM {location} WHERE lid <> 0 ORDER BY lid ASC", $context['sandbox']['current'], $limit, array());
+  $result_array = $result->fetchAllAssoc('lid');
+  foreach ($result_array as $row) {
+    $address = location_taxonomize_location_fixup((array)$row);
+    $added = location_taxonomize_process_item($address);
+    $context['results']['added'] += $added;
+    $context['sandbox']['progress']++;
+    $context['message'] = t('Processing location lid %n', array('%n' => $row->lid));
+    $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['max'];
+  }
+  $context['sandbox']['current'] = $context['sandbox']['progress'];
+  $context['results']['processed'] = $context['sandbox']['progress'];
+}

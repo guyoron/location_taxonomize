@@ -1,0 +1,13 @@
+name = Location taxonomize - Address Field
+description = Enables Location Taxonomize to use Address Field module as a source.
+core = 7.x
+
+dependencies[] = location_taxonomize
+dependencies[] = addressfield
+
+files[] = location_taxonomize_af.module
+files[] = location_taxonomize_af.install
+files[] = location_taxonomize_af.inc
+
+package = "Location"
+

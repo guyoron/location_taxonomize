@@ -1,0 +1,44 @@
+<?php
+
+/*
+ * @file
+ * Installer
+ */
+
+require_once('location_taxonomize_location.inc');
+
+/**
+ * Implements hook_install().
+ */
+function location_taxonomize_location_install() {
+  _location_taxonomize_location_set_defaults();
+  $main_settings = variable_get('location_taxonomize_vocab');
+  if (empty($main_settings['source'])) {
+    $main_settings['source'] = 'location_taxonomize_location';
+    variable_set('location_taxonomize_vocab', $main_settings);
+  }
+}
+
+/**
+ * Implements hook_enable().
+ */
+function location_taxonomize_location_enable() {
+  // ...
+}
+
+/**
+ * Implements hook_requirements().
+ */
+function location_taxonomize_location_requirements($phase) {
+  $requirements = array();
+  return $requirements;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function location_taxonomize_location_uninstall() {
+  // delete all variables created by this modules
+  _location_taxonomize_location_del_variables();
+}
+
