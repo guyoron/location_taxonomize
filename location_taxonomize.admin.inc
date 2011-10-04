@@ -143,7 +143,7 @@ function location_taxonomize_form($form, &$form_state) {
   // get the options for the selected or default source
   $source_settings = _location_taxonomize_get_source_settings($source);
   // Hierarchy selection
-  dd(_location_taxonomize_get_fields(TRUE, TRUE, $source));
+  dd($source);
   $form['location_taxonomize_vocab']['hierarchy'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Location Taxonomy Hierarchy'),
@@ -251,6 +251,14 @@ function location_taxonomize_form($form, &$form_state) {
                   the Location module'),
     '#default_value' => $opts_settings['enable'],
     '#description' => t('Turn on or off the main functionality of this module.'),
+  );
+  
+  // Term Attach feature
+  $form['location_taxonomize_settings']['term_attach'] = array(
+    '#type'         => 'checkbox',
+    '#title'        => t('Also attach Location Taxonomy terms to nodes with those locations'),
+    '#default_value'  => $opts_settings['term_attach'],
+    '#description'    => t('Description'),
   );
   
   // naming fieldset

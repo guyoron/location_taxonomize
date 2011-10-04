@@ -36,6 +36,7 @@ function _location_taxonomize_variables() {
     ),
     'location_taxonomize_settings' => array(
       'enable'  => 1,
+      'term_attach' => 0,
       'naming'  => array(
         'country'   => 'name',
         'province'  => 'name',
