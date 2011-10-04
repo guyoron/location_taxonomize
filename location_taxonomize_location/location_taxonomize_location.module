@@ -17,7 +17,6 @@ function location_taxonomize_location_locationapi(&$obj, $op, $a3, $a4, $a5) {
   switch ($op) {
     // if we're saving a location, send it to LT for processing
     case 'save':
-      dpm('hi');
       // make sure the province_name and country_name fields are there and updated
       $location = location_taxonomize_location_fixup($obj);
       $saved = location_taxonomize_process_item($location);
