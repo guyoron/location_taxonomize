@@ -263,7 +263,7 @@ function location_taxonomize_form($form, &$form_state) {
     '#default_value'  => $opts_settings['term_attach'],
     '#description'    => t('Description'),
   );
-  
+   
   // naming fieldset
   $form['location_taxonomize_settings']['naming'] = array(
     '#type'         => 'fieldset',
