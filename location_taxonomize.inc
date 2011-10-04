@@ -258,6 +258,16 @@ function location_taxonomize_source_field_name($internal_name) {
 }
 
 /**
+ * Returns whether the option to enable this module is set
+ */
+function location_taxonomize_enabled() {
+  $settings = variable_get('location_taxonomize_settings');
+  $vid = variable_get('location_taxonomize_vid');
+  $enabled = $settings['enable'] && isset($vid);
+  return $enabled;
+}
+
+/**
  * Uses the core countries list to return a country code given a name
  */
 function location_taxonomize_get_country_code($name) {
