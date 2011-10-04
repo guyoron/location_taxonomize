@@ -15,7 +15,7 @@ function location_taxonomize_form($form, &$form_state) {
   if (!empty($form_state['values']['location_taxonomize_vocab']['source'])) {
     $source = $form_state['values']['location_taxonomize_vocab']['source'];
     // remove the choices for the previous Fields field
-    unset($form_state['input']['location_taxonomize_vocab']['fields']);
+    unset($form_state['input']['location_taxonomize_vocab']['hierarchy']);
   }
   else $source = $opts_vocab['source'];
   $vid = variable_get('location_taxonomize_vid');
@@ -143,6 +143,7 @@ function location_taxonomize_form($form, &$form_state) {
   // get the options for the selected or default source
   $source_settings = _location_taxonomize_get_source_settings($source);
   // Hierarchy selection
+  dd(_location_taxonomize_get_fields(TRUE, TRUE, $source));
   $form['location_taxonomize_vocab']['hierarchy'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Location Taxonomy Hierarchy'),
@@ -168,6 +169,18 @@ function location_taxonomize_form($form, &$form_state) {
     return $form;
   }
   
+  /*************************************************
+   * Initialization ends here
+   ************************************************/
+   
+  // determine whether the hierarchy configuration includes a province field
+  $hierarchy = _location_taxonomize_get_hierarchy();
+  $province_field_name = location_taxonomize_source_field_name('province');
+  $has_province_field = in_array($province_field_name, $hierarchy);
+  // determine whether the hierarchy configuration includes a country field
+  $country_field_name = location_taxonomize_source_field_name('country');
+  $has_country_field = in_array($country_field_name, $hierarchy);
+    
   // operations fieldset
   $form['location_taxonomize_ops'] = array(
     '#type' => 'fieldset',
@@ -273,6 +286,13 @@ function location_taxonomize_form($form, &$form_state) {
     ),
   );
   
+  // disable country naming if there is no province field
+  if (!$has_country_field) {
+    $form['location_taxonomize_settings']['naming']['country']['#disabled'] = TRUE;
+    $form['location_taxonomize_settings']['naming']['usa']['#disabled'] = TRUE;
+    $form['location_taxonomize_settings']['naming']['country']['#description'] = t('These options are disabled because no Country field is included in your hierarchy');
+  }
+  
   $form['location_taxonomize_settings']['naming']['province'] = array(
     '#type'       => 'radios',
     '#title'      => t('Province naming'),
@@ -284,15 +304,10 @@ function location_taxonomize_form($form, &$form_state) {
     '#default_value' => $opts_settings['naming']['province'],
   );
   
-  // hide provine naming if there is no province field
-  $province_name = location_taxonomize_source_field_name('province');
-  //debug($province_name, 'province_name');
-  $has_province_field = isset($source_settings['fields'][$province_name]);
-  //debug($has_province_field, 'has_province_field');
-  $province_field_on = $source_settings['fields'][$province_name] != 0;
-  //debug($province_field_on, 'province_field_on');
-  if (!$has_province_field || !$province_field_on) {
-    $form['location_taxonomize_settings']['naming']['province']['#access'] = FALSE;
+  // disable province naming if there is no province field
+  if (!$has_province_field) {
+    $form['location_taxonomize_settings']['naming']['province']['#disabled'] = TRUE;
+    $form['location_taxonomize_settings']['naming']['province']['#description'] = t('These options are disabled because no Province field is included in your hierarchy');
   }
   
   // text to use if there is no value to save for a term
@@ -370,6 +385,12 @@ function location_taxonomize_form($form, &$form_state) {
     '#default_value' => $longname_opts['country_naming'],
   );
   
+  // disable country naming field if province is not included in hierarchy
+  if (!$has_country_field) {
+    $form['location_taxonomize_settings']['longname']['country_naming']['#disabled'] = TRUE;
+    $form['location_taxonomize_settings']['longname']['country_naming']['#description'] = t('These options are disabled because no Country field is included in your hierarchy');
+  }
+  
   $form['location_taxonomize_settings']['longname']['usa'] = array(
     '#type' => 'checkbox',
     '#title' => t("Use 'USA' instead of 'US'"),
@@ -393,15 +414,17 @@ function location_taxonomize_form($form, &$form_state) {
     ),
     '#default_value' => $longname_opts['province_naming'],
   );
-  if (!$has_province_field || !$province_field_on) {
-    $form['location_taxonomize_settings']['longname']['province_naming']['#access'] = FALSE;
+  // disable province naming field if province is not included in hierarchy
+  if (!$has_province_field) {
+    $form['location_taxonomize_settings']['longname']['province_naming']['#disabled'] = TRUE;
+    $form['location_taxonomize_settings']['longname']['province_naming']['#description'] = t('These options are disabled because no Province field is included in your hierarchy');
   }
   return system_settings_form($form);
 }
 
 function location_taxonomize_source_ajax_callback($form, &$form_state) {
   //dpm('ajax callback');
-  return $form['location_taxonomize_vocab']['fields'];
+  return $form['location_taxonomize_vocab']['hierarchy'];
 }
 
 /**

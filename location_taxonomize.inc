@@ -164,7 +164,7 @@ function _location_taxonomize_del_variables() {
  * if $source is set, gets the fields for that source
  */
 function _location_taxonomize_get_fields($assoc = TRUE, $labels = FALSE, $source = NULL) {
-  if (!isset($source)) {
+  if ($source == NULL) {
     $source = _location_taxonomize_get_source();
   }
   $suffix = '_get_fields';
