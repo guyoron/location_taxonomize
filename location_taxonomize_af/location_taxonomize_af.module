@@ -2,26 +2,37 @@
 
 /**
  * @file
+ * This is a 'source module' that adds a data source for the Location Taoxnomize
+ * module. It implements the Location Taxonomize functionality for the 
+ * Address Field module.
  */
 
 require_once('location_taxonomize_af.inc');
 
+/**
+ * Implements hook_field_widget_info_alter().
+ * This is used to add a setting to the addressfield widget type that
+ * determines whether the field is taxonomized
+ */
 function location_taxonomize_af_field_widget_info_alter(&$info) {
-  dpm('1');
-  dpm($info);
+  //dpm('1');
   // Add a setting to a widget type.
   $info['addressfield_standard']['settings'] += array(
     'location_taxonomize' => 0,
   );
-  dpm($info);
 }
 
+/**
+ * Implements hook_form_field_ui_field_edit_form_alter().
+ * Here we add a form element on the addressfield widget settings form
+ * to allow users to configure whether this field will be taxonomized
+ * 
+ */
 function location_taxonomize_af_form_field_ui_field_edit_form_alter(&$form, $form_state, $form_id) {
-  dpm('2');
-  //dpm($form['#field']);
+  //dpm('2');
   if ($form['#field']['type'] != 'addressfield') return;
   $settings = $form['#instance']['widget']['settings'];
-  dpm($settings);
+  //dpm($settings);
   $enable = array(
     '#type'           => 'checkbox',
     '#title'          => t('Taxonomize locations from this field using Location Taxonomize'),
@@ -32,6 +43,7 @@ function location_taxonomize_af_form_field_ui_field_edit_form_alter(&$form, $for
 
 /**
  * Implements hook_field_widget_WIDGET_TYPE_form_alter().
+ * Here we add a process callback for every widget that is set to be taxonomized
  */
 function location_taxonomize_af_field_widget_addressfield_standard_form_alter(&$element, &$form_state, $context) {
   //dpm('widget form alter');
@@ -49,6 +61,8 @@ function location_taxonomize_af_field_widget_addressfield_standard_form_alter(&$
 
 /**
  * A #process callback function for the addressfield widget
+ * Here we make note of this field in the form_state array, and add a submit
+ * callback to the form that will handle the processing.
  */
 function location_taxonomize_af_process_address($element, &$form_state, &$form) {
   dpm('process callback');
@@ -78,7 +92,7 @@ function location_taxonomize_af_element_submitted($form, &$form_state) {
        }
       // Add the country name
       $delta['country_name'] = location_taxonomize_get_country_name($delta['country']);
-      dpm($delta);
+      //dpm($delta);
       location_taxonomize_af_process_item($delta);
       $actual_delta++;
     }
@@ -90,8 +104,8 @@ function location_taxonomize_af_element_submitted($form, &$form_state) {
  * Location Taxonomize to be saved into the taxonomy
  */
 function location_taxonomize_af_process_item($address) {
-  dpm('processing address');
-  dpm($address);
+  //dpm('processing address');
+  //dpm($address);
   $settings = variable_get('location_taxonomize_settings');
   $vid = variable_get('location_taxonomize_vid');
   // check module settings

@@ -29,11 +29,12 @@ function _location_taxonomize_af_variables() {
 }
 
 /**
- * Returns the Location module fields that can be used for the Location Vocabulary
+ * Returns the Address Field fields that can be used for the Location Vocabulary
  * @param $assoc - whether to return an associative array (TRUE) or just an
  *                 indexed array (FALSE)
+ * @param $labels - whether to return the labels of fields as array values
  */
-function location_taxonomize_af_get_fields($assoc = TRUE, $opts = FALSE) {
+function location_taxonomize_af_get_fields($assoc = TRUE, $labels = FALSE) {
   // get fields from Address Field
   $fields = addressfield_data_property_info();
   foreach($fields as $key => $value) {
@@ -42,16 +43,16 @@ function location_taxonomize_af_get_fields($assoc = TRUE, $opts = FALSE) {
   $return = array();
   // remove unsupported fields
   foreach ($fields as $field => $value) {
-    /* formatted this way to try to preserve readability as well as accpetable
-       line lengths */
     if ($field != 'name_line' &&
         $field != 'first_name' &&
         $field != 'last_name' &&
         $field != 'organisation_name' &&
         $field != 'premise'
     ) {
-      if ($opts) $return[$field] = $field;
-      elseif ($assoc) $return[$field] = $value;
+      if ($assoc) {
+        if ($labels) $return[$field] = $value;
+        else $return[$field] = $field;
+      }
       else $return[] = $field;
     }
   }
@@ -81,7 +82,7 @@ function _location_taxonomize_af_del_variables() {
 
 /**
  * Tells Location Taxonomize the names used in this module for the 'Primary
- * Fields' Country, State/Province, City
+ * Fields' defined by Location Taxonomize
  */
 function location_taxonomize_af_primary_field_names() {
   return array(

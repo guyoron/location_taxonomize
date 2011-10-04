@@ -17,12 +17,13 @@ define('LT_VOCAB_NAME', 'location_taxonomize');
 function _location_taxonomize_reset() {
   location_taxonomize_empty_vocab();
   _location_taxonomize_set_defaults();
-  drupal_set_message(t('Module reset'));
+  drupal_set_message(t('Location Taxonomize has been reset'));
 }
 
 /**
  * Keeps a list of all the variables maintained by this module, with their
- * default values.
+ * default values. These default value are applied during installation. Some
+ * defaults are set elsewhere (e.g. during initialization).
  */
 function _location_taxonomize_variables() {
   return array(
@@ -55,7 +56,7 @@ function _location_taxonomize_variables() {
 }
 
 /**
- * Empties the Location Vocabulary (called as an AJAX form callback)
+ * Empties the Location Vocabulary (called as an AJAX callback from the admin form)
  */
 function location_taxonomize_empty_vocab() {
   $terms = taxonomy_get_tree(variable_get('location_taxonomize_vid'));
@@ -72,7 +73,7 @@ function location_taxonomize_empty_vocab() {
  * @param $assoc - whether to return an associative array (TRUE) or
  *                keyed array (FALSE)
  * @param $labels - if TRUE and $assoc is TRUE, returns the labels
- *                  of the fields as values 
+ *                  of the fields as the array values 
  */
 function _location_taxonomize_get_hierarchy($assoc = FALSE, $labels = FALSE) {
   $settings = variable_get('location_taxonomize_vocab');
@@ -92,14 +93,16 @@ function _location_taxonomize_get_hierarchy($assoc = FALSE, $labels = FALSE) {
 }
 
 /**
- * Initializes the longname fields variable
+ * Initializes the Long Name fields variable (called during initialization)
  */
 function _location_taxonomize_init_var_longname() {
-  $hierarchy = _location_taxonomize_get_hierarchy(FALSE);
+  $hierarchy = _location_taxonomize_get_hierarchy();
   $defaults = array();
   foreach ($hierarchy as $field) {
-    if ($field != 'country' && $field != 'province' && $field != 'city') {
-      $defaults[$field] = 0;
+    if (location_taxonomize_convert_field_name($field) != 'country' &&
+        location_taxonomize_convert_field_name($field) != 'province' &&
+        location_taxonomize_convert_field_name($field) != 'city') {
+          $defaults[$field] = 0;
     }
     else $defaults[$field] = $field;
   }
@@ -109,7 +112,7 @@ function _location_taxonomize_init_var_longname() {
 }
 
 /**
- * Returns an array indicating which of the possible Source modules are available
+ * Returns an array indicating which of the possible Source modules are installed
  */
 function location_taxonomize_get_sources() {
   $possibilities = array(
@@ -160,8 +163,8 @@ function _location_taxonomize_del_variables() {
 /**
  * Returns the possible fields for the hierarchy
  * if $assoc, return value is in form key => key
- * if $labels, return value is in form key => value
- * if $source is set, gets the fields for that source
+ * if $labels, return value is in form key => value with field labels as values
+ * if $source is set, gets the fields for that source (defaults to current source)
  */
 function _location_taxonomize_get_fields($assoc = TRUE, $labels = FALSE, $source = NULL) {
   if ($source == NULL) {
@@ -169,7 +172,7 @@ function _location_taxonomize_get_fields($assoc = TRUE, $labels = FALSE, $source
   }
   $suffix = '_get_fields';
   $function = $source . $suffix;
-  return $function($assoc);
+  return $function($assoc, $labels);
 }
 
 /**
@@ -207,7 +210,7 @@ function location_taxonomize_source_default_set($module) {
 
 /**
  * Some fields are defined as 'Primary Fields'. 
- * This function returns a dictionary mapping internal field names
+ * This function returns an array mapping internal field names
  * to source field names, or the other direction, if $reverse is TRUE
  */
 function location_taxonomize_get_primary_fields($reverse = FALSE) {

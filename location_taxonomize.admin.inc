@@ -97,7 +97,7 @@ function location_taxonomize_form($form, &$form_state) {
   // Choose initialization method, if we have not initialized
   if(!$initialized) {
     // check if there is already a Location vocab we could use
-    $vocab = taxonomy_vocabulary_machine_name_load(LOCATION_TAXONOMIZE_VOCAB_NAME);
+    $vocab = taxonomy_vocabulary_machine_name_load(LT_VOCAB_NAME);
     if ($vocab) {
       $possible_vid = $vocab->vid;
       $form['location_taxonomize_vocab']['possible_vid'] = array(
@@ -134,7 +134,7 @@ function location_taxonomize_form($form, &$form_state) {
         '#description' => t("If you want to use an existing Vocabulary, you must
                             change that Vocabulary's machine name to '@name'.
                             It will then be available here as an option.",
-                            array('@name' => LOCATION_TAXONOMIZE_VOCAB_NAME)),
+                            array('@name' => LT_VOCAB_NAME)),
       );
 
     }
@@ -440,16 +440,16 @@ function location_taxonomize_form_validate($form, &$form_state) {
       $vid = variable_get('location_taxonomize_vid');
       if ($vid) form_set_error('', t('There seems to already be a Vocabulary
                               associated with Location Taxonomize.'));
-      $vocab = taxonomy_vocabulary_machine_name_load(LOCATION_TAXONOMIZE_VOCAB_NAME);
+      $vocab = taxonomy_vocabulary_machine_name_load(LT_VOCAB_NAME);
       if ($values_init['method'] == 'new' && $vocab) {
         form_set_error('', t("Could not create new Location Taxonomy vocabulary.
                        A vocabulary with the name '@name' already exists.",
-                       array('@name' => LOCATION_TAXONOMIZE_VOCAB_NAME)));
+                       array('@name' => LT_VOCAB_NAME)));
       }
       if ($values_init['method'] == 'existing') {
         if (!$vocab) form_set_error('', t("Could not use the existing vocabulary.
                                     There is no existing vocabulary with the name
-                                    '@name'", array('@name' => LOCATION_TAXONOMIZE_VOCAB_NAME)));
+                                    '@name'", array('@name' => LT_VOCAB_NAME)));
         elseif ($vocab->vid != $values_init['possible_vid']) {
           form_set_error('', t('Could not use the existing vocabulary (vid @vid). Wrong vid.',
                                array('@vid' => $values_init['possible_vid'])));

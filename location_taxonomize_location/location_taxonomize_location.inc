@@ -31,8 +31,9 @@ function _location_taxonomize_location_variables() {
  * Returns the Location module fields that can be used for the Location Vocabulary
  * @param $assoc - whether to return an associative array (TRUE) or just an
  *                 indexed array (FALSE)
+ * @param $labels - not implemented
  */
-function location_taxonomize_location_get_fields($assoc = TRUE) {
+function location_taxonomize_location_get_fields($assoc = TRUE, $labels = FALSE) {
   // get names of fields in the location table
   $fields = drupal_schema_fields_sql('location');
   $return = array();
