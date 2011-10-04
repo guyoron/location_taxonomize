@@ -12,15 +12,14 @@ require_once('location_taxonomize_af.inc');
  */
 function location_taxonomize_af_install() {
   _location_taxonomize_af_set_defaults();
-  // set this module as the default source module if another is not already set
-  location_taxonomize_source_default_set(LT_AF_MODULE_ID);
 }
 
 /**
  * Implements hook_enable().
  */
 function location_taxonomize_af_enable() {
-  // ...
+  // set this module as the default source module if another is not already set
+  location_taxonomize_source_default_set(LT_AF_MODULE_ID);
 }
 
 /**

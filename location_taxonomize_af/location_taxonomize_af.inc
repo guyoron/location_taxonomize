@@ -14,7 +14,7 @@ define('LT_AF_MODULE_NAME', 'Location Taxonomize Address Field');
  * default values.
  */
 function _location_taxonomize_af_variables() {
-  $fields = location_taxonomize_af_get_fields(TRUE, TRUE);
+  $fields = location_taxonomize_af_get_fields(TRUE);
   // set field defaults
   foreach ($fields as $key => $value) {
     if ($key != 'country' && $key != 'administrative_area' && $key != 'locality') {

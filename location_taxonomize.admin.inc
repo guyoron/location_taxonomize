@@ -143,7 +143,10 @@ function location_taxonomize_form($form, &$form_state) {
   // get the options for the selected or default source
   $source_settings = _location_taxonomize_get_source_settings($source);
   // Hierarchy selection
-  dd($source);
+
+  //dd($source);
+  //dd(_location_taxonomize_get_fields(TRUE, TRUE, $source));
+  //dd($source_settings['fields']);
   $form['location_taxonomize_vocab']['hierarchy'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Location Taxonomy Hierarchy'),
