@@ -200,7 +200,7 @@ function _location_taxonomize_get_source_settings($source = NULL) {
  */
 function location_taxonomize_source_default_set($module) {
   $settings = variable_get('location_taxonomize_vocab');
-  if(empty($settings['source'])) {
+  if(empty($settings['source']) || !module_exists($settings['source'])) {
     $settings['source'] = $module;
     variable_set('location_taxonomize_vocab', $settings);
     return TRUE;
