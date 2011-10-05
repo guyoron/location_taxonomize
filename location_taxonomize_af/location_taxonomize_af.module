@@ -96,7 +96,7 @@ function location_taxonomize_af_element_submitted($form, &$form_state) {
       $tids = location_taxonomize_af_process_item($delta);
       // attach these terms to the node if that option is enabled
       if (location_taxonomize_term_attach_enabled()) {
-        location_taxonomize_af_term_attach($tids, $form, $form_state);
+        location_taxonomize_term_attach($tids, $form, $form_state);
       }
       $actual_delta++;
     }
@@ -119,35 +119,6 @@ function location_taxonomize_af_process_item($address) {
   $msg = t('Location taxonomize: @num new terms saved', array('@num' => $saved));
   drupal_set_message($msg);
   return $tids;
-}
-
- /**
-  * Attaches the given tids to the node form given in form_state if they need to
-  * be attached
-  */
-function location_taxonomize_af_term_attach($tids, $form, &$form_state) {
-  //dpm($form_state['values']);
-  $lang = 'und';
-  // check that the field exists and is set up correctly
-  $field = location_taxonomize_term_attach_check_field($form);
-  if ($field == FALSE) {
-    drupal_set_message(t('Location Taxonomize could not attach the terms to the node because the Taxonomy Reference field is not set up correctly'), 'warning');
-  }
-  else {
-    // attach the tids to the field if they are not attached already
-    if ($form_state['values'][$field][$lang][0]['tid'] == NULL) {
-      array_pop($form_state['values'][$field][$lang]);
-    }
-    $values = array_values($form_state['values'][$field][$lang]);
-    foreach ($values as $num => $value) {
-      $values[$num] = array_pop($value);
-    }
-    foreach ($tids as $tid) {
-      if (!in_array($tid, $values)) {
-        $form_state['values'][$field][$lang][]['tid'] = $tid;
-      }
-    }
-  }
 }
 
 /**

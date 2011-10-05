@@ -13,11 +13,11 @@ function location_taxonomize_form_alter(&$form, &$form_state, $form_id) {
   // check if there is a location fieldset on this form
   if (isset($form['locations']) && $form['#node_edit_form'] == TRUE) {
     // add a submit handler to the form
-    $form['#submit'][] = 'location_taxonomize_location_submit';
+    $form['#submit'][] = 'location_taxonomize_location_submitt';
   }
 }
 
-function location_taxonomize_location_submit($form, &$form_state) {
+function location_taxonomize_location_submitt($form, &$form_state) {
   // check if this module is enabled as the current source
   if (_location_taxonomize_get_source() != LT_LOC_MODULE_ID) return;
   // check if taxonomization is enabled
@@ -33,6 +33,10 @@ function location_taxonomize_location_submit($form, &$form_state) {
       $location = location_taxonomize_location_fixup($obj);
       $results = location_taxonomize_process_item($location);
       $saved += $results['saved'];
+      $tids = $results['tids'];
+      if (location_taxonomize_term_attach_enabled()) {
+        location_taxonomize_term_attach($tids, $form, $form_state);
+      }
     }
   }
   $msg = t('Location taxonomize: @num new terms saved', array('@num' => $saved));
