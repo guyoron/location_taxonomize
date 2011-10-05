@@ -2,27 +2,41 @@
 
 /**
  * @file
+ * This is a 'source module' that adds a data source for the Location Taoxnomize
+ * module. It implements the Location Taxonomize functionality for the 
+ * Location module.
  */
 
 require_once('location_taxonomize_location.inc');
 
-/**
- * Implements hook_locationapi().
- */
-function location_taxonomize_location_locationapi(&$obj, $op, $a3, $a4, $a5) {
+function location_taxonomize_form_alter(&$form, &$form_state, $form_id) {
+  // check if there is a location fieldset on this form
+  if (isset($form['locations']) && $form['#node_edit_form'] == TRUE) {
+    // add a submit handler to the form
+    $form['#submit'][] = 'location_taxonomize_location_submit';
+  }
+}
+
+function location_taxonomize_location_submit($form, &$form_state) {
   // check if this module is enabled as the current source
   if (_location_taxonomize_get_source() != LT_LOC_MODULE_ID) return;
-  // check module settings
+  // check if taxonomization is enabled
   if (!location_taxonomize_enabled()) return;
-  switch ($op) {
-    // if we're saving a location, send it to LT for processing
-    case 'save':
-      // make sure the province_name and country_name fields are there and updated
+  // get the location values from the form
+  $locations = $form_state['values']['locations'];
+  // taxonomize locations
+  $saved = 0;
+  foreach ($locations as $obj) {
+    unset($obj['location_settings']);
+    // skip empty locations 
+    if (!location_taxonomize_location_location_empty($obj)) {
       $location = location_taxonomize_location_fixup($obj);
-      $saved = location_taxonomize_process_item($location);
-      $msg = t('Location taxonomize: @num new terms saved', array('@num' => $saved));
-      drupal_set_message($msg);
+      $results = location_taxonomize_process_item($location);
+      $saved += $results['saved'];
+    }
   }
+  $msg = t('Location taxonomize: @num new terms saved', array('@num' => $saved));
+  drupal_set_message($msg);
 }
 
 /**
@@ -53,4 +67,20 @@ function location_taxonomize_location_bulk_taxonomize_op($form_state, &$context)
   }
   $context['sandbox']['current'] = $context['sandbox']['progress'];
   $context['results']['processed'] = $context['sandbox']['progress'];
+}
+
+/**
+ * Helper function to determine if a location object is empty or not. This is not
+ * a great solution, but it's the best I can do at the moment.
+ */
+function location_taxonomize_location_location_empty($location) {
+  $count = count($location);
+  $empty = 0;
+  foreach ($location as $item => $value) {
+    if (empty($value) || $value == '' || !isset($value)) {
+      $empty++;
+    }
+  }
+  if ($empty >= $count - 1) return TRUE;
+  else return FALSE;
 }
