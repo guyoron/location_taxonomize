@@ -261,9 +261,9 @@ function location_taxonomize_form($form, &$form_state) {
     '#type'         => 'checkbox',
     '#title'        => t('Also attach Location Taxonomy terms to nodes with those locations'),
     '#default_value'  => $opts_settings['term_attach'],
-    '#description'    => t('Description'),
+    '#description'    => t("In order for this to work you must add a field of type Term Reference with the name 'location_taxonomize_terms' to all node types you wish to attach terms to."),
   );
-   
+  
   // naming fieldset
   $form['location_taxonomize_settings']['naming'] = array(
     '#type'         => 'fieldset',

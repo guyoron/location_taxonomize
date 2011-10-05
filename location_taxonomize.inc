@@ -8,6 +8,7 @@
 define('LT_MODULE_ID', 'location_taxonomize');
 define('LT_MODULE_NAME', 'Location taxonomize');
 define('LT_VOCAB_NAME', 'location_taxonomize');
+define('LT_TERM_ATTACH_FIELD', 'location_taxonomize_terms');
 
 
 /**
@@ -177,6 +178,22 @@ function _location_taxonomize_get_fields($assoc = TRUE, $labels = FALSE, $source
 }
 
 /**
+ * Checks the given form to make sure that the term attach field exists and is 
+ * set up correctly
+ */
+function location_taxonomize_term_attach_check_field($form) {
+  $field_name = 'field_' . LT_TERM_ATTACH_FIELD;
+  // make sure that a field by this name exists
+  if (!isset($form[$field_name])) return FALSE;
+  // make sure that this field has the right settings
+  $field_info = field_info_field($field_name);
+  if ($field_info['deleted'] == 1) return FALSE;
+  if ($field_info['type'] != 'taxonomy_term_reference') return FALSE;
+  if ($field_info['settings']['allowed_values'][0]['vocabulary'] != LT_MODULE_ID) return FALSE;
+  return $field_name;
+}
+
+/**
  * Returns the name of the current source module
  */
 function _location_taxonomize_get_source() {
@@ -266,6 +283,15 @@ function location_taxonomize_enabled() {
   $settings = variable_get('location_taxonomize_settings');
   $vid = variable_get('location_taxonomize_vid');
   $enabled = $settings['enable'] && isset($vid);
+  return $enabled;
+}
+
+/**
+ * Returns whether the term attach option is enabled
+ */
+function location_taxonomize_term_attach_enabled() {
+  $settings = variable_get('location_taxonomize_settings');
+  $enabled = $settings['term_attach'];
   return $enabled;
 }
 

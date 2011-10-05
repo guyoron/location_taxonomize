@@ -103,20 +103,24 @@ function location_taxonomize_initialize($form, $form_state) {
 /**
  * Determines if a location needs to be taxonomized. 
  * If so, it saves the appropriate terms
- * Returns the number of terms added
+ * Returns an array containing two items: the first is the number of new terms
+ * saved, and the second is an array of all the terms that correspond to this
+ * object, including ones that were added and ones that already existed
  * @param $obj - a location object
  */
 function location_taxonomize_process_item($obj) {
+  // make sure we are enabled
+  if (!location_taxonomize_enabled()) return NULL;
   // get settings
   $settings = variable_get('location_taxonomize_settings');
   $vid = variable_get('location_taxonomize_vid');
   $hierarchy = _location_taxonomize_get_hierarchy();
-      // holds the number of newly saved terms
+  // holds the number of newly saved terms
   $saved = 0;
   $tids = array();
   // this loops through hierarchy levels and saves terms if necessary
   for ($hlevel = 0; $hlevel < count($hierarchy); $hlevel++) {
-            $hlevel_name = $hierarchy[$hlevel];
+    $hlevel_name = $hierarchy[$hlevel];
     // set the term name
     $name = _location_taxonomize_create_term_name($hlevel_name, $obj, $settings);
     // find if the term exists already or not
@@ -146,7 +150,7 @@ function location_taxonomize_process_item($obj) {
     }
     elseif ($findterm->tid) $tids[] = $findterm->tid;
   }
-  return $saved;
+  return array('saved' => $saved, 'tids' => $tids);
 }
 
 /**
