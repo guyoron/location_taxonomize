@@ -47,6 +47,24 @@ function location_taxonomize_permission() {
 }
 
 /**
+ * Implements hook_field_attach_form().
+ *   - hides the term reference field if necessary
+ */
+function location_taxonomize_af_field_attach_form($entity_type, $entity, &$form, &$form_state, $langcode) {
+  // get the fields on this form
+  $fields = $form_state['field'];
+  // check if we are configured to hide the field
+  $settings = location_taxonomize_get_settings();
+  if ($settings['hide_terms_field']) {
+    // hide the term references field if it's there
+    $field_name = 'field_' . LT_TERM_ATTACH_FIELD;
+    if (in_array($field_name, array_keys($fields))) {
+      $form[$field_name]['#access'] = FALSE;
+    }
+  }
+}
+
+/**
  * Called from the configuration form. Handles initialization of Location Taxonomy
  */
 function location_taxonomize_initialize($form, $form_state) {

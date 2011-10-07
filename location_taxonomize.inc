@@ -38,6 +38,7 @@ function _location_taxonomize_variables() {
     'location_taxonomize_settings' => array(
       'enable'  => 1,
       'term_attach' => 0,
+      'hide_terms_field' => 0,
       'naming'  => array(
         'country'   => 'name',
         'province'  => 'name',
@@ -293,6 +294,14 @@ function location_taxonomize_term_attach_enabled() {
   $settings = variable_get('location_taxonomize_settings');
   $enabled = $settings['term_attach'];
   return $enabled;
+}
+
+/**
+ * Returns the main settings array for this module
+ */
+function location_taxonomize_get_settings() {
+  $settings = variable_get('location_taxonomize_settings');
+  return $settings;
 }
 
 /**

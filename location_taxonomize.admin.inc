@@ -264,6 +264,14 @@ function location_taxonomize_form($form, &$form_state) {
     '#description'    => t("In order for this to work you must add a field of type Term Reference with the name 'location_taxonomize_terms' to all node types you wish to attach terms to."),
   );
   
+  // options for hiding the term references field
+  $form['location_taxonomize_settings']['hide_terms_field'] = array(
+    '#type'         => 'checkbox',
+    '#title'        => t("Hide the 'location_taxonomize_terms' field on edit forms so that taxonomy terms cannot be assigned manually to it."),
+    '#default_value'  => $opts_settings['hide_terms_field'],
+    '#description'    => t("This is useful if you want the terms to only be attached by Location Taxonomize. Otherwise users could select terms which don't actually correspond to entered locations."),
+  );
+  
   // naming fieldset
   $form['location_taxonomize_settings']['naming'] = array(
     '#type'         => 'fieldset',
