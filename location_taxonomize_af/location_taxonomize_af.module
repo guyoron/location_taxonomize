@@ -89,6 +89,7 @@ function location_taxonomize_af_element_submitted($form, &$form_state) {
   // Act on values
   $fields = $form_state['temporary']['addressfields'];
   $total_saved = 0;
+  $all_tids = array();
   foreach ($fields as $field) {
     $deltas = $form_state['values'][$field][$lang];
     $actual_delta = 0;
@@ -102,13 +103,15 @@ function location_taxonomize_af_element_submitted($form, &$form_state) {
       $delta['country_name'] = location_taxonomize_get_country_name($delta['country']);
       //dpm($delta);
       $results = location_taxonomize_af_process_item($delta);
-      $tids = $results['tids'];
+      $all_tids = array_merge($all_tids, $results['tids']);
       $total_saved += $results['saved'];
-      // attach these terms to the node if that option is enabled
-      if (location_taxonomize_term_attach_enabled()) {
-        location_taxonomize_term_attach($tids, $form, $form_state);
-      }
       $actual_delta++;
+    }
+  }
+  // attach terms to the node if that option is enabled
+  if (!empty($all_tids) && $total_saved != 0) {
+    if (location_taxonomize_term_attach_enabled()) {
+      location_taxonomize_term_attach($all_tids, $form, $form_state);
     }
   }
   $msg = t('Location taxonomize: @num new terms saved', array('@num' => $total_saved));
