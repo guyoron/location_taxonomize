@@ -55,7 +55,10 @@ function location_taxonomize_af_field_widget_addressfield_standard_form_alter(&$
   $taxonomize = $context['instance']['widget']['settings']['location_taxonomize'];
   // add a process function to addressfield widgets
   if ($taxonomize) {
-    $element['#process'][] = 'location_taxonomize_af_process_address';
+    if (!in_array('location_taxonomize_af_process_address', $element['#process'])) {
+      $element['#process'][] = 'location_taxonomize_af_process_address';
+    }
+    dpm($element['#process']);
   }
 }
 
@@ -68,7 +71,9 @@ function location_taxonomize_af_process_address($element, &$form_state, &$form) 
   //dpm('process callback');
   //dpm($element);
   // add a submit handler to forms that have this widget
-  $form['#submit'][] = 'location_taxonomize_af_element_submitted';
+  if (!in_array('location_taxonomize_af_element_submitted', $form['#submit'])) {
+    $form['#submit'][] = 'location_taxonomize_af_element_submitted';
+  }
   // make note that this field needs to be processed in the submit handler
   $form_state['temporary']['addressfields'][] = $element['#field_name'];
   return $element;
@@ -188,7 +193,6 @@ function location_taxonomize_af_bulk_taxonomize_op($form_state, &$context) {
           // Add the country name
           $address['country_name'] = location_taxonomize_get_country_name($address['country']);
           // save contents
-          dd($address);
           $saved += location_taxonomize_process_item($address);
         }
         $i++;

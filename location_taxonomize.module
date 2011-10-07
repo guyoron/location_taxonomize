@@ -214,14 +214,24 @@ function _location_taxonomy_add_longname(&$term, $hlevel, $location) {
       switch ($hlevel_name_lt) {
         case 'country':
           if ($term_hlevel_name_lt == 'country' || $ln_settings['country_naming'] == 'name') {
-            $longname[] = $location[location_taxonomize_source_field_name('country_name')];
+            if (isset($location[location_taxonomize_source_field_name('country_name')])) {
+              $longname[] = $location[location_taxonomize_source_field_name('country_name')];
+            }
+            else {
+              $longname[] = $location[location_taxonomize_source_field_name('country')];
+            }
           }
           elseif ($location[$hlevel_name] == 'us' && $ln_settings['usa']) $longname[] = 'USA';
           else $longname[] = drupal_strtoupper($location[$hlevel_name]);
           break;
         case 'province':
           if ($term_hlevel_name_lt == 'province' || $ln_settings['province_naming'] == 'name') {
-            $longname[] = $location[location_taxonomize_source_field_name('province_name')];
+            if (isset($location[location_taxonomize_source_field_name('province_name')])) {
+              $longname[] = $location[location_taxonomize_source_field_name('province_name')];
+            }
+            else {
+              $longname[] = $location[location_taxonomize_source_field_name('province')];
+            }
           }
           else $longname[] = $location[$hlevel_name];
           break;
