@@ -58,7 +58,6 @@ function location_taxonomize_af_field_widget_addressfield_standard_form_alter(&$
     if (!in_array('location_taxonomize_af_process_address', $element['#process'])) {
       $element['#process'][] = 'location_taxonomize_af_process_address';
     }
-    dpm($element['#process']);
   }
 }
 
@@ -85,11 +84,11 @@ function location_taxonomize_af_process_address($element, &$form_state, &$form) 
  * A submit handler for forms that contain an addressfield
  */
 function location_taxonomize_af_element_submitted($form, &$form_state) {
-  dpm('in submit');
+  //dpm('in submit');
   $lang = 'und';
   // Act on values
   $fields = $form_state['temporary']['addressfields'];
-  dpm($fields);
+  $total_saved = 0;
   foreach ($fields as $field) {
     $deltas = $form_state['values'][$field][$lang];
     $actual_delta = 0;
@@ -102,7 +101,9 @@ function location_taxonomize_af_element_submitted($form, &$form_state) {
       // Add the country name
       $delta['country_name'] = location_taxonomize_get_country_name($delta['country']);
       //dpm($delta);
-      $tids = location_taxonomize_af_process_item($delta);
+      $results = location_taxonomize_af_process_item($delta);
+      $tids = $results['tids'];
+      $total_saved += $results['saved'];
       // attach these terms to the node if that option is enabled
       if (location_taxonomize_term_attach_enabled()) {
         location_taxonomize_term_attach($tids, $form, $form_state);
@@ -110,6 +111,8 @@ function location_taxonomize_af_element_submitted($form, &$form_state) {
       $actual_delta++;
     }
   }
+  $msg = t('Location taxonomize: @num new terms saved', array('@num' => $total_saved));
+  drupal_set_message($msg);
 }
 
 /**
@@ -123,11 +126,7 @@ function location_taxonomize_af_process_item($address) {
   // check module settings
   if (!location_taxonomize_enabled()) return;
   $results = location_taxonomize_process_item($address);
-  $saved = $results['saved'];
-  $tids = $results['tids'];
-  $msg = t('Location taxonomize: @num new terms saved', array('@num' => $saved));
-  drupal_set_message($msg);
-  return $tids;
+  return $results;
 }
 
 /**
