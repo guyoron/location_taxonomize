@@ -75,7 +75,9 @@ function location_taxonomize_af_process_address($element, &$form_state, &$form) 
     $form['#submit'][] = 'location_taxonomize_af_element_submitted';
   }
   // make note that this field needs to be processed in the submit handler
-  $form_state['temporary']['addressfields'][] = $element['#field_name'];
+  if (!isset($form_state['temporary']['addressfields']) || !in_array($element['#field_name'], $form_state['temporary']['addressfields'])) {
+    $form_state['temporary']['addressfields'][] = $element['#field_name'];
+  }
   return $element;
 }
 
@@ -83,9 +85,11 @@ function location_taxonomize_af_process_address($element, &$form_state, &$form) 
  * A submit handler for forms that contain an addressfield
  */
 function location_taxonomize_af_element_submitted($form, &$form_state) {
+  dpm('in submit');
   $lang = 'und';
   // Act on values
   $fields = $form_state['temporary']['addressfields'];
+  dpm($fields);
   foreach ($fields as $field) {
     $deltas = $form_state['values'][$field][$lang];
     $actual_delta = 0;
