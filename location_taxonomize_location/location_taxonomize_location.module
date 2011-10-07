@@ -26,6 +26,7 @@ function location_taxonomize_location_submitt($form, &$form_state) {
   $locations = $form_state['values']['locations'];
   // taxonomize locations
   $saved = 0;
+  $tids = array();
   foreach ($locations as $obj) {
     unset($obj['location_settings']);
     // skip empty locations 
@@ -33,10 +34,12 @@ function location_taxonomize_location_submitt($form, &$form_state) {
       $location = location_taxonomize_location_fixup($obj);
       $results = location_taxonomize_process_item($location);
       $saved += $results['saved'];
-      $tids = $results['tids'];
-      if (location_taxonomize_term_attach_enabled()) {
-        location_taxonomize_term_attach($tids, $form, $form_state);
-      }
+      $tids = array_merge($tids, $results['tids']);
+    }
+  }
+  if (!empty($tids) && $saved != 0) {
+    if (location_taxonomize_term_attach_enabled()) {
+      location_taxonomize_term_attach($tids, $form, $form_state);
     }
   }
   $msg = t('Location taxonomize: @num new terms saved', array('@num' => $saved));
