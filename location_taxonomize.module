@@ -119,6 +119,26 @@ function location_taxonomize_initialize($form, $form_state) {
 }
 
 /**
+ * @param $items - an array of items ready to be taxonomized
+ */
+function location_taxonomize_taxonomize($items, $form, &$form_state) {
+  $saved = 0;
+  $tids = array();
+  foreach ($items as $item) {
+    $results = location_taxonomize_process_item($item);
+    $saved += $results['saved'];
+    $tids = array_merge($tids, $results['tids']);
+  }
+  if (!empty($tids)) {
+    if (location_taxonomize_term_attach_enabled()) {
+      location_taxonomize_term_attach($tids, $form, $form_state);
+    }
+  }
+  $msg = t('Location taxonomize: @num new terms saved', array('@num' => $saved));
+  drupal_set_message($msg);
+}
+
+/**
  * Determines if a location needs to be taxonomized. 
  * If so, it saves the appropriate terms
  * Returns an array containing two items: the first is the number of new terms

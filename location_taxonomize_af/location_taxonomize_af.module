@@ -15,7 +15,6 @@ require_once('location_taxonomize_af.inc');
  * determines whether the field is taxonomized
  */
 function location_taxonomize_af_field_widget_info_alter(&$info) {
-  //dpm('1');
   // Add a setting to a widget type.
   $info['addressfield_standard']['settings'] += array(
     'location_taxonomize' => 0,
@@ -29,10 +28,8 @@ function location_taxonomize_af_field_widget_info_alter(&$info) {
  * 
  */
 function location_taxonomize_af_form_field_ui_field_edit_form_alter(&$form, $form_state, $form_id) {
-  //dpm('2');
   if ($form['#field']['type'] != 'addressfield') return;
   $settings = $form['#instance']['widget']['settings'];
-  //dpm($settings);
   $enable = array(
     '#type'           => 'checkbox',
     '#title'          => t('Taxonomize locations from this field using Location Taxonomize'),
@@ -67,12 +64,11 @@ function location_taxonomize_af_field_widget_addressfield_standard_form_alter(&$
  * callback to the form that will handle the processing.
  */
 function location_taxonomize_af_process_address($element, &$form_state, &$form) {
-  //dpm('process callback');
-  //dpm($element);
   // add a submit handler to forms that have this widget
   if (!in_array('location_taxonomize_af_element_submitted', $form['#submit'])) {
     $form['#submit'][] = 'location_taxonomize_af_element_submitted';
   }
+  
   // make note that this field needs to be processed in the submit handler
   if (!isset($form_state['temporary']['addressfields']) || !in_array($element['#field_name'], $form_state['temporary']['addressfields'])) {
     $form_state['temporary']['addressfields'][] = $element['#field_name'];
@@ -88,8 +84,7 @@ function location_taxonomize_af_element_submitted($form, &$form_state) {
   $lang = 'und';
   // Act on values
   $fields = $form_state['temporary']['addressfields'];
-  $total_saved = 0;
-  $all_tids = array();
+  $items = array();
   foreach ($fields as $field) {
     $deltas = $form_state['values'][$field][$lang];
     $actual_delta = 0;
@@ -101,35 +96,14 @@ function location_taxonomize_af_element_submitted($form, &$form_state) {
        }
       // Add the country name
       $delta['country_name'] = location_taxonomize_get_country_name($delta['country']);
-      //dpm($delta);
-      $results = location_taxonomize_af_process_item($delta);
-      $all_tids = array_merge($all_tids, $results['tids']);
-      $total_saved += $results['saved'];
+      $items[] = $delta;
       $actual_delta++;
     }
   }
-  // attach terms to the node if that option is enabled
-  if (!empty($all_tids) && $total_saved != 0) {
-    if (location_taxonomize_term_attach_enabled()) {
-      location_taxonomize_term_attach($all_tids, $form, $form_state);
-    }
+  // taxonomize
+  if (!empty($items)) {
+    location_taxonomize_taxonomize($items, $form, $form_state);
   }
-  $msg = t('Location taxonomize: @num new terms saved', array('@num' => $total_saved));
-  drupal_set_message($msg);
-}
-
-/**
- * Central function that processes an addressfield item and sends it to 
- * Location Taxonomize to be saved into the taxonomy
- * Returns an array with the tids of the terms related to this address
- */
-function location_taxonomize_af_process_item($address) {
-  //dpm('processing address');
-  //dpm($address);
-  // check module settings
-  if (!location_taxonomize_enabled()) return;
-  $results = location_taxonomize_process_item($address);
-  return $results;
 }
 
 /**

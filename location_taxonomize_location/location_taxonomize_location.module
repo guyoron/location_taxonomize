@@ -25,25 +25,18 @@ function location_taxonomize_location_submitt($form, &$form_state) {
   // get the location values from the form
   $locations = $form_state['values']['locations'];
   // taxonomize locations
-  $saved = 0;
-  $tids = array();
+  $items = array();
   foreach ($locations as $obj) {
     unset($obj['location_settings']);
     // skip empty locations 
     if (!location_taxonomize_location_location_empty($obj)) {
       $location = location_taxonomize_location_fixup($obj);
-      $results = location_taxonomize_process_item($location);
-      $saved += $results['saved'];
-      $tids = array_merge($tids, $results['tids']);
+      $items[] = $location;
     }
   }
-  if (!empty($tids) && $saved != 0) {
-    if (location_taxonomize_term_attach_enabled()) {
-      location_taxonomize_term_attach($tids, $form, $form_state);
-    }
+  if (!empty($items)) {
+    location_taxonomize_taxonomize($items, $form, $form_state);
   }
-  $msg = t('Location taxonomize: @num new terms saved', array('@num' => $saved));
-  drupal_set_message($msg);
 }
 
 /**
