@@ -87,7 +87,7 @@ function location_taxonomize_form($form, &$form_state) {
     // Stop the form here
     $form = system_settings_form($form);
     $form['actions']['submit']['#value'] = t('Initialize Location Taxonomy');
-    $form['#submit'][] = 'location_taxonomize_initialize';
+    $form['actions']['submit']['#disabled'] = TRUE;
     return $form;
   }
   if ($initialized) {
@@ -144,9 +144,6 @@ function location_taxonomize_form($form, &$form_state) {
   $source_settings = _location_taxonomize_get_source_settings($source);
   // Hierarchy selection
 
-  //dd($source);
-  //dd(_location_taxonomize_get_fields(TRUE, TRUE, $source));
-  //dd($source_settings['fields']);
   $form['location_taxonomize_vocab']['hierarchy'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Location Taxonomy Hierarchy'),
@@ -442,7 +439,6 @@ function location_taxonomize_form($form, &$form_state) {
 }
 
 function location_taxonomize_source_ajax_callback($form, &$form_state) {
-  //dpm('ajax callback');
   return $form['location_taxonomize_vocab']['hierarchy'];
 }
 

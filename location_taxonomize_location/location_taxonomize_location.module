@@ -9,6 +9,9 @@
 
 require_once('location_taxonomize_location.inc');
 
+/** 
+ * Implements hook_form_alter().
+ */
 function location_taxonomize_form_alter(&$form, &$form_state, $form_id) {
   // check if there is a location fieldset on this form
   if (isset($form['locations']) && $form['#node_edit_form'] == TRUE) {
@@ -17,6 +20,9 @@ function location_taxonomize_form_alter(&$form, &$form_state, $form_id) {
   }
 }
 
+/**
+ * Submit handler for forms with Location fields in them
+ */
 function location_taxonomize_location_submitt($form, &$form_state) {
   // check if this module is enabled as the current source
   if (_location_taxonomize_get_source() != LT_LOC_MODULE_ID) return;

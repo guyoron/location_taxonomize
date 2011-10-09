@@ -38,3 +38,21 @@ function location_taxonomize_uninstall() {
   // delete all variables set by this module
   _location_taxonomize_del_variables();
 }
+
+/**
+ * Reinitialize variables for the 2.x branch
+ */
+function location_taxonomize_update_7200() {
+  $settings = variable_get('location_taxonomize_vocab');
+  if (!isset($settings['hierarchy'])) {
+    // remove all previously set variables
+    variable_del('location_taxonomize_vid');
+    variable_del('location_taxonomize_vocab');
+    variable_del('location_taxonomize_settings');
+    // reinitialize variables
+    _location_taxonomize_set_defaults();
+  }
+}
+
+
+
