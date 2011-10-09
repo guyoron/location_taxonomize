@@ -23,7 +23,7 @@ that vocabulary with data from the Location module. To set up:
 2. Navigate to the configuration page (admin/config/location_taxonomize)
 3. You will first need to initialize your Location Vocabulary:
 4. Choose a source module: either Location or Address Field.
-4. Choose an initialization method. You have two choices:
+5. Choose an initialization method. You have two choices:
     A)  Create a new Location Vocabulary. If you choose this, a new vocabulary will be
         created for you, with the name 'location_taxonomize', and this vocabulary will
         be associated with Location taxonomize.
@@ -33,7 +33,7 @@ that vocabulary with data from the Location module. To set up:
         will be associated with Location taxonomize, and new data will be added to the existing
         terms. (NOTE that the hierarchy structure of your vocabulary should match the one you
         choose in the next step)
-5. Choose a hierarchy structure. This will determine how terms are saved in your Location
+6. Choose a hierarchy structure. This will determine how terms are saved in your Location
    vocabulary. A few fields are available for you to choose from, and only the ones you choose
    will be saved as terms. The terms will be saved in the order shown. The first field you choose in
    the list will describe the top-level terms of your vocabulary, and the next terms will be children
@@ -41,8 +41,8 @@ that vocabulary with data from the Location module. To set up:
    simply select those fields.
    NOTE that you cannot change this after you initialize. However, you can always disassociate the
    vocabulary from Location taxonomize, and re-initialize it with different settings.
-6. Initialize your Location vocabulary.
-7. Your vocabulary is now set up and active. Now you should see more options:
+7. Initialize your Location vocabulary.
+8. Your vocabulary is now set up and active. Now you should see more options:
 
 OPERATIONS
 Gives you tools to:
