@@ -18,9 +18,11 @@ Usage Instructions
 Location taxonomize will "associate" itself with one vocabulary you choose, and fill
 that vocabulary with data from the Location module. To set up:
 
-1. Install the module as you would any Drupal module
+1. Install the module as you would any Drupal module. Install also at least one of the source
+   modules to enable integration with either Location or Address Field
 2. Navigate to the configuration page (admin/config/location_taxonomize)
-3. You will first need to initialize your Location Vocabulary.
+3. You will first need to initialize your Location Vocabulary:
+4. Choose a source module: either Location or Address Field.
 4. Choose an initialization method. You have two choices:
     A)  Create a new Location Vocabulary. If you choose this, a new vocabulary will be
         created for you, with the name 'location_taxonomize', and this vocabulary will
@@ -55,4 +57,6 @@ Gives you tools to:
 SETTINGS
 - Turn on or off synchronizing with Location data
 - Change the way terms are named when they are saved
+- Attach terms: if you select this and provide a term reference field on nodes you use with this module,
+  the terms created for the locations will then be attached back to the node.
 - Add a Long Name field to the term. This is used to save a field with a value like "San Francisco, CA, USA"
