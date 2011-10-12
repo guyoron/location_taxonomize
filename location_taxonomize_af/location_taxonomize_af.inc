@@ -46,7 +46,6 @@ function location_taxonomize_af_get_fields($assoc = TRUE, $labels = FALSE) {
     if ($field != 'name_line' &&
         $field != 'first_name' &&
         $field != 'last_name' &&
-        $field != 'organisation_name' &&
         $field != 'premise'
     ) {
       if ($assoc) {
