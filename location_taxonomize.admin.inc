@@ -10,6 +10,7 @@
  * Location Taxonomize administration form
  */
 function location_taxonomize_form($form, &$form_state) {
+  dpm(_location_taxonomize_get_hierarchy());
   $opts_vocab = variable_get('location_taxonomize_vocab');
   // check if there is already a source selected in form_state
   if (!empty($form_state['values']['location_taxonomize_vocab']['source'])) {

@@ -55,6 +55,9 @@ function location_taxonomize_af_get_fields($assoc = TRUE, $labels = FALSE) {
       else $return[] = $field;
     }
   }
+  // reorder a bit
+  $company = array_splice($return, 1, 1);
+  array_splice($return, 6, 0, $company);
   return $return;
 }
 
