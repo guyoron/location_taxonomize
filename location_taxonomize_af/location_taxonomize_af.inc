@@ -40,24 +40,26 @@ function location_taxonomize_af_get_fields($assoc = TRUE, $labels = FALSE) {
   foreach($fields as $key => $value) {
     $fields[$key] = $value['label'];
   }
+  // define the fields we support and their order
+  $supported = array(
+    'country',
+    'administrative_area',
+    'sub_administrative_area',
+    'locality',
+    'dependent_locality',
+    'postal_code',
+    'organisation_name',
+    'thoroughfare',
+  );
   $return = array();
   // remove unsupported fields
-  foreach ($fields as $field => $value) {
-    if ($field != 'name_line' &&
-        $field != 'first_name' &&
-        $field != 'last_name' &&
-        $field != 'premise'
-    ) {
-      if ($assoc) {
-        if ($labels) $return[$field] = $value;
-        else $return[$field] = $field;
-      }
-      else $return[] = $field;
+  foreach ($supported as $field) {
+    if ($assoc) {
+      if ($labels) $return[$field] = $fields[$field];
+      else $return[$field] = $field;
     }
+    else $return[] = $field;
   }
-  // reorder a bit
-  $company = array_splice($return, 1, 1);
-  array_splice($return, 6, 0, $company);
   return $return;
 }
 
