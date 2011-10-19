@@ -20,7 +20,7 @@ that vocabulary with data from the Location module. To set up:
 
 1. Install the module as you would any Drupal module. Install also at least one of the source
    modules to enable integration with either Location or Address Field
-2. Navigate to the configuration page (admin/config/location_taxonomize)
+2. Navigate to the configuration page (admin/config/content/location_taxonomize)
 3. You will first need to initialize your Location Vocabulary:
 4. Choose a source module: either Location or Address Field.
 5. Choose an initialization method. You have two choices:
