@@ -178,7 +178,9 @@ function location_taxonomize_af_bulk_taxonomize_op($form_state, &$context) {
         }
         $i++;
         array_shift($context['sandbox']['fields'][$nid]);
-        if ($i > $limit) break;
+        if (empty($context['sandbox']['fields'][$nid])) {
+          unset($context['sandbox']['fields'][$nid]);
+        }
       }
       if ($i > $limit) break;
     }
