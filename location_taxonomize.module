@@ -139,6 +139,25 @@ function location_taxonomize_taxonomize($items, $form, &$form_state) {
   }
   $msg = t('Location taxonomize: @num new terms saved', array('@num' => $saved));
   drupal_set_message($msg);
+  return array("saved" => $saved, "tids" => $tids);
+}
+
+function location_taxonomize_taxonomize_bulk($items) {
+  $saved = 0;
+  foreach ($items as $nid => $items) {
+    $tids = array();
+    foreach ($items as $item) {
+      $results = location_taxonomize_process_item($item);
+      $saved += $results['saved'];
+      $tids = array_merge($tids, $results['tids']);
+    }
+    if (!empty($tids)) {
+      if (location_taxonomize_term_attach_enabled()) {
+        location_taxonomize_term_attach_bulk($tids, $nid);
+      }
+    }
+  }
+  return array("saved" => $saved);
 }
 
 /**
@@ -360,6 +379,20 @@ function location_taxonomize_term_attach($tids, $form, &$form_state) {
   foreach ($tids as $tid) {
     $form_state['values'][$field][$lang][]['tid'] = $tid;
   }
+}
+
+function location_taxonomize_term_attach_bulk($tids, $nid) {
+  $langcode = 'und';
+  // load the node
+  $node = node_load($nid);
+  if (!isset($node->field_location_taxonomize_terms)) return;
+  $tids = array_unique($tids);
+  $save = array();
+  foreach ($tids as $tid) {
+    $save[$langcode][]['tid'] = $tid;
+  }
+  $node->field_location_taxonomize_terms = $save;
+  node_save($node);
 }
 
 ////////////////////////////////////////

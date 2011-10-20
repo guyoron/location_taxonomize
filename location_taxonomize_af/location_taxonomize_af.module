@@ -158,12 +158,14 @@ function location_taxonomize_af_bulk_taxonomize_op($form_state, &$context) {
     $context['results']['added'] = 0;
     $context['results']['processed'] = 0;
     $context['sandbox']['fields'] = $final;
+    if ($count == 0) return;
   }
   // maximum 10 addresses per function iteration
   $limit = 10;
   // iterate through the next group of addresses
   $i = 0;
   $saved = 0;
+  $taxonomize = array();
   if (!empty($context['sandbox']['fields'])) {
     foreach ($context['sandbox']['fields'] as $nid => $fields) {
       $node = node_load($nid);
@@ -172,15 +174,17 @@ function location_taxonomize_af_bulk_taxonomize_op($form_state, &$context) {
         foreach ($items as $address) {
           // Add the country name
           $address['country_name'] = location_taxonomize_get_country_name($address['country']);
-          // save contents
-          $saved += location_taxonomize_process_item($address);
+          $taxonomize[$nid][] = $address;
         }
         $i++;
+        array_shift($context['sandbox']['fields'][$nid]);
         if ($i > $limit) break;
-        unset($context['sandbox']['fields'][$nid][$field]);
       }
       if ($i > $limit) break;
     }
+    // taxonomize
+    $results = location_taxonomize_taxonomize_bulk($taxonomize);
+    $saved = $results['saved'];
   }
 
   $added = $saved;
