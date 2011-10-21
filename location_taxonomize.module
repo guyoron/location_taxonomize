@@ -376,6 +376,7 @@ function location_taxonomize_term_attach($tids, $form, &$form_state) {
   $form_state['values'][$field][$lang] = array();
   
   // add the values
+  $tids = array_unique($tids);
   foreach ($tids as $tid) {
     $form_state['values'][$field][$lang][]['tid'] = $tid;
   }
