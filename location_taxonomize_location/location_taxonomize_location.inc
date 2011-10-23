@@ -81,8 +81,12 @@ function _location_taxonomize_location_del_variables() {
  * Adds the country name and province name fields to a Location
  */
 function location_taxonomize_location_fixup($loc) {
-  $loc['country_name'] = location_country_name($loc['country']);
-  $loc['province_name'] = location_province_name($loc['country'], $loc['province']);
+  if (isset($loc['country'])) {
+    $loc['country_name'] = location_country_name($loc['country']);
+    if (isset($loc['province'])) {
+      $loc['province_name'] = location_province_name($loc['country'], $loc['province']);
+    }
+  }
   return $loc;
 }
 
