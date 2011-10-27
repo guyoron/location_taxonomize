@@ -363,6 +363,14 @@ function location_taxonomize_form($form, &$form_state) {
     ),
   );
 
+  // option to use the longname value as the term name
+  $form['location_taxonomize_settings']['longname']['main'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Save the Long Name as the term name'),
+    '#description' => t('If this is checked, the naming preferences above are disregarded and the Long Name is used as the term name. If this is not checked, the Long Name is saved in its own field.'),
+    '#default_value' => $opts_settings['longname']['main'],
+  );
+
   // choose fields to use for Full Name field
   $form['location_taxonomize_settings']['longname']['fields'] = array(
     '#type' => 'checkboxes',

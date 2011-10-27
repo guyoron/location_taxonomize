@@ -175,6 +175,7 @@ function location_taxonomize_process_item($obj) {
   $settings = variable_get('location_taxonomize_settings');
   $vid = variable_get('location_taxonomize_vid');
   $hierarchy = _location_taxonomize_get_hierarchy();
+  $longname_main = $settings['longname_enable'] && $settings['longname']['main'];
   // holds the number of newly saved terms
   $saved = 0;
   $tids = array();
@@ -182,7 +183,12 @@ function location_taxonomize_process_item($obj) {
   for ($hlevel = 0; $hlevel < count($hierarchy); $hlevel++) {
     $hlevel_name = $hierarchy[$hlevel];
     // set the term name
-    $name = _location_taxonomize_create_term_name($hlevel_name, $obj, $settings);
+    if ($longname_main) {
+      $name = location_taxonomize_make_longname($hlevel, $obj);
+      $longname = $name;
+    } else {
+      $name = _location_taxonomize_create_term_name($hlevel_name, $obj, $settings);
+    }
     // find if the term exists already or not
     if ($hlevel == 0) $parentid = -1;
     else $parentid = $tids[$hlevel-1];
@@ -195,7 +201,12 @@ function location_taxonomize_process_item($obj) {
       );
       // add longname if necessary
       if ($settings['longname_enable']) {
-        _location_taxonomy_add_longname($term, $hlevel, $obj);
+        if ($longname) {
+          _location_taxonomy_add_longname($term, $hlevel, $obj, $longname);
+        }
+        else {
+          _location_taxonomy_add_longname($term, $hlevel, $obj);
+        }
       }
       // set term parent
       if ($hlevel == 0) {
@@ -252,7 +263,15 @@ function _find_term($name, $hlevel, $parentid) {
 /**
  * Adds a longname field to a term
  */
-function _location_taxonomy_add_longname(&$term, $hlevel, $location) {
+function _location_taxonomy_add_longname(&$term, $hlevel, $location, $longname = NULL) {
+  if ($longname == NULL) {
+    $longname = location_taxonomize_make_longname($hlevel, $location);
+  }
+  // add the longname to the term
+  $term->location_taxonomize_longname['und'][0]['value'] = $longname;
+}
+
+function location_taxonomize_make_longname($hlevel, $location) {
   // get settings
   $settings = variable_get('location_taxonomize_settings');
   $ln_settings = $settings['longname'];
@@ -311,10 +330,8 @@ function _location_taxonomy_add_longname(&$term, $hlevel, $location) {
       $longname_str .= check_plain($ln_settings['separator']) . ' ';
     }
   }
-  // add the longname to the term
-  $term->location_taxonomize_longname['und'][0]['value'] = $longname_str;
+  return $longname_str;
 }
-
 /**
  * Helper function to create the name for a term to be saved, considering
  * all the config options

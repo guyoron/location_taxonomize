@@ -47,6 +47,7 @@ function _location_taxonomize_variables() {
       'na_text'         => 'Unknown',
       'longname_enable' => 0,
       'longname'        => array(
+        'main'            => 0,
         // this is set by the initialization process
         'fields'          => NULL,
         'separator'       => ',',
