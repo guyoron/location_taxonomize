@@ -200,13 +200,8 @@ function location_taxonomize_process_item($obj) {
         'vid' => $vid,
       );
       // add longname if necessary
-      if ($settings['longname_enable']) {
-        if ($longname) {
-          _location_taxonomy_add_longname($term, $hlevel, $obj, $longname);
-        }
-        else {
+      if ($settings['longname_enable'] && !$longname_main) {
           _location_taxonomy_add_longname($term, $hlevel, $obj);
-        }
       }
       // set term parent
       if ($hlevel == 0) {
