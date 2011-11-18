@@ -20,7 +20,7 @@ function location_taxonomize_form($form, &$form_state) {
   else $source = $opts_vocab['source'];
   $vid = variable_get('location_taxonomize_vid');
   $initialized = !empty($vid);
-  
+
   // Vocab Info Fieldset
   $form['location_taxonomize_vocab'] = array(
     '#type' => 'fieldset',

@@ -348,12 +348,15 @@ function _location_taxonomize_create_term_name($hlevel_name, &$location, &$setti
       else $name = drupal_strtoupper($location[$hlevel_name]);
       break;
     case 'province':
+      $us_states = location_taxonomize_us_states();
       if (empty($location[$hlevel_name])) {
         $name = $settings['na_text'];
       }
       elseif ($settings['naming']['province'] == 'name') {
         if (!empty($location[location_taxonomize_source_field_name('province_name')])) {
           $name = $location[location_taxonomize_source_field_name('province_name')];
+        } else if (isset($us_states[strtoupper($location[$hlevel_name])])) {
+          $name = $us_states[strtoupper($location[$hlevel_name])];
         }
         else $name= $location[$hlevel_name];
       }

@@ -54,5 +54,16 @@ function location_taxonomize_update_7200() {
   }
 }
 
-
+/**
+ * Implements hook_update_n().
+ */
+function location_taxonomize_update_7201() {
+  // add the 'longname main' settings variable
+  $settings = variable_get('location_taxonomize_settings');
+  if (!isset($settings['longname']['main'])) {
+    // remove all previously set variables
+    $settings['longname']['main'] = 0;
+    variable_set('location_taxonomize_settings', $settings);
+  }
+}
 
