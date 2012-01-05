@@ -42,7 +42,10 @@ that vocabulary with data from the Location module. To set up:
    NOTE that you cannot change this after you initialize. However, you can always disassociate the
    vocabulary from Location taxonomize, and re-initialize it with different settings.
 7. Initialize your Location vocabulary.
-8. Your vocabulary is now set up and active. Now you should see more options:
+8. If you chose to integrate with Address Field, note that you must enable the "Taxonomize locations
+   from this field using Location Taxonomize." option for each field you want to taxonomize in that
+   field's settings.
+9. Your vocabulary is now set up and active. Now you should see more options:
 
 OPERATIONS
 Gives you tools to:
