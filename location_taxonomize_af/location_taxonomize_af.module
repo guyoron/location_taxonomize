@@ -66,7 +66,7 @@ function location_taxonomize_af_field_widget_addressfield_standard_form_alter(&$
 function location_taxonomize_af_process_address($element, &$form_state, &$form) {
   // add a submit handler to forms that have this widget
   if (!in_array('location_taxonomize_af_element_submitted', $form['#submit'])) {
-    $form['#submit'][] = 'location_taxonomize_af_element_submitted';
+    array_unshift($form['#submit'], 'location_taxonomize_af_element_submitted');
   }
   
   // make note that this field needs to be processed in the submit handler
