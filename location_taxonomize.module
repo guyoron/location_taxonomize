@@ -50,7 +50,7 @@ function location_taxonomize_permission() {
  * Implements hook_field_attach_form().
  *   - hides the term reference field if necessary
  */
-function location_taxonomize_af_field_attach_form($entity_type, $entity, &$form, &$form_state, $langcode) {
+function location_taxonomize_field_attach_form($entity_type, $entity, &$form, &$form_state, $langcode) {
   // get the fields on this form, or quit if there are none
   if (isset($form_state['field'])) {
     $fields = $form_state['field'];
