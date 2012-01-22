@@ -43,7 +43,6 @@ function location_taxonomize_af_form_field_ui_field_edit_form_alter(&$form, $for
  * Here we add a process callback for every widget that is set to be taxonomized
  */
 function location_taxonomize_af_field_widget_addressfield_standard_form_alter(&$element, &$form_state, $context) {
-  //dpm('widget form alter');
   // check if this module is enabled as the current source
   if (_location_taxonomize_get_source() != LT_AF_MODULE_ID) return;
   // apply this only if we are on a node-edit form
@@ -80,7 +79,6 @@ function location_taxonomize_af_process_address($element, &$form_state, &$form) 
  * A submit handler for forms that contain an addressfield
  */
 function location_taxonomize_af_element_submitted($form, &$form_state) {
-  //dpm('in submit');
   $lang = 'und';
   // Act on values
   $fields = $form_state['temporary']['addressfields'];
