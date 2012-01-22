@@ -50,6 +50,7 @@ function location_taxonomize_af_get_fields($assoc = TRUE, $labels = FALSE) {
     'postal_code',
     'organisation_name',
     'thoroughfare',
+    'premise',
   );
   $return = array();
   // remove unsupported fields
