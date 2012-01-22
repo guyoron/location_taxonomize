@@ -10,6 +10,15 @@
 require_once('location_taxonomize_af.inc');
 
 /**
+ * Register this module as a source module for Location Taxonomize
+ */
+function location_taxonomize_af_location_taxonomize_source() {
+  return array(
+   'location_taxonomize_af' => 'Address Field', 
+  );
+}
+
+/**
  * Implements hook_field_widget_info_alter().
  * This is used to add a setting to the addressfield widget type that
  * determines whether the field is taxonomized

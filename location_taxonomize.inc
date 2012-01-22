@@ -119,10 +119,9 @@ function _location_taxonomize_init_var_longname() {
  * Returns an array indicating which of the possible Source modules are installed
  */
 function location_taxonomize_get_sources() {
-  $possibilities = array(
-    'location_taxonomize_location' => 'Location',
-    'location_taxonomize_af' => 'Address Field'
-  );
+  // Get source modules
+  $possibilities = module_invoke_all('location_taxonomize_source');
+  
   $available = array();
   foreach ($possibilities as $module => $name) {
     if (module_exists($module)) {

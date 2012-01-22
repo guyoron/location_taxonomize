@@ -9,6 +9,15 @@
 
 require_once('location_taxonomize_location.inc');
 
+/**
+ * Register this module as a source module for Location Taxonomize
+ */
+function location_taxonomize_location_location_taxonomize_source() {
+  return array(
+   'location_taxonomize_location' => 'Location', 
+  );
+}
+
 /** 
  * Implements hook_form_alter().
  */
