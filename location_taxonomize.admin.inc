@@ -257,7 +257,7 @@ function location_taxonomize_form($form, &$form_state) {
     '#type'         => 'checkbox',
     '#title'        => t('Also attach Location Taxonomy terms to nodes with those locations'),
     '#default_value'  => $opts_settings['term_attach'],
-    '#description'    => t("In order for this to work you must add a field of type Term Reference with the name 'location_taxonomize_terms' to all node types you wish to attach terms to."),
+    '#description'    => t("In order for this to work you must add a field of type Term Reference with the name 'location_taxonomize_terms' to all node types you wish to attach terms to. If this field allows only one value, only the 'lowest' term in the hierarchy will be attached. If you want all terms to attach, set the field to allow multiple values."),
   );
   
   // options for hiding the term references field

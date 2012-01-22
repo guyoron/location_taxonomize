@@ -402,6 +402,10 @@ function location_taxonomize_term_attach_bulk($tids, $nid) {
   // load the node
   $node = node_load($nid);
   if (!isset($node->field_location_taxonomize_terms)) return;
+  
+  // Reverse the order to assign the lowest term in the hierarchy first
+  $tids = array_reverse($tids);
+  
   $tids = array_unique($tids);
   $save = array();
   foreach ($tids as $tid) {
