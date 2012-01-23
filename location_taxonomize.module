@@ -390,6 +390,9 @@ function location_taxonomize_term_attach($tids, $form, &$form_state) {
   // empty the currently set values
   $form_state['values'][$field][$lang] = array();
   
+  // Reverse the order to assign the lowest term in the hierarchy first
+  $tids = array_reverse($tids);
+  
   // add the values
   $tids = array_unique($tids);
   foreach ($tids as $tid) {
