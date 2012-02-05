@@ -1,6 +1,7 @@
 name = Location taxonomize
 description = Creates and maintains a Location taxonomy, synchronized with data from the Location module.
 core = 7.x
+configure = admin/config/content/location_taxonomize
 
 dependencies[] = taxonomy
 
