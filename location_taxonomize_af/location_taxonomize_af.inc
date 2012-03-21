@@ -12,9 +12,19 @@ define('LT_AF_MODULE_NAME', 'Location Taxonomize Address Field');
 /**
  * Keeps a list of all the variables maintained by this module, with their
  * default values.
+ *
+ * @param $fields
+ *  A boolean indicating whether to actually load the hierarchy fields variable.
+ *  This is made FALSE for variable deletion, for example, when the actual fields
+ *  subarray is not important and does not need to be calculated.
  */
-function _location_taxonomize_af_variables() {
-  $fields = location_taxonomize_af_get_fields(TRUE);
+function _location_taxonomize_af_variables($include_fields = TRUE) {
+  if ($include_fields) {
+    $fields = location_taxonomize_af_get_fields(TRUE);
+  }
+  else {
+    $fields = array();
+  }
   // set field defaults
   foreach ($fields as $key => $value) {
     if ($key != 'country' && $key != 'administrative_area' && $key != 'locality') {
@@ -79,7 +89,7 @@ function _location_taxonomize_af_set_defaults() {
  * Deletes all variables set by this module
  */
 function _location_taxonomize_af_del_variables() {
-  $vars = _location_taxonomize_af_variables();
+  $vars = _location_taxonomize_af_variables(FALSE);
   foreach ($vars as $key => $value) {
     variable_del($key);
   }
