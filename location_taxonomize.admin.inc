@@ -246,10 +246,9 @@ function location_taxonomize_form($form, &$form_state) {
   // option to enable or disable synchronization
   $form['location_taxonomize_settings']['enable'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Synchronize the Location Taxonomy with data from 
-                  the Location module'),
+    '#title' => t("Synchronize the Location Taxonomy with location data as soon as it's submitted."),
     '#default_value' => $opts_settings['enable'],
-    '#description' => t('Turn on or off the main functionality of this module.'),
+    '#description' => t("Turn on or off the main functionality of this module. You can achieve the same functiuonality without this checked using the 'Bulk Taxonomize' Feature"),
   );
   
   // Term Attach feature
