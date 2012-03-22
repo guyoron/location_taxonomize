@@ -68,7 +68,7 @@ function location_taxonomize_field_attach_form($entity_type, $entity, &$form, &$
 }
 
 /**
- * Called from the configuration form. Handles initialization of Location Taxonomy
+ * Submit callback for the initialization config form. Handles initialization of Location Taxonomy.
  */
 function location_taxonomize_initialize($form, $form_state) {
   $values_init = $form_state['values']['location_taxonomize_vocab'];
@@ -118,6 +118,13 @@ function location_taxonomize_initialize($form, $form_state) {
   }
   // set defaults for longname fields
   _location_taxonomize_init_var_longname();
+  // Allow modules to hook into the initialization process.
+  $settings = array(
+    'source' => $values_init['source'],
+    'method' => $values_init['method'],
+    'hierarchy' => $values_init['hierarchy'],
+  );
+  module_invoke_all('location_taxonomize_initialize', $settings);
   drupal_set_message(t('Location Taxonomize initialized successfully'));
 }
 

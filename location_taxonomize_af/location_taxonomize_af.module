@@ -19,6 +19,16 @@ function location_taxonomize_af_location_taxonomize_source() {
 }
 
 /**
+ * Implements hook_location_taxonomize_initialize().
+ */
+function location_taxonomize_af_location_taxonomize_initialize($settings) {
+  // Show a message making it clear that the field-specific enable checkbox needs to be selected.
+  if ($settings['source'] == 'location_taxonomize_af') {
+    drupal_set_message(t("NOTE: In order to actually taxonomize data from Address Field fields, you must also edit the individual fields and enable the 'Taxonomize locations from this field' checkbox."), 'warning');
+  }
+}
+
+/**
  * Implements hook_field_widget_info_alter().
  * This is used to add a setting to the addressfield widget type that
  * determines whether the field is taxonomized
