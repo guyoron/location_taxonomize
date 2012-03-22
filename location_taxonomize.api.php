@@ -11,6 +11,19 @@
 */
 
 /**
+ * Allows to register a module as a source module for Location Taxonomize.
+ *
+ * @return
+ *  Array of source modules, like [module machine name] => [name to appear in UI].
+ */
+function hook_location_taxonomize_source() {
+  // Add the module called 'location_taxonomize_af' as a source module.
+  return array(
+   'location_taxonomize_af' => 'Address Field', 
+  );
+}
+
+/**
  * Act during the Location Taxonomize initialization process.
  *
  * This is called during location_taxonomize_initialize, which is called after
