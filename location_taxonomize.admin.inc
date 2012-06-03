@@ -441,6 +441,16 @@ function location_taxonomize_form($form, &$form_state) {
     $form['location_taxonomize_settings']['longname']['province_naming']['#disabled'] = TRUE;
     $form['location_taxonomize_settings']['longname']['province_naming']['#description'] = t('These options are disabled because no Province field is included in your hierarchy');
   }
+
+  // Setting to show confirmation messages
+  $form['location_taxonomize_show_messages'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show confirmation messages when taxonomizing'),
+    '#default_value' => variable_get('location_taxonomize_show_messages', 1),
+    '#description' => t('Uncheck this to turn off messages that are shown when locations are taxonomized and terms are saved, like "X terms saved to the location vocabulary."'),
+    
+  );
+  
   return system_settings_form($form);
 }
 

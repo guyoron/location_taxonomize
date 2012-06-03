@@ -144,8 +144,10 @@ function location_taxonomize_taxonomize($items, $form, &$form_state) {
       location_taxonomize_term_attach($tids, $form, $form_state);
     }
   }
-  $msg = t('Location taxonomize: @num new terms saved', array('@num' => $saved));
-  drupal_set_message($msg);
+  if (variable_get('location_taxonomize_show_messages', 1)) {
+    $msg = t('Location taxonomize: @num new terms saved', array('@num' => $saved));
+    drupal_set_message($msg);
+  }
   return array("saved" => $saved, "tids" => $tids);
 }
 
@@ -256,9 +258,11 @@ function _find_term($name, $hlevel, $parentid) {
     return FALSE;
   }
   // if we get here, there was more than one term that matched exactly
-  $msg = t("Location taxonomize couldn't save a term because its hierarchy
+  if (variable_get('location_taxonomize_show_messages', 1)) {
+    $msg = t("Location taxonomize couldn't save a term because its hierarchy
           location was ambiguous.");
-  drupal_set_message($msg);
+    drupal_set_message($msg);
+  }
   return TRUE;
 }
 

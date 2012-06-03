@@ -56,6 +56,7 @@ function _location_taxonomize_variables() {
         'usa' => 1,
       ),
     ),
+    'location_taxonomize_show_messages' => 1,
   );
 }
 
